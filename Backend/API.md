@@ -20,7 +20,7 @@ return type
 |----------|---------|
 | id       | number  |
 | login    | string  |
-| admin | boolean | 
+| isAdmin  | boolean | 
 
 ### Login 
 post: /login
@@ -36,7 +36,7 @@ return type
 |----------|---------|
 | id       | number  |
 | login    | string  |
-| admin | boolean | 
+| isAdmin  | boolean | 
 
 ### Logout 
 delete: /logout
@@ -81,7 +81,7 @@ return type
 |----------|---------|
 | id       | number  |
 | login    | string  |
-| admin | boolean | 
+| isAdmin  | boolean | 
 
 ## Chat
 

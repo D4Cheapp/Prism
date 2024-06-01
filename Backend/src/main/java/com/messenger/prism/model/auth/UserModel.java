@@ -1,7 +1,9 @@
 package com.messenger.prism.model.auth;
 
 import com.messenger.prism.entity.AuthEntity;
+import lombok.Data;
 
+@Data
 public class UserModel {
     private Long id;
     private String login;
@@ -11,31 +13,7 @@ public class UserModel {
         UserModel model = new UserModel();
         model.setId(entity.getId());
         model.setLogin(entity.getLogin());
-        model.setAdmin(entity.getIsAdmin());
+        model.setIsAdmin(entity.getRole().equals("ADMIN"));
         return model;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public Boolean getAdmin() {
-        return isAdmin;
-    }
-
-    public void setAdmin(Boolean admin) {
-        isAdmin = admin;
     }
 }
