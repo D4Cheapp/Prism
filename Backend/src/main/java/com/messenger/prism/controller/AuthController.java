@@ -1,6 +1,7 @@
 package com.messenger.prism.controller;
 
 import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.model.auth.UserLoginModel;
 import com.messenger.prism.model.auth.UserModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
 import com.messenger.prism.service.AuthService;
@@ -15,6 +16,11 @@ public class AuthController {
     @Autowired
     private AuthService service;
 
+    @GetMapping
+    public ResponseEntity<String> greeting() {
+        return ResponseEntity.ok().body("Hi");
+    }
+
     @PostMapping("/registration")
     public ResponseEntity registration(@RequestBody UserRegistrationModel user) {
         try {
@@ -26,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody AuthEntity user) {
+    public ResponseEntity login(@RequestBody UserLoginModel user) {
         try {
             UserModel returnedUser = service.login(user);
             return ResponseEntity.ok().body(returnedUser);
@@ -35,18 +41,18 @@ public class AuthController {
         }
     }
 
-       //TODO logout
+    //TODO logout
 //    @DeleteMapping("/logout")
-//    public ResponseEntity logout() {
+//    public ResponseEntity logout(HttpSession session) {
 //        try {
-//            service.logout();
-//            return ResponseEntity.ok().body("Success");
+//            session.invalidate();
+//            return ResponseEntity.ok().body("Successful logout");
 //        } catch (Exception e) {
 //            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
 //        }
 //    }
 
-      //TODO get current user
+    //TODO get current user
 //    @GetMapping("/user")
 //    public ResponseEntity getCurrentUser() {
 //        try {

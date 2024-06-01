@@ -1,6 +1,7 @@
 package com.messenger.prism.service;
 
 import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.model.auth.UserLoginModel;
 import com.messenger.prism.model.auth.UserModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
 import com.messenger.prism.repository.AuthRepo;
@@ -30,7 +31,7 @@ public class AuthService {
         return UserModel.toModel(userEntity);
     }
 
-    public UserModel login(AuthEntity user) throws Exception {
+    public UserModel login(UserLoginModel user) throws Exception {
         Optional<AuthEntity> storedUser = Optional.ofNullable(repo.findByLogin(user.getLogin()));
         if (storedUser.isEmpty()) {
             throw new Exception("Incorrect login");
