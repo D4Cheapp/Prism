@@ -11,7 +11,7 @@ import lombok.Data;
 public class UserEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer  id;
   private String name;
   private Boolean isOnline;
   //TODO: найти способ хранения чатов

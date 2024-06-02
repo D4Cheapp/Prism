@@ -22,7 +22,7 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity registration(@RequestBody UserRegistrationModel user) {
+    public ResponseEntity<?> registration(@RequestBody UserRegistrationModel user) {
         try {
             UserModel returnedUser = service.regitration(user);
             return ResponseEntity.ok().body(returnedUser);
@@ -32,7 +32,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody UserLoginModel user) {
+    public ResponseEntity<?> login(@RequestBody UserLoginModel user) {
         try {
             UserModel returnedUser = service.login(user);
             return ResponseEntity.ok().body(returnedUser);
@@ -64,7 +64,7 @@ public class AuthController {
 //     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         try {
             service.deleteUser(id);
             return ResponseEntity.ok().body("Successful deletion");
@@ -74,7 +74,7 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/login")
-    public ResponseEntity editUserLogin(@PathVariable Long id, @RequestBody AuthEntity login) {
+    public ResponseEntity<?> editUserLogin(@PathVariable Integer id, @RequestBody AuthEntity login) {
         try {
             UserModel returnedUser = service.editUserLogin(id, login);
             return ResponseEntity.ok().body(returnedUser);
@@ -84,7 +84,7 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/password")
-    public ResponseEntity editUserPassword(@PathVariable Long id, @RequestBody AuthEntity password) {
+    public ResponseEntity<?> editUserPassword(@PathVariable Integer id, @RequestBody AuthEntity password) {
         try {
             UserModel returnedUser = service.editUserPassword(id, password);
             return ResponseEntity.ok().body(returnedUser);
