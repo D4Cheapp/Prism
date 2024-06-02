@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class UserModel {
-    private Long id;
+    private Integer id;
     private String login;
     private Boolean isAdmin;
 

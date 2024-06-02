@@ -12,7 +12,7 @@ import java.util.Date;
 public class MessageEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
   private String userId;
   private String text;
   private Date receiveTime;

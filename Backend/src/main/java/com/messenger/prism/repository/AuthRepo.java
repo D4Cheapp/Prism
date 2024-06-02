@@ -5,6 +5,6 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.repository.CrudRepository;
 
 @RedisHash
-public interface AuthRepo extends CrudRepository<AuthEntity, String> {
+public interface AuthRepo extends CrudRepository<AuthEntity, Integer> {
     AuthEntity findByLogin(String login);
 }

@@ -11,7 +11,7 @@ import lombok.Data;
 public class ChatEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private Integer id;
   //TODO: найти способ хранения сообщений
   private String[] messageId;
   private Boolean isGroup;
