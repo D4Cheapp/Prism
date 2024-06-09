@@ -19,7 +19,6 @@ public class Message {
   private Date receiveTime;
   private Boolean isRead;
   private Boolean isEdited;
-
   private String replyId;
   private String voiceMessageUrl;
   private String videoMessageUrl;

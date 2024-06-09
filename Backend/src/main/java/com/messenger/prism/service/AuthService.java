@@ -25,10 +25,8 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 public class AuthService {
     @Autowired
     private AuthRepo repo;
-
     @Autowired
     private PasswordEncoder encoder;
-
     @Autowired
     private AuthenticationProvider authenticationProvider;
 
@@ -82,6 +80,16 @@ public class AuthService {
             throw new RuntimeException("User not found");
         }
         repo.deleteById(id);
+    }
+
+    public UserModel getCurrentUser(Authentication authentication) throws Exception {
+        String currentUserLogin = authentication.getName();
+        Auth storedUser = repo.findByLogin(currentUserLogin);
+        boolean isUserNotFound = storedUser == null;
+        if (isUserNotFound) {
+            throw new Exception("User not found");
+        }
+        return UserModel.toModel(storedUser);
     }
 
     public UserModel editUserLogin(Integer id, Auth login) throws Exception {
