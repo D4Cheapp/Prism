@@ -9,12 +9,16 @@ import lombok.Data;
 @Entity
 @Data
 public class Profile {
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer  id;
-  private String name;
-  private Boolean isOnline;
-  //TODO: найти способ хранения чатов
-  private String[] chatId;
-  private String profilePictureUrl;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+    private String name;
+    private String phone;
+    private String tag;
+    private String status;
+    private Boolean isOnline;
+    //TODO: найти способ хранения чатов
+    private String[] chatId;
+    private String[] blackListId;
+    private String profilePictureUrl;
 }
