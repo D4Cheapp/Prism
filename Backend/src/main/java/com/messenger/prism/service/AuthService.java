@@ -39,14 +39,22 @@ public class AuthService {
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     }
 
+    private void isUserHavePermission(Authentication authentication, Optional<Auth> storedUser) throws Exception {
+        Auth currentUser = repo.findByLogin(authentication.getName());
+        boolean isCurrentUserNotAdmin = !currentUser.getRole().equals("ADMIN");
+        boolean isNotCurrentUserToDelete = !currentUser.getId().equals(storedUser.get().getId());
+        boolean isUserHaveNotPermission = isCurrentUserNotAdmin && isNotCurrentUserToDelete;
+        if (isUserHaveNotPermission) {
+            throw new Exception("You don't have permission to delete this user");
+        }
+    }
+
 
     public UserModel regitration(UserRegistrationModel user) throws Exception {
         boolean isAdminFieldMissing = user.getIsAdmin() == null;
         boolean isUserAlreadyExists = repo.findByLogin(user.getLogin()) != null;
-        boolean isConfirmPasswordInorrect =
-                !(user.getConfirmPassword() != null
-                        && user.getConfirmPassword()
-                        .equals(user.getPassword()));
+        boolean isConfirmPasswordInorrect = !(user.getConfirmPassword() != null
+                && user.getConfirmPassword().equals(user.getPassword()));
         if (isAdminFieldMissing) {
             user.setIsAdmin(false);
         }
@@ -74,10 +82,12 @@ public class AuthService {
         return UserModel.toModel(storedUser);
     }
 
-    public void deleteUser(Integer id) {
+    public void deleteUser(Authentication authentication, Integer id) throws Exception {
+        Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = repo.findById(id).isEmpty();
+        isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
-            throw new RuntimeException("User not found");
+            throw new Exception("User not found");
         }
         repo.deleteById(id);
     }
@@ -92,11 +102,12 @@ public class AuthService {
         return UserModel.toModel(storedUser);
     }
 
-    public UserModel editUserLogin(Integer id, Auth login) throws Exception {
+    public UserModel editUserLogin(Authentication authentication, Integer id, Auth login) throws Exception {
         Optional<Auth> storedUser = repo.findById(id);
         Auth changedLoginUser = repo.findByLogin(login.getLogin());
         boolean isUserNotFound = storedUser.isEmpty();
         boolean isLoginAlreadyExists = changedLoginUser != null;
+        isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
             throw new Exception("User not found");
         }
@@ -108,9 +119,10 @@ public class AuthService {
         return UserModel.toModel(storedUser.get());
     }
 
-    public UserModel editUserPassword(Integer id, Auth password) throws Exception {
+    public UserModel editUserPassword(Authentication authentication, Integer id, Auth password) throws Exception {
         Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = storedUser.isEmpty();
+        isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
             throw new Exception("User not found");
         }
