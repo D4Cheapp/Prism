@@ -15,13 +15,10 @@ public class Chat {
   //TODO: найти способ хранения сообщений
   private String[] messageId;
   private Boolean isGroup;
-
   private String pinMessageId;
   private String chatPictureUrl;
-
   private String firstPersonId;
   private String secondPersonId;
-
   private String chatName;
   //TODO: найти способ хранения пользователей
   private String[] memberId;

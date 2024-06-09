@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> {
                     request
-                            .requestMatchers("/prism/v1/login", "/prism/v1/registration")
+                            .requestMatchers("/login", "/registration")
                             .permitAll();
                     request
                             .anyRequest()

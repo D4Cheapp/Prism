@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     @Autowired
     private AuthService service;
-
     private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     @GetMapping
@@ -59,16 +58,15 @@ public class AuthController {
         }
     }
 
-    //TODO get current user
-//    @GetMapping("/user")
-//    public ResponseEntity getCurrentUser() {
-//        try {
-//            service.getCurrentUser();
-//            return ResponseEntity.ok().body("Success");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-//        }
-//     }
+    @GetMapping("/user")
+    public ResponseEntity<?> getCurrentUser(Authentication authentication) {
+        try {
+            UserModel currentUser = service.getCurrentUser(authentication);
+            return ResponseEntity.ok().body(currentUser);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
 
     @DeleteMapping("/user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
