@@ -1,10 +1,12 @@
 package com.messenger.prism.controller;
 
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import com.messenger.prism.model.auth.UserLoginModel;
 import com.messenger.prism.model.auth.UserModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
 import com.messenger.prism.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,9 +34,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginModel user) {
+    public ResponseEntity<?> login(@RequestBody UserLoginModel user,
+                                   HttpServletRequest request, HttpServletResponse response) {
         try {
             UserModel returnedUser = service.login(user);
+            service.authentication(request, response, user.getLogin(), user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -74,7 +78,7 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/login")
-    public ResponseEntity<?> editUserLogin(@PathVariable Integer id, @RequestBody AuthEntity login) {
+    public ResponseEntity<?> editUserLogin(@PathVariable Integer id, @RequestBody Auth login) {
         try {
             UserModel returnedUser = service.editUserLogin(id, login);
             return ResponseEntity.ok().body(returnedUser);
@@ -84,7 +88,7 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/password")
-    public ResponseEntity<?> editUserPassword(@PathVariable Integer id, @RequestBody AuthEntity password) {
+    public ResponseEntity<?> editUserPassword(@PathVariable Integer id, @RequestBody Auth password) {
         try {
             UserModel returnedUser = service.editUserPassword(id, password);
             return ResponseEntity.ok().body(returnedUser);

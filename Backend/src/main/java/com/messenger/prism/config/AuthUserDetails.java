@@ -1,6 +1,6 @@
 package com.messenger.prism.config;
 
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ public class AuthUserDetails implements UserDetails {
     private final String password;
     private final List<GrantedAuthority> authorities;
 
-    public AuthUserDetails(AuthEntity user) {
+    public AuthUserDetails(Auth user) {
         this.login = user.getLogin();
         this.password = user.getPassword();
         this.authorities =

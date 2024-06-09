@@ -1,6 +1,6 @@
 package com.messenger.prism.model.auth;
 
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import lombok.Data;
 
 @Data
@@ -9,7 +9,7 @@ public class UserModel {
     private String login;
     private Boolean isAdmin;
 
-    public static UserModel toModel(AuthEntity entity) {
+    public static UserModel toModel(Auth entity) {
         UserModel model = new UserModel();
         model.setId(entity.getId());
         model.setLogin(entity.getLogin());

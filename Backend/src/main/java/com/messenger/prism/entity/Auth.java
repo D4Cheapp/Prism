@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Entity
 @Data
-public class AuthEntity {
+public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

@@ -1,7 +1,7 @@
 package com.messenger.prism.repository;
 
-import com.messenger.prism.entity.ChatEntity;
+import com.messenger.prism.entity.Chat;
 import org.springframework.data.repository.CrudRepository;
 
-public interface ChatRepo extends CrudRepository<ChatEntity, Integer> {
+public interface ChatRepo extends CrudRepository<Chat, Integer> {
 }
