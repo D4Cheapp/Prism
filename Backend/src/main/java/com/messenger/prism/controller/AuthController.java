@@ -9,14 +9,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("prism/v1")
-//TODO: Реализация через cookie
 public class AuthController {
     @Autowired
     private AuthService service;
+
+    private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     @GetMapping
     public ResponseEntity<String> greeting() {
@@ -45,16 +48,16 @@ public class AuthController {
         }
     }
 
-    //TODO logout
-//    @DeleteMapping("/logout")
-//    public ResponseEntity logout(HttpSession session) {
-//        try {
-//            session.invalidate();
-//            return ResponseEntity.ok().body("Successful logout");
-//        } catch (Exception e) {
-//            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
-//        }
-//    }
+    @DeleteMapping("/logout")
+    public ResponseEntity<String> logout(Authentication authentication,
+                                         HttpServletRequest request, HttpServletResponse response) {
+        try {
+            this.logoutHandler.logout(request, response, authentication);
+            return ResponseEntity.ok().body("Successful logout");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
 
     //TODO get current user
 //    @GetMapping("/user")
