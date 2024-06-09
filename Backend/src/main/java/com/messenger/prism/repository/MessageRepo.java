@@ -1,7 +1,7 @@
 package com.messenger.prism.repository;
 
-import com.messenger.prism.entity.MessageEntity;
+import com.messenger.prism.entity.Message;
 import org.springframework.data.repository.CrudRepository;
 
-public interface MessageRepo extends CrudRepository<MessageEntity, Integer > {
+public interface MessageRepo extends CrudRepository<Message, Integer > {
 }

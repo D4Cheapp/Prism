@@ -1,15 +1,25 @@
 package com.messenger.prism.service;
 
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import com.messenger.prism.model.auth.UserLoginModel;
 import com.messenger.prism.model.auth.UserModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
 import com.messenger.prism.repository.AuthRepo;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+
+import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
 
 @Service
 public class AuthService {
@@ -18,6 +28,19 @@ public class AuthService {
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private AuthenticationProvider authenticationProvider;
+
+    public void authentication(HttpServletRequest request, HttpServletResponse response, String login, String password) {
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(login, password);
+        Authentication auth = authenticationProvider.authenticate(token);
+        SecurityContext context = SecurityContextHolder.getContext();
+        context.setAuthentication(auth);
+        HttpSession session = request.getSession(true);
+        session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
+    }
+
 
     public UserModel regitration(UserRegistrationModel user) throws Exception {
         boolean isAdminFieldMissing = user.getIsAdmin() == null;
@@ -35,13 +58,13 @@ public class AuthService {
         if (isConfirmPasswordInorrect) {
             throw new Exception("Incorrect confirm password");
         }
-        AuthEntity userEntity = UserRegistrationModel.toEntity(user, encoder);
+        Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
         repo.save(userEntity);
         return UserModel.toModel(userEntity);
     }
 
     public UserModel login(UserLoginModel user) throws Exception {
-        AuthEntity storedUser = repo.findByLogin(user.getLogin());
+        Auth storedUser = repo.findByLogin(user.getLogin());
         boolean isUserNotFound = storedUser == null;
         if (isUserNotFound) {
             throw new Exception("User not found");
@@ -61,9 +84,9 @@ public class AuthService {
         repo.deleteById(id);
     }
 
-    public UserModel editUserLogin(Integer id, AuthEntity login) throws Exception {
-        Optional<AuthEntity> storedUser = repo.findById(id);
-        AuthEntity changedLoginUser = repo.findByLogin(login.getLogin());
+    public UserModel editUserLogin(Integer id, Auth login) throws Exception {
+        Optional<Auth> storedUser = repo.findById(id);
+        Auth changedLoginUser = repo.findByLogin(login.getLogin());
         boolean isUserNotFound = storedUser.isEmpty();
         boolean isLoginAlreadyExists = changedLoginUser != null;
         if (isUserNotFound) {
@@ -77,8 +100,8 @@ public class AuthService {
         return UserModel.toModel(storedUser.get());
     }
 
-    public UserModel editUserPassword(Integer id, AuthEntity password) throws Exception {
-        Optional<AuthEntity> storedUser = repo.findById(id);
+    public UserModel editUserPassword(Integer id, Auth password) throws Exception {
+        Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = storedUser.isEmpty();
         if (isUserNotFound) {
             throw new Exception("User not found");

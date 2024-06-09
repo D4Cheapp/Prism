@@ -1,7 +1,7 @@
 package com.messenger.prism.service;
 
 import com.messenger.prism.config.AuthUserDetails;
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import com.messenger.prism.repository.AuthRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,7 @@ public class AuthUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
-        Optional<AuthEntity> user = Optional.ofNullable(repo.findByLogin(login));
+        Optional<Auth> user = Optional.ofNullable(repo.findByLogin(login));
         return user.map(AuthUserDetails::new).orElseThrow(() ->
                 new UsernameNotFoundException("User " + login + " not found"));
     }

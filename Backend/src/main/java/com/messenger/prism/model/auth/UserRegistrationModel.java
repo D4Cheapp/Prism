@@ -1,6 +1,6 @@
 package com.messenger.prism.model.auth;
 
-import com.messenger.prism.entity.AuthEntity;
+import com.messenger.prism.entity.Auth;
 import lombok.Data;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -11,8 +11,8 @@ public class UserRegistrationModel {
     private String confirmPassword;
     private Boolean isAdmin;
 
-    public static AuthEntity toEntity(UserRegistrationModel model, PasswordEncoder encoder) {
-        AuthEntity entity = new AuthEntity();
+    public static Auth toEntity(UserRegistrationModel model, PasswordEncoder encoder) {
+        Auth entity = new Auth();
         String role = model.getIsAdmin() ? "ADMIN" : "USER";
         entity.setRole(role);
         entity.setLogin(model.getLogin());
