@@ -20,15 +20,12 @@ public class AuthController {
     private AuthService service;
     private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
-    @GetMapping
-    public ResponseEntity<String> greeting() {
-        return ResponseEntity.ok().body("Hi");
-    }
-
     @PostMapping("/registration")
-    public ResponseEntity<?> registration(@RequestBody UserRegistrationModel user) {
+    public ResponseEntity<?> registration(@RequestBody UserRegistrationModel user,
+                                          HttpServletRequest request, HttpServletResponse response) {
         try {
             UserModel returnedUser = service.regitration(user);
+            service.authentication(request, response, user.getLogin(), user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -69,9 +66,9 @@ public class AuthController {
     }
 
     @DeleteMapping("/user/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id, Authentication authentication) {
         try {
-            service.deleteUser(id);
+            service.deleteUser(authentication, id);
             return ResponseEntity.ok().body("Successful deletion");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -79,9 +76,9 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/login")
-    public ResponseEntity<?> editUserLogin(@PathVariable Integer id, @RequestBody Auth login) {
+    public ResponseEntity<?> editUserLogin(@PathVariable Integer id, @RequestBody Auth login, Authentication authentication) {
         try {
-            UserModel returnedUser = service.editUserLogin(id, login);
+            UserModel returnedUser = service.editUserLogin(authentication, id, login);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
@@ -89,9 +86,9 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/password")
-    public ResponseEntity<?> editUserPassword(@PathVariable Integer id, @RequestBody Auth password) {
+    public ResponseEntity<?> editUserPassword(@PathVariable Integer id, @RequestBody Auth password, Authentication authentication) {
         try {
-            UserModel returnedUser = service.editUserPassword(id, password);
+            UserModel returnedUser = service.editUserPassword(authentication, id, password);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
