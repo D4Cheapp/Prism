@@ -52,7 +52,8 @@ public class SecurityConfig {
                 }))
                 .authorizeHttpRequests(request -> {
                     request
-                            .requestMatchers("/prism/v1/login", "/prism/v1/registration")
+                            .requestMatchers("/prism/v1/login", "/prism/v1/registration",
+                                    "/prism/v1/swagger-ui/*", "/prism/v1/api-doc", "/prism/v1/api-doc/*")
                             .permitAll();
                     request
                             .anyRequest()
