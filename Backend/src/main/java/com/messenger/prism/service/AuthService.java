@@ -1,6 +1,11 @@
 package com.messenger.prism.service;
 
 import com.messenger.prism.entity.Auth;
+import com.messenger.prism.exception.PermissionsException;
+import com.messenger.prism.exception.auth.IncorrectConfirmPasswordException;
+import com.messenger.prism.exception.auth.IncorrectPasswordException;
+import com.messenger.prism.exception.auth.UserAlreadyExistException;
+import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.model.auth.UserLoginModel;
 import com.messenger.prism.model.auth.UserModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
@@ -39,92 +44,92 @@ public class AuthService {
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     }
 
-    private void isUserHavePermission(Authentication authentication, Optional<Auth> storedUser) throws Exception {
+    private void isUserHavePermission(Authentication authentication, Optional<Auth> storedUser) throws PermissionsException {
         Auth currentUser = repo.findByLogin(authentication.getName());
-        boolean isCurrentUserNotAdmin = !currentUser.getRole().equals("ADMIN");
-        boolean isNotCurrentUserToDelete = !currentUser.getId().equals(storedUser.get().getId());
-        boolean isUserHaveNotPermission = isCurrentUserNotAdmin && isNotCurrentUserToDelete;
+        boolean isCurrentUserNotDeveloper = !currentUser.getRole().equals("DEVELOPER");
+        boolean isNotCurrentUserToDelete = storedUser.isPresent() && !currentUser.getId().equals(storedUser.get().getId());
+        boolean isUserHaveNotPermission = isCurrentUserNotDeveloper && isNotCurrentUserToDelete;
         if (isUserHaveNotPermission) {
-            throw new Exception("You don't have permission to delete this user");
+            throw new PermissionsException();
         }
     }
 
 
-    public UserModel regitration(UserRegistrationModel user) throws Exception {
-        boolean isAdminFieldMissing = user.getIsAdmin() == null;
+    public UserModel regitration(UserRegistrationModel user) throws IncorrectConfirmPasswordException, UserAlreadyExistException {
+        boolean isDeveloperFieldMissing = user.getIsDeveloper() == null;
         boolean isUserAlreadyExists = repo.findByLogin(user.getLogin()) != null;
         boolean isConfirmPasswordInorrect = !(user.getConfirmPassword() != null
                 && user.getConfirmPassword().equals(user.getPassword()));
-        if (isAdminFieldMissing) {
-            user.setIsAdmin(false);
+        if (isDeveloperFieldMissing) {
+            user.setIsDeveloper(false);
         }
         if (isUserAlreadyExists) {
-            throw new Exception("User with this login already exists");
+            throw new UserAlreadyExistException();
         }
         if (isConfirmPasswordInorrect) {
-            throw new Exception("Incorrect confirm password");
+            throw new IncorrectConfirmPasswordException();
         }
         Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
         repo.save(userEntity);
         return UserModel.toModel(userEntity);
     }
 
-    public UserModel login(UserLoginModel user) throws Exception {
+    public UserModel login(UserLoginModel user) throws UserNotFoundException, IncorrectPasswordException {
         Auth storedUser = repo.findByLogin(user.getLogin());
         boolean isUserNotFound = storedUser == null;
         if (isUserNotFound) {
-            throw new Exception("User not found");
+            throw new UserNotFoundException();
         }
         boolean isPasswordIncorrect = !encoder.matches(user.getPassword(), storedUser.getPassword());
         if (isPasswordIncorrect) {
-            throw new Exception("Incorrect password");
+            throw new IncorrectPasswordException();
         }
         return UserModel.toModel(storedUser);
     }
 
-    public void deleteUser(Authentication authentication, Integer id) throws Exception {
+    public void deleteUser(Authentication authentication, Integer id) throws UserNotFoundException, PermissionsException {
         Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = repo.findById(id).isEmpty();
         isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
-            throw new Exception("User not found");
+            throw new UserNotFoundException();
         }
         repo.deleteById(id);
     }
 
-    public UserModel getCurrentUser(Authentication authentication) throws Exception {
+    public UserModel getCurrentUser(Authentication authentication) throws UserNotFoundException {
         String currentUserLogin = authentication.getName();
         Auth storedUser = repo.findByLogin(currentUserLogin);
         boolean isUserNotFound = storedUser == null;
         if (isUserNotFound) {
-            throw new Exception("User not found");
+            throw new UserNotFoundException();
         }
         return UserModel.toModel(storedUser);
     }
 
-    public UserModel editUserLogin(Authentication authentication, Integer id, Auth login) throws Exception {
+    public UserModel editUserLogin(Authentication authentication, Integer id, Auth login) throws PermissionsException, UserNotFoundException, UserAlreadyExistException {
         Optional<Auth> storedUser = repo.findById(id);
         Auth changedLoginUser = repo.findByLogin(login.getLogin());
         boolean isUserNotFound = storedUser.isEmpty();
         boolean isLoginAlreadyExists = changedLoginUser != null;
         isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
-            throw new Exception("User not found");
+            throw new UserNotFoundException();
         }
         if (isLoginAlreadyExists) {
-            throw new Exception("User with this login already exists");
+            throw new UserAlreadyExistException();
         }
         storedUser.get().setLogin(login.getLogin());
         repo.save(storedUser.get());
         return UserModel.toModel(storedUser.get());
     }
 
-    public UserModel editUserPassword(Authentication authentication, Integer id, Auth password) throws Exception {
+    public UserModel editUserPassword(Authentication authentication, Integer id, Auth password) throws PermissionsException, UserNotFoundException {
         Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = storedUser.isEmpty();
         isUserHavePermission(authentication, storedUser);
         if (isUserNotFound) {
-            throw new Exception("User not found");
+            throw new UserNotFoundException();
         }
         storedUser.get().setPassword(encoder.encode(password.getPassword()));
         repo.save(storedUser.get());
