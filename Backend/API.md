@@ -1,28 +1,30 @@
 # Prism api documentation
 
-## Root link  /prism/v1
+## Root link /prism/v1
 
 ## Authentification
 
-### Registration 
+### Registration
+
 post: /registration
 
-| Property         | Type           |
-|------------------|----------------|
-| login            | string         |
-| password         | string         |
+| Property        | Type           |
+|-----------------|----------------|
+| login           | string         |
+| password        | string         |
 | confirmPassword | string         |
-| isAdmin         | boolean / null | 
+| isDeveloper     | boolean / null | 
 
 return type
 
-| Property | Type    |
-|----------|---------|
-| id       | number  |
-| login    | string  |
-| isAdmin  | boolean | 
+| Property    | Type    |
+|-------------|---------|
+| id          | number  |
+| login       | string  |
+| isDeveloper | boolean | 
 
-### Login 
+### Login
+
 post: /login
 
 | Property | Type   |
@@ -32,56 +34,61 @@ post: /login
 
 return type
 
-| Property | Type    |
-|----------|---------|
-| id       | number  |
-| login    | string  |
-| isAdmin  | boolean | 
+| Property    | Type    |
+|-------------|---------|
+| id          | number  |
+| login       | string  |
+| isDeveloper | boolean | 
 
-### Logout 
+### Logout
+
 delete: /logout
 
-### Get current user 
+### Get current user
+
 get: /user
 
-| Property | Type    |
-|----------|---------|
-| id       | number  |
-| login    | string  |
-| isAdmin | boolean | 
+| Property    | Type    |
+|-------------|---------|
+| id          | number  |
+| login       | string  |
+| isDeveloper | boolean | 
 
-### Delete user 
+### Delete user
+
 delete: /user/{id}
 
 ### Edit user login
+
 patch: /user/{id}/login
 
-| Property | Type           |
-|----------|----------------|
-| login    | string         |
+| Property | Type   |
+|----------|--------|
+| login    | string |
 
 return type
 
-| Property | Type    |
-|----------|---------|
-| id       | number  |
-| login    | string  |
-| admin | boolean | 
+| Property    | Type    |
+|-------------|---------|
+| id          | number  |
+| login       | string  |
+| isDeveloper | boolean | 
 
 ### Edit user password
+
 patch: /user/{id}/password
 
-| Property | Type           |
-|----------|----------------|
-| password | string         |
+| Property | Type   |
+|----------|--------|
+| password | string |
 
 return type
 
-| Property | Type    |
-|----------|---------|
-| id       | number  |
-| login    | string  |
-| isAdmin  | boolean | 
+| Property    | Type    |
+|-------------|---------|
+| id          | number  |
+| login       | string  |
+| isDeveloper | boolean | 
 
 ## Chat
 

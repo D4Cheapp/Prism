@@ -9,11 +9,11 @@ public class UserRegistrationModel {
     private String login;
     private String password;
     private String confirmPassword;
-    private Boolean isAdmin;
+    private Boolean isDeveloper;
 
     public static Auth toEntity(UserRegistrationModel model, PasswordEncoder encoder) {
         Auth entity = new Auth();
-        String role = model.getIsAdmin() ? "ADMIN" : "USER";
+        String role = model.getIsDeveloper() ? "DEVELOPER" : "USER";
         entity.setRole(role);
         entity.setLogin(model.getLogin());
         entity.setPassword(encoder.encode(model.getPassword()));
