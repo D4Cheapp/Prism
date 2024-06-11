@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Chat")
 @RestController
-@RequestMapping("prism/v1/chat")
+@RequestMapping("/chat")
 public class ChatController {
     @Autowired
     private ChatRepo repo;
