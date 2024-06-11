@@ -17,39 +17,43 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Authentication")
 @RestController
-@RequestMapping("prism/v1")
+@RequestMapping("/auth")
 public class AuthController {
+    private final SecurityContextLogoutHandler logoutHandler =
+            new SecurityContextLogoutHandler();
     @Autowired
     private AuthService service;
-    private final SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
     @PostMapping("/registration")
-    public ResponseEntity<UserModel> registration(@RequestBody UserRegistrationModel user,
-                                                  HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<UserModel> registration(@RequestBody UserRegistrationModel user, HttpServletRequest request, HttpServletResponse response) {
         try {
             UserModel returnedUser = service.regitration(user);
-            service.authentication(request, response, user.getLogin(), user.getPassword());
+            service.authentication(request, response, user.getLogin(),
+                    user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
+                    ":" + " " + e.getMessage()));
         }
     }
 
     @PostMapping("/login")
     public ResponseEntity<UserModel> login(@RequestBody UserLoginModel user,
-                                           HttpServletRequest request, HttpServletResponse response) {
+                                           HttpServletRequest request,
+                                           HttpServletResponse response) {
         try {
             UserModel returnedUser = service.login(user);
-            service.authentication(request, response, user.getLogin(), user.getPassword());
+            service.authentication(request, response, user.getLogin(),
+                    user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
+                    ":" + " " + e.getMessage()));
         }
     }
 
     @DeleteMapping("/logout")
-    public ResponseEntity<TextResponseModel> logout(Authentication authentication,
-                                                    HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<TextResponseModel> logout(Authentication authentication, HttpServletRequest request, HttpServletResponse response) {
         try {
             this.logoutHandler.logout(request, response, authentication);
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Successful logout", true));
@@ -64,7 +68,8 @@ public class AuthController {
             UserModel currentUser = service.getCurrentUser(authentication);
             return ResponseEntity.ok().body(currentUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
+                    ":" + " " + e.getMessage()));
         }
     }
 
@@ -79,22 +84,28 @@ public class AuthController {
     }
 
     @PatchMapping("/user/{id}/login")
-    public ResponseEntity<UserModel> editUserLogin(@PathVariable Integer id, @RequestBody Auth login, Authentication authentication) {
+    public ResponseEntity<UserModel> editUserLogin(@PathVariable Integer id,
+                                                   @RequestBody Auth login,
+                                                   Authentication authentication) {
         try {
-            UserModel returnedUser = service.editUserLogin(authentication, id, login);
+            UserModel returnedUser = service.editUserLogin(authentication, id
+                    , login);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
+                    ":" + " " + e.getMessage()));
         }
     }
 
     @PatchMapping("/user/{id}/password")
     public ResponseEntity<UserModel> editUserPassword(@PathVariable Integer id, @RequestBody Auth password, Authentication authentication) {
         try {
-            UserModel returnedUser = service.editUserPassword(authentication, id, password);
+            UserModel returnedUser = service.editUserPassword(authentication,
+                    id, password);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error: " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
+                    ":" + " " + e.getMessage()));
         }
     }
 }

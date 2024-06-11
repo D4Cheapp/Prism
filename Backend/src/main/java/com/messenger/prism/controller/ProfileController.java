@@ -6,10 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "User")
+@Tag(name = "Profile")
 @RestController
-@RequestMapping("prism/v1/user")
-public class UserController {
+@RequestMapping("/profile")
+public class ProfileController {
     @Autowired
     private ProfileRepo repo;
 }

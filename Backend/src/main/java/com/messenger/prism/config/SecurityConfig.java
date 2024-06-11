@@ -31,7 +31,8 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authProvider =
+                new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
@@ -39,26 +40,16 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(request -> {
-                    CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(Collections.singletonList("*"));
-                    config.setAllowedMethods(Collections.singletonList("*"));
-                    config.setAllowedHeaders(Collections.singletonList("*"));
-                    config.setExposedHeaders(Collections.singletonList("Authorization"));
-                    config.setMaxAge(3600L);
-                    return config;
-                }))
-                .authorizeHttpRequests(request -> {
-                    request
-                            .requestMatchers("/prism/v1/login", "/prism/v1/registration",
-                                    "/prism/v1/swagger-ui/*", "/prism/v1/api-doc", "/prism/v1/api-doc/*")
-                            .permitAll();
-                    request
-                            .anyRequest()
-                            .authenticated();
-                })
-                .build();
+        return http.csrf(AbstractHttpConfigurer::disable).cors(cors -> cors.configurationSource(request -> {
+            CorsConfiguration config = new CorsConfiguration();
+            config.setAllowedOrigins(Collections.singletonList("*"));
+            config.setAllowedMethods(Collections.singletonList("*"));
+            config.setAllowedHeaders(Collections.singletonList("*"));
+            return config;
+        })).authorizeHttpRequests(request -> {
+            request.requestMatchers("/auth/login", "/auth/registration",
+                    "/swagger-ui/*", "/api-doc", "/api-doc/*").permitAll();
+            request.anyRequest().authenticated();
+        }).build();
     }
 }

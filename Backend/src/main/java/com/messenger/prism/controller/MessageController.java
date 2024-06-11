@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Message")
 @RestController
-@RequestMapping("prism/v1/message")
+@RequestMapping("/message")
 public class MessageController {
     @Autowired
     private MessageRepo repo;
