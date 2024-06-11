@@ -6,5 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 @RedisHash
 public interface AuthRepo extends CrudRepository<Auth, Integer> {
-    Auth findByLogin(String login);
+    Auth findByEmail(String email);
 }

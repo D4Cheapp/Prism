@@ -6,14 +6,14 @@ import lombok.Data;
 @Data
 public class UserModel {
     private Integer id;
-    private String login;
+    private String email;
     private Boolean isDeveloper;
     private String error;
 
     public static UserModel toModel(Auth entity) {
         UserModel model = new UserModel();
         model.setId(entity.getId());
-        model.setLogin(entity.getLogin());
+        model.setEmail(entity.getEmail());
         model.setIsDeveloper(entity.getRole().equals("DEVELOPER"));
         return model;
     }

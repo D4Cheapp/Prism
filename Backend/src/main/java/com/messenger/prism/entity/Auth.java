@@ -11,8 +11,8 @@ import lombok.Data;
 public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
-    private String login;
+    private int id;
+    private String email;
     private String password;
     private String role;
 }

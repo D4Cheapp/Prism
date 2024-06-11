@@ -33,10 +33,10 @@ public class AuthService {
     private AuthenticationProvider authenticationProvider;
 
     public void authentication(HttpServletRequest request,
-                               HttpServletResponse response, String login,
+                               HttpServletResponse response, String email,
                                String password) {
         UsernamePasswordAuthenticationToken token =
-                new UsernamePasswordAuthenticationToken(login, password);
+                new UsernamePasswordAuthenticationToken(email, password);
         Authentication auth = authenticationProvider.authenticate(token);
         SecurityContext context = SecurityContextHolder.getContext();
         context.setAuthentication(auth);
@@ -44,9 +44,13 @@ public class AuthService {
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     }
 
-    public UserModel regitration(UserRegistrationModel user) throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, TooLongLoginException, EmptyLoginException, TooShortLoginException {
+    public UserModel regitration(UserRegistrationModel user) throws IncorrectConfirmPasswordException,
+            UserAlreadyExistException, EmptyPasswordException,
+            PasswordIsTooWeakException, TooLongPasswordException,
+            TooShortPasswordException, EmptyEmailException,
+            IncorectEmailException {
         boolean isDeveloperFieldMissing = user.getIsDeveloper() == null;
-        boolean isUserAlreadyExists = repo.findByLogin(user.getLogin()) != null;
+        boolean isUserAlreadyExists = repo.findByEmail(user.getEmail()) != null;
         boolean isConfirmPasswordInorrect =
                 !(user.getConfirmPassword() != null && user.getConfirmPassword().equals(user.getPassword()));
         if (isDeveloperFieldMissing) {
@@ -58,7 +62,7 @@ public class AuthService {
         if (isConfirmPasswordInorrect) {
             throw new IncorrectConfirmPasswordException();
         }
-        checkLoginValidity(user.getLogin());
+        checkEmailValidity(user.getEmail());
         checkPasswordValidity(user.getPassword());
         Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
         repo.save(userEntity);
@@ -67,7 +71,7 @@ public class AuthService {
 
     public UserModel login(UserLoginModel user) throws UserNotFoundException,
             IncorrectPasswordException {
-        Auth storedUser = repo.findByLogin(user.getLogin());
+        Auth storedUser = repo.findByEmail(user.getEmail());
         boolean isUserNotFound = storedUser == null;
         if (isUserNotFound) {
             throw new UserNotFoundException();
@@ -80,7 +84,8 @@ public class AuthService {
         return UserModel.toModel(storedUser);
     }
 
-    public void deleteUser(Authentication authentication, Integer id) throws UserNotFoundException, PermissionsException {
+    public void deleteUser(Authentication authentication, Integer id) throws UserNotFoundException,
+            PermissionsException {
         Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = repo.findById(id).isEmpty();
         checkPermission(authentication, storedUser);
@@ -92,7 +97,7 @@ public class AuthService {
 
     public UserModel getCurrentUser(Authentication authentication) throws UserNotFoundException {
         String currentUserLogin = authentication.getName();
-        Auth storedUser = repo.findByLogin(currentUserLogin);
+        Auth storedUser = repo.findByEmail(currentUserLogin);
         boolean isUserNotFound = storedUser == null;
         if (isUserNotFound) {
             throw new UserNotFoundException();
@@ -100,12 +105,12 @@ public class AuthService {
         return UserModel.toModel(storedUser);
     }
 
-    public UserModel editUserLogin(Authentication authentication, Integer id,
-                                   Auth login) throws PermissionsException,
+    public UserModel editUserEmail(Authentication authentication, Integer id,
+                                   Auth email) throws PermissionsException,
             UserNotFoundException, UserAlreadyExistException,
-            TooLongLoginException, EmptyLoginException, TooShortLoginException {
+            EmptyEmailException, IncorectEmailException {
         Optional<Auth> storedUser = repo.findById(id);
-        Auth changedLoginUser = repo.findByLogin(login.getLogin());
+        Auth changedLoginUser = repo.findByEmail(email.getEmail());
         boolean isUserNotFound = storedUser.isEmpty();
         boolean isLoginAlreadyExists = changedLoginUser != null;
         checkPermission(authentication, storedUser);
@@ -115,14 +120,17 @@ public class AuthService {
         if (isLoginAlreadyExists) {
             throw new UserAlreadyExistException();
         }
-        checkLoginValidity(login.getLogin());
-        storedUser.get().setLogin(login.getLogin());
+        checkEmailValidity(email.getEmail());
+        storedUser.get().setEmail(email.getEmail());
         repo.save(storedUser.get());
         return UserModel.toModel(storedUser.get());
     }
 
     public UserModel editUserPassword(Authentication authentication,
-                                      Integer id, Auth password) throws PermissionsException, UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
+                                      Integer id, Auth password) throws PermissionsException,
+            UserNotFoundException, EmptyPasswordException,
+            PasswordIsTooWeakException, TooLongPasswordException,
+            TooShortPasswordException {
         Optional<Auth> storedUser = repo.findById(id);
         boolean isUserNotFound = storedUser.isEmpty();
         checkPermission(authentication, storedUser);
@@ -137,11 +145,11 @@ public class AuthService {
 
     private void checkPermission(Authentication authentication,
                                  Optional<Auth> storedUser) throws PermissionsException {
-        Auth currentUser = repo.findByLogin(authentication.getName());
+        Auth currentUser = repo.findByEmail(authentication.getName());
         boolean isCurrentUserNotDeveloper = !currentUser.getRole().equals(
                 "DEVELOPER");
         boolean isNotCurrentUserToDelete =
-                storedUser.isPresent() && !currentUser.getId().equals(storedUser.get().getId());
+                storedUser.isPresent() && !(currentUser.getId() == storedUser.get().getId());
         boolean isUserHaveNotPermission =
                 isCurrentUserNotDeveloper && isNotCurrentUserToDelete;
         if (isUserHaveNotPermission) {
@@ -149,17 +157,19 @@ public class AuthService {
         }
     }
 
-    private void checkPasswordValidity(String password) throws TooLongPasswordException, TooShortPasswordException, EmptyPasswordException, PasswordIsTooWeakException {
+    private void checkPasswordValidity(String password) throws TooLongPasswordException,
+            TooShortPasswordException, EmptyPasswordException,
+            PasswordIsTooWeakException {
         boolean isPasswordShort = password.length() < 6;
         boolean isPasswordTooLong = password.length() > 16;
         boolean isPasswordEmpty = password.isEmpty();
         boolean isPasswordIncludesCapitalLetters =
-                password.matches(".*[A-Z" + "]|[А-Я].*");
+                password.matches(".*[A-ZА-Я].*");
         boolean isPasswordIncluidesLowerLetters =
-                password.matches(".*[a-z" + "]|[а-я].*");
+                password.matches(".*[a-zа-я].*");
         boolean isPasswordIncluidesNumbers = password.matches(".*[0-9].*");
         boolean isPasswordTooWeak =
-                !isPasswordIncluidesNumbers | !isPasswordIncluidesLowerLetters | !isPasswordIncludesCapitalLetters;
+                !isPasswordIncluidesNumbers || !isPasswordIncluidesLowerLetters || !isPasswordIncludesCapitalLetters;
         if (isPasswordEmpty) {
             throw new EmptyPasswordException();
         }
@@ -174,19 +184,15 @@ public class AuthService {
         }
     }
 
-    private void checkLoginValidity(String login) throws EmptyLoginException,
-            TooShortLoginException, TooLongLoginException {
-        boolean isLoginShort = login.length() < 3;
-        boolean isLoginTooLong = login.length() > 16;
-        boolean isLoginEmpty = login.isEmpty();
-        if (isLoginEmpty) {
-            throw new EmptyLoginException();
+    private void checkEmailValidity(String email) throws EmptyEmailException,
+            IncorectEmailException {
+        boolean isEmailIncorrect = !email.matches(".+@.+\\..+");
+        boolean isEmailEmpty = email.isEmpty();
+        if (isEmailEmpty) {
+            throw new EmptyEmailException();
         }
-        if (isLoginShort) {
-            throw new TooShortLoginException();
-        }
-        if (isLoginTooLong) {
-            throw new TooLongLoginException();
+        if (isEmailIncorrect) {
+            throw new IncorectEmailException();
         }
     }
 }

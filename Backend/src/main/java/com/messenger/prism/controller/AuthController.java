@@ -28,12 +28,11 @@ public class AuthController {
     public ResponseEntity<UserModel> registration(@RequestBody UserRegistrationModel user, HttpServletRequest request, HttpServletResponse response) {
         try {
             UserModel returnedUser = service.regitration(user);
-            service.authentication(request, response, user.getLogin(),
+            service.authentication(request, response, user.getEmail(),
                     user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
-                    ":" + " " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
         }
     }
 
@@ -43,12 +42,11 @@ public class AuthController {
                                            HttpServletResponse response) {
         try {
             UserModel returnedUser = service.login(user);
-            service.authentication(request, response, user.getLogin(),
+            service.authentication(request, response, user.getEmail(),
                     user.getPassword());
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
-                    ":" + " " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
         }
     }
 
@@ -68,8 +66,7 @@ public class AuthController {
             UserModel currentUser = service.getCurrentUser(authentication);
             return ResponseEntity.ok().body(currentUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
-                    ":" + " " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
         }
     }
 
@@ -83,17 +80,16 @@ public class AuthController {
         }
     }
 
-    @PatchMapping("/user/{id}/login")
-    public ResponseEntity<UserModel> editUserLogin(@PathVariable Integer id,
-                                                   @RequestBody Auth login,
+    @PatchMapping("/user/{id}/email")
+    public ResponseEntity<UserModel> editUserEmail(@PathVariable Integer id,
+                                                   @RequestBody Auth email,
                                                    Authentication authentication) {
         try {
-            UserModel returnedUser = service.editUserLogin(authentication, id
-                    , login);
+            UserModel returnedUser = service.editUserEmail(authentication, id
+                    , email);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
-                    ":" + " " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
         }
     }
 
@@ -104,8 +100,7 @@ public class AuthController {
                     id, password);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(UserModel.toModel("Error" +
-                    ":" + " " + e.getMessage()));
+            return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
         }
     }
 }
