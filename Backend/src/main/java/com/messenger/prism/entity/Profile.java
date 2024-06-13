@@ -11,13 +11,12 @@ import lombok.Data;
 public class Profile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String name;
     private String phone;
     private String tag;
     private String status;
     private boolean isOnline;
-    //TODO: найти способ хранения чатов
     private Integer[] chatId;
     private Integer[] friendId;
     private Integer[] blackListId;

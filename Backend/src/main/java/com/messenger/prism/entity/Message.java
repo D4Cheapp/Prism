@@ -13,13 +13,13 @@ import java.util.Date;
 public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
     private String userId;
     private String text;
     private Date receiveTime;
     private boolean isRead;
     private boolean isEdited;
-    private int replyId;
+    private Integer replyId;
     private String voiceMessageUrl;
     private String videoMessageUrl;
     private String[] fileUrl;
