@@ -1,4 +1,4 @@
-package com.messenger.prism.exception.auth;
+package com.messenger.prism.exception.auth.email;
 
 public class IncorectEmailException extends Exception {
     public IncorectEmailException() {

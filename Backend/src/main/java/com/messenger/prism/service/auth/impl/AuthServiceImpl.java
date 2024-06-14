@@ -2,11 +2,14 @@ package com.messenger.prism.service.auth.impl;
 
 import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
-import com.messenger.prism.exception.auth.*;
-import com.messenger.prism.model.auth.ActivationCodeModel;
-import com.messenger.prism.model.auth.UserLoginModel;
-import com.messenger.prism.model.auth.UserModel;
-import com.messenger.prism.model.auth.UserRegistrationModel;
+import com.messenger.prism.exception.auth.ActivationCodeExpireException;
+import com.messenger.prism.exception.auth.UserAlreadyExistException;
+import com.messenger.prism.exception.auth.UserNotFoundException;
+import com.messenger.prism.exception.auth.email.EmptyEmailException;
+import com.messenger.prism.exception.auth.email.EmptyPasswordException;
+import com.messenger.prism.exception.auth.email.IncorectEmailException;
+import com.messenger.prism.exception.auth.password.*;
+import com.messenger.prism.model.auth.*;
 import com.messenger.prism.repository.AuthRepo;
 import com.messenger.prism.service.auth.AuthService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,30 +55,6 @@ public class AuthServiceImpl implements AuthService {
         session.setAttribute(SPRING_SECURITY_CONTEXT_KEY, context);
     }
 
-    public void regitration(UserRegistrationModel user) throws IncorrectConfirmPasswordException,
-            UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException,
-            TooLongPasswordException, TooShortPasswordException, EmptyEmailException,
-            IncorectEmailException {
-        boolean isDeveloperFieldMissing = user.getIsDeveloper() == null;
-        boolean isUserAlreadyExists = storeUserRepo.findByEmail(user.getEmail()) != null;
-        boolean isConfirmPasswordInorrect =
-                !(user.getConfirmPassword() != null && user.getConfirmPassword().equals(user.getPassword()));
-        if (isDeveloperFieldMissing) {
-            user.setIsDeveloper(false);
-        }
-        if (isUserAlreadyExists) {
-            throw new UserAlreadyExistException();
-        }
-        if (isConfirmPasswordInorrect) {
-            throw new IncorrectConfirmPasswordException();
-        }
-        checkEmailValidity(user.getEmail());
-        checkPasswordValidity(user.getPassword());
-        Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
-        emailSenderService.saveActivationCode(userEntity, "Please activate your account", "/auth" +
-                "/registration/confirm/");
-    }
-
     public UserModel login(UserLoginModel user) throws UserNotFoundException,
             IncorrectPasswordException {
         Auth storedUser = storeUserRepo.findByEmail(user.getEmail());
@@ -111,7 +90,44 @@ public class AuthServiceImpl implements AuthService {
         return UserModel.toModel(storedUser);
     }
 
-    public void editUserEmail(Authentication authentication, Integer id, String email) throws PermissionsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException {
+    public UserModel editUserPassword(Authentication authentication, Integer id,
+                                      EditPasswordModel passwords) throws PermissionsException,
+            UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException,
+            TooLongPasswordException, TooShortPasswordException, IncorrectPasswordException {
+        Optional<Auth> storedUser = storeUserRepo.findById(id);
+        boolean isUserNotFound = storedUser.isEmpty();
+        checkPermission(authentication, storedUser);
+        if (isUserNotFound) {
+            throw new UserNotFoundException();
+        }
+        boolean isOldPasswordIncorrect = !encoder.matches(passwords.getOldPassword(),
+                storedUser.get().getPassword());
+        if (isOldPasswordIncorrect) {
+            throw new IncorrectPasswordException();
+        }
+        passwords.setNewPassword(passwords.getNewPassword().trim());
+        checkPasswordValidity(passwords.getNewPassword());
+        storedUser.get().setPassword(encoder.encode(passwords.getNewPassword()));
+        storeUserRepo.save(storedUser.get());
+        return UserModel.toModel(storedUser.get());
+    }
+
+    public UserModel restoreUserPassword(String code, ActivationCodeModel user,
+                                         RestorePasswordModel passwords) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
+        ActivationCodeModel storedUser = emailSenderService.getUserByActivationCode(code);
+        boolean isPasswordsNotSame =
+                !passwords.getConfirmPassword().equals(passwords.getPassword());
+        this.checkPasswordValidity(passwords.getPassword());
+        if (isPasswordsNotSame) {
+            throw new IncorrectConfirmPasswordException();
+        }
+        storedUser.setPassword(encoder.encode(passwords.getPassword()));
+        storeUserRepo.save(ActivationCodeModel.toAuth(storedUser));
+        return UserModel.toModel(ActivationCodeModel.toAuth(storedUser));
+    }
+
+
+    public void sendEditUserEmailCode(Authentication authentication, Integer id, String email) throws PermissionsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException {
         Optional<Auth> storedUser = storeUserRepo.findById(id);
         Auth changedEmailUser = storeUserRepo.findByEmail(email);
         boolean isUserNotFound = storedUser.isEmpty();
@@ -125,31 +141,45 @@ public class AuthServiceImpl implements AuthService {
         }
         checkEmailValidity(email);
         storedUser.get().setEmail(email);
-        emailSenderService.saveActivationCode(storedUser.get(), "Please confirm your email",
-                "/auth/user/email/confirm/");
+        emailSenderService.saveActivationCode(storedUser.get(), "Wisit this link to confirm your "
+                + "email", "/auth/user/email/confirm/");
     }
 
-    public UserModel editUserPassword(Authentication authentication, Integer id, String password) throws PermissionsException, UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
-        Optional<Auth> storedUser = storeUserRepo.findById(id);
-        boolean isUserNotFound = storedUser.isEmpty();
-        checkPermission(authentication, storedUser);
+    public void sendRegitrationCode(UserRegistrationModel user) throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException {
+        boolean isDeveloperFieldMissing = user.getIsDeveloper() == null;
+        boolean isUserAlreadyExists = storeUserRepo.findByEmail(user.getEmail()) != null;
+        boolean isConfirmPasswordInorrect =
+                !(user.getConfirmPassword() != null && user.getConfirmPassword().equals(user.getPassword()));
+        if (isDeveloperFieldMissing) {
+            user.setIsDeveloper(false);
+        }
+        if (isUserAlreadyExists) {
+            throw new UserAlreadyExistException();
+        }
+        if (isConfirmPasswordInorrect) {
+            throw new IncorrectConfirmPasswordException();
+        }
+        checkEmailValidity(user.getEmail());
+        checkPasswordValidity(user.getPassword());
+        Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
+        emailSenderService.saveActivationCode(userEntity, "Wisit this link to activate your " +
+                "account", "/auth" + "/registration/confirm/");
+    }
+
+    public void sendRestorePasswordCode(String email) throws UserNotFoundException {
+        Auth currentUser = storeUserRepo.findByEmail(email);
+        boolean isUserNotFound = currentUser == null;
         if (isUserNotFound) {
             throw new UserNotFoundException();
         }
-        checkPasswordValidity(password);
-        storedUser.get().setPassword(encoder.encode(password));
-        storeUserRepo.save(storedUser.get());
-        return UserModel.toModel(storedUser.get());
+        emailSenderService.saveActivationCode(currentUser, "Wisit this link to restore your " +
+                "password ", "/auth" + "/user/restore-password/confirm/");
     }
 
     public UserModel saveUserAfterConfirm(ActivationCodeModel user) {
         Auth userEntity = ActivationCodeModel.toAuth(user);
         storeUserRepo.save(userEntity);
         return UserModel.toModel(userEntity);
-    }
-
-    public void restorePasswordByEmail(String email) {
-
     }
 
     private void checkPermission(Authentication authentication, Optional<Auth> storedUser) throws PermissionsException {
@@ -169,11 +199,6 @@ public class AuthServiceImpl implements AuthService {
         boolean isPasswordShort = password.length() < 6;
         boolean isPasswordTooLong = password.length() > 16;
         boolean isPasswordEmpty = password.isEmpty();
-        boolean isPasswordIncludesCapitalLetters = password.matches(".*[A-ZА-Я].*");
-        boolean isPasswordIncluidesLowerLetters = password.matches(".*[a-zа-я].*");
-        boolean isPasswordIncluidesNumbers = password.matches(".*[0-9].*");
-        boolean isPasswordTooWeak =
-                !isPasswordIncluidesNumbers || !isPasswordIncluidesLowerLetters || !isPasswordIncludesCapitalLetters;
         if (isPasswordEmpty) {
             throw new EmptyPasswordException();
         }
@@ -183,8 +208,25 @@ public class AuthServiceImpl implements AuthService {
         if (isPasswordTooLong) {
             throw new TooLongPasswordException();
         }
-        if (isPasswordTooWeak) {
-            throw new PasswordIsTooWeakException();
+        this.isPasswordTooWeak(password);
+    }
+
+    private void isPasswordTooWeak(String password) throws PasswordIsTooWeakException {
+        boolean isPasswordIncludesCapitalLetters = password.matches(".*[A-ZА-Я].*");
+        boolean isPasswordIncluidesLowerLetters = password.matches(".*[a-zа-я].*");
+        boolean isPasswordIncluidesNumbers = password.matches(".*[0-9].*");
+        boolean isPasswordIncluidesSpecialCharacters = password.matches(".*[!@#$%^&*()].*");
+        if (!isPasswordIncludesCapitalLetters) {
+            throw new PasswordIsTooWeakException("must include at least one capital letter");
+        }
+        if (!isPasswordIncluidesLowerLetters) {
+            throw new PasswordIsTooWeakException("must include at least one lower letter");
+        }
+        if (!isPasswordIncluidesNumbers) {
+            throw new PasswordIsTooWeakException("must include at least one number");
+        }
+        if (!isPasswordIncluidesSpecialCharacters) {
+            throw new PasswordIsTooWeakException("must include at least one special character");
         }
     }
 

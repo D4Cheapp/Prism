@@ -36,8 +36,9 @@ public class SecurityConfig {
             return config;
         })).authorizeHttpRequests(request -> {
             request.requestMatchers("/auth/login", "/auth/registration", "/auth/registration" +
-                    "/confirm/*", "/auth/user/restore-password/confirm/*", "/auth/user/email" +
-                    "/confirm/*", "/swagger-ui/*", "/api-doc", "/api-doc/*").permitAll();
+                    "/confirm/*", "/auth/user/restore-password", "/auth/user/restore-password" +
+                    "/confirm" + "/*", "/auth/user/email" + "/confirm" + "/*", "/swagger-ui/*",
+                    "/api-doc", "/api" + "-doc/*").permitAll();
             request.anyRequest().authenticated();
         }).build();
     }

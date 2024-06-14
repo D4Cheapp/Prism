@@ -1,4 +1,4 @@
-package com.messenger.prism.exception.auth;
+package com.messenger.prism.exception.auth.password;
 
 public class IncorrectConfirmPasswordException extends Exception {
     public IncorrectConfirmPasswordException() {

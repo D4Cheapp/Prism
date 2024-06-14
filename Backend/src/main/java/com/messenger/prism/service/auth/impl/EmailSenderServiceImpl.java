@@ -29,7 +29,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         mail.setFrom(fromEmail);
         mail.setTo(account.getEmail());
         mail.setSubject("Prism activation code");
-        mail.setText(message + "\nActivation link: {backendurl/frontendurl}" + activationUrl + code);
+        mail.setText(message + "\nActivation link: http://localhost:8080/prism/v1" + activationUrl + code);
         acticationCodeRepo.saveCode(new ActivationCodeModel(account, code));
         javaMailSender.send(mail);
     }

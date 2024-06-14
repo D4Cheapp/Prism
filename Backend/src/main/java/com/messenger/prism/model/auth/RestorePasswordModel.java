@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class RestorePasswordModel {
-    private String oldPassword;
-    private String newPassword;
+    private String password;
+    private String confirmPassword;
 }
