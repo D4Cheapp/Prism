@@ -16,9 +16,9 @@ public class Profile {
     private String phone;
     private String tag;
     private String status;
-    private Boolean isOnline;
-    //TODO: найти способ хранения чатов
-    private String[] chatId;
-    private String[] blackListId;
+    private boolean isOnline;
+    private Integer[] chatId;
+    private Integer[] friendId;
+    private Integer[] blackListId;
     private String profilePictureUrl;
 }
