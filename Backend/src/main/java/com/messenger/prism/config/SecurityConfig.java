@@ -35,10 +35,24 @@ public class SecurityConfig {
             config.setAllowedHeaders(Collections.singletonList("*"));
             return config;
         })).authorizeHttpRequests(request -> {
-            request.requestMatchers("/auth/login", "/auth/registration", "/auth/registration" +
-                    "/confirm/*", "/auth/user/restore-password", "/auth/user/restore-password" +
-                    "/confirm" + "/*", "/auth/user/email" + "/confirm" + "/*", "/swagger-ui/*",
-                    "/api-doc", "/api" + "-doc/*").permitAll();
+            String loginPath = "/auth/login";
+            String registrationPath = "/auth/registration";
+            String registrationConfirmPath = "/auth/registration/confirm/*";
+            String registrationConfirmTemplatePath = "/registration/confirm";
+            String restorePasswordPath = "/auth/user/restore-password";
+            String restorePasswordConfirmPath = "/auth/user/restore-password/confirm/*";
+            String restorePasswordConfirmTemplatePath = "/user/restore-password/confirm";
+            String emailConfirmPath = "/auth/user/email/confirm/*";
+            String emailConfirmTemplatePath = "/user/email/confirm";
+            String swaggerPath = "/swagger-ui/*";
+            String swaggerDocPath = "/api-doc";
+            String staticAuthCssFiles = "/css/*";
+            String staticAuthjsFiles = "/js/*";
+            request.requestMatchers(loginPath, registrationPath, registrationConfirmPath,
+                    restorePasswordPath, restorePasswordConfirmPath, emailConfirmPath,
+                    swaggerPath, swaggerDocPath, emailConfirmTemplatePath,
+                    restorePasswordConfirmTemplatePath, registrationConfirmTemplatePath,
+                    staticAuthCssFiles, staticAuthjsFiles).permitAll();
             request.anyRequest().authenticated();
         }).build();
     }

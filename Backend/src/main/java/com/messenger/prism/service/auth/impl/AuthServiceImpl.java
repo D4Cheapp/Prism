@@ -142,7 +142,7 @@ public class AuthServiceImpl implements AuthService {
         checkEmailValidity(email);
         storedUser.get().setEmail(email);
         emailSenderService.saveActivationCode(storedUser.get(), "Wisit this link to confirm your "
-                + "email", "/auth/user/email/confirm/");
+                + "email", "/user/email/confirm?code=");
     }
 
     public void sendRegitrationCode(UserRegistrationModel user) throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException {
@@ -163,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
         checkPasswordValidity(user.getPassword());
         Auth userEntity = UserRegistrationModel.toEntity(user, encoder);
         emailSenderService.saveActivationCode(userEntity, "Wisit this link to activate your " +
-                "account", "/auth" + "/registration/confirm/");
+                "account", "/registration/confirm?code=");
     }
 
     public void sendRestorePasswordCode(String email) throws UserNotFoundException {
@@ -173,7 +173,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UserNotFoundException();
         }
         emailSenderService.saveActivationCode(currentUser, "Wisit this link to restore your " +
-                "password ", "/auth" + "/user/restore-password/confirm/");
+                "password ", "/user/restore-password/confirm?code=");
     }
 
     public UserModel saveUserAfterConfirm(ActivationCodeModel user) {
