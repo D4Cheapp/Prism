@@ -9,33 +9,51 @@
 <body>
   <div class="Sign_In">
     <h1>Sign In</h1>
-    <div class="E-mail">
-      <form id="mali">
-        <label for="mail"><p>Email</p></label>
-        <input type="text" name="login" id="login" placeholder="Example@mail.com">
-      </form>
-    </div>
-    <div class="password">
-      <form id="pword">
-        <label for="pword"><p>Password</p></label>
-        <input type="password" name="pass" class="pass" minlength="8" re>
-      </form>
-    </div>
-    <div class="confirmPassword">
-      <form id="checkpword">
-        <label for="checkpword"><p>Confirm Password</p></label>
-        <input type="password" name="pass" class="pass" minlength="8" re>
-      </form>
-    </div>
-    <div class="AdminCheck">
-      <form>
+    <div class="Auth">
+      <form name="loginForm" onsubmit="registration(event)">
+        <label for="login"><p>Email</p></label>
+        <input type="text" name="login" id="login" placeholder="Example@mail.com" minlength="3">
+        <a href="/Frontend/Pages/EmailConfirm.html" target="_blank" class="Verify" onclick="Verify(e)">Verify E-mail</a>
+        <label for="pass"><p>Password</p></label>
+        <input type="password"
+        name="pass"
+        class="pass"
+        id="pass"
+        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}"  
+        title="Must contain at least one number, one uppercase and lowercase letter, and at least 6 characters"  required
+        minlength="6" 
+        maxlength="16"
+        re>
+        <button class="showPass" onclick="showPassword()">
+          <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e8eaed"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
+        </button> 
+        <label 
+        for="confirmPass">
+        <p>Confirm Password</p>
+        </label>
+        <input 
+        type="password" 
+        name="confirmPass" 
+        class="pass" 
+        id="confirmPass" 
+        pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
+        onkeyup="validate_password()" 
+        minlength="6" re>
+        <div id="wrong_pass_alert"></div>
+        <label 
+        for="IsAdmin">Developer
+        </label>
         <input id="IsAdmin" type="checkbox">
-        <label for="IsAdmin">Administrator</label>
+        <div class="Sign_In_Button">
+            <button name="Sign In" class="SIB" id="SIB" type="submit" onclick="wrong_pass_alert(event)">Sign In</button>
+        </div>
       </form>
-    </div>
-    <div class="Sign_In_Button">
-      <button name="Sign In" class="SIB">Sign In</button>
+      <a href="Pages/logIn.html"> Log In </a>
+      <div>
+        <a href="Pages/MainPage.html">ну крч пока так</a>
+      </div>
     </div>
   </div>
+  <script src="Utils/api.js"></script>
 </body>
 </html>
