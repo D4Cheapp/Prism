@@ -37,22 +37,13 @@ public class SecurityConfig {
         })).authorizeHttpRequests(request -> {
             String loginPath = "/auth/login";
             String registrationPath = "/auth/registration";
-            String registrationConfirmPath = "/auth/registration/confirm/*";
-            String registrationConfirmTemplatePath = "/registration/confirm";
-            String restorePasswordPath = "/auth/user/restore-password";
-            String restorePasswordConfirmPath = "/auth/user/restore-password/confirm/*";
-            String restorePasswordConfirmTemplatePath = "/user/restore-password/confirm";
-            String emailConfirmPath = "/auth/user/email/confirm/*";
-            String emailConfirmTemplatePath = "/user/email/confirm";
+            String restorePasswordConfirmPath = "/auth/restore-password";
+            String emailConfirmPath = "/auth/email";
             String swaggerPath = "/swagger-ui/*";
             String swaggerDocPath = "/api-doc";
-            String staticAuthCssFiles = "/css/*";
-            String staticAuthjsFiles = "/js/*";
-            request.requestMatchers(loginPath, registrationPath, registrationConfirmPath,
-                    restorePasswordPath, restorePasswordConfirmPath, emailConfirmPath,
-                    swaggerPath, swaggerDocPath, emailConfirmTemplatePath,
-                    restorePasswordConfirmTemplatePath, registrationConfirmTemplatePath,
-                    staticAuthCssFiles, staticAuthjsFiles).permitAll();
+            String swaggerDocPath2 = "/api-doc/*";
+            request.requestMatchers(loginPath, registrationPath, restorePasswordConfirmPath,
+                    emailConfirmPath, swaggerPath, swaggerDocPath, swaggerDocPath2).permitAll();
             request.anyRequest().authenticated();
         }).build();
     }

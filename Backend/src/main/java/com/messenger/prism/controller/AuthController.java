@@ -50,24 +50,44 @@ public class AuthController {
     }
 
     @PostMapping("/registration")
-    public ResponseEntity<TextResponseModel> sendRegistrationCode(@RequestBody UserRegistrationModel user) {
+    public ResponseEntity<TextResponseModel> sendRegistrationCode(@RequestBody UserRegistrationModel user, HttpServletRequest request) {
         try {
-            authService.sendRegitrationCode(user);
+            emailSenderService.sendRegitrationCode(user);
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Confirmation " + "email was sent to: " + user.getEmail(), true));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(TextResponseModel.toTextResponseModel("Error" + ":" + " " + e.getMessage(), false));
         }
     }
 
-    @PostMapping("/registration/confirm/{code}")
-    public ResponseEntity<TextResponseModel> confirmRegistration(@PathVariable String code,
+    @PostMapping("/restore-password")
+    public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email, HttpServletRequest request) {
+        try {
+            emailSenderService.sendRestorePasswordCode(email.getEmail());
+            return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Restore " +
+                    "password " + "email was succesfuly sent", true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(TextResponseModel.toTextResponseModel("Error" + ":" + " " + e.getMessage(), false));
+        }
+    }
+
+    @PostMapping("/email")
+    public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmition(@RequestBody EmailModel email, HttpServletRequest request, Authentication authentication) {
+        try {
+            emailSenderService.sendEditUserEmailCode(authentication, email);
+            return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Confirmation " + "for email change was sent to: " + email.getEmail(), true));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(TextResponseModel.toTextResponseModel("Error" + ":" + " " + e.getMessage(), false));
+        }
+    }
+
+    @PatchMapping("/registration")
+    public ResponseEntity<TextResponseModel> confirmRegistration(AuthConfirmModel confirmModel,
                                                                  HttpServletRequest request) {
         try {
             ActivationCodeModel activationCodeModel =
-                    emailSenderService.getUserByActivationCode(code);
+                    emailSenderService.getUserByActivationCode(confirmModel.getCode());
             UserModel returnedUser = authService.saveUserAfterConfirm(activationCodeModel);
-            emailSenderService.deleteActivationCode(code);
-            authService.deleteSession(request);
+            emailSenderService.deleteActivationCode(confirmModel.getCode());
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("User was " +
                     "created successfully", true));
         } catch (Exception e) {
@@ -75,14 +95,14 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/user/email/confirm/{code}")
-    public ResponseEntity<TextResponseModel> confirmEmail(@PathVariable String code,
+    @PatchMapping("/email")
+    public ResponseEntity<TextResponseModel> confirmEmail(AuthConfirmModel confirmModel,
                                                           HttpServletRequest request) {
         try {
             ActivationCodeModel activationCodeModel =
-                    emailSenderService.getUserByActivationCode(code);
+                    emailSenderService.getUserByActivationCode(confirmModel.getCode());
             UserModel returnedUser = authService.saveUserAfterConfirm(activationCodeModel);
-            emailSenderService.deleteActivationCode(code);
+            emailSenderService.deleteActivationCode(confirmModel.getCode());
             authService.deleteSession(request);
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Email " + "was"
                     + " changed successfully", true));
@@ -91,27 +111,14 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/user/restore-password")
-    public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email) {
-        try {
-            authService.sendRestorePasswordCode(email.getEmail());
-            return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Restore " +
-                    "password " + "email was succesfuly sent", true));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(TextResponseModel.toTextResponseModel("Error" + ":" + " " + e.getMessage(), false));
-        }
-    }
-
-    @PatchMapping("/user/restore-password/confirm/{code}")
-    public ResponseEntity<TextResponseModel> confirmPasswordRestore(@PathVariable String code,
-                                                                    @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request) {
+    @PatchMapping("/restore-password")
+    public ResponseEntity<TextResponseModel> confirmPasswordRestore(@RequestBody RestorePasswordModel passwordModel) {
         try {
             ActivationCodeModel activationCodeModel =
-                    emailSenderService.getUserByActivationCode(code);
-            UserModel returnedUser = authService.restoreUserPassword(code, activationCodeModel,
-                    passwordModel);
-            authService.deleteSession(request);
-            emailSenderService.deleteActivationCode(code);
+                    emailSenderService.getUserByActivationCode(passwordModel.getCode());
+            UserModel returnedUser = authService.restoreUserPassword(passwordModel.getCode(),
+                    activationCodeModel, passwordModel);
+            emailSenderService.deleteActivationCode(passwordModel.getCode());
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Password " +
                     "was changed successfully", true));
         } catch (Exception e) {
@@ -119,24 +126,13 @@ public class AuthController {
         }
     }
 
-    @PatchMapping("/user/{id}/password")
-    public ResponseEntity<UserModel> sendEditUserPasswordConfirmition(@PathVariable Integer id,
-                                                                      @RequestBody EditPasswordModel passwords, Authentication authentication) {
+    @PatchMapping("/password")
+    public ResponseEntity<UserModel> sendEditUserPasswordConfirmition(@RequestBody EditPasswordModel passwords, Authentication authentication) {
         try {
-            UserModel returnedUser = authService.editUserPassword(authentication, id, passwords);
+            UserModel returnedUser = authService.editUserPassword(authentication, passwords);
             return ResponseEntity.ok().body(returnedUser);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(UserModel.toModel("Error" + ":" + " " + e.getMessage()));
-        }
-    }
-
-    @PatchMapping("/user/{id}/email")
-    public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmition(@PathVariable Integer id, @RequestBody EmailModel email, Authentication authentication) {
-        try {
-            authService.sendEditUserEmailCode(authentication, id, email.getEmail());
-            return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Confirmation " + "for email change was sent to: " + email.getEmail(), true));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(TextResponseModel.toTextResponseModel("Error" + ":" + " " + e.getMessage(), false));
         }
     }
 
