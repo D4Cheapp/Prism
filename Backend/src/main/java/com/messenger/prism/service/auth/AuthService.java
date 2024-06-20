@@ -2,6 +2,7 @@ package com.messenger.prism.service.auth;
 
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
+import com.messenger.prism.exception.auth.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.email.EmptyPasswordException;
 import com.messenger.prism.exception.auth.password.*;
@@ -30,4 +31,6 @@ public interface AuthService {
                                   RestorePasswordModel password) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException;
 
     UserModel saveUserAfterConfirm(ActivationCodeModel user);
+
+    void checkTrottleRequest(HttpServletRequest request, String type) throws TooManyAttemptsException;
 }
