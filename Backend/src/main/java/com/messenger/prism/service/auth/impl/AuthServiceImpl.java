@@ -3,6 +3,7 @@ package com.messenger.prism.service.auth.impl;
 import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
+import com.messenger.prism.exception.auth.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.email.EmptyPasswordException;
 import com.messenger.prism.exception.auth.password.*;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import static org.springframework.security.web.context.HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY;
@@ -124,5 +126,46 @@ public class AuthServiceImpl implements AuthService {
         Auth userEntity = ActivationCodeModel.toAuth(user);
         storeUserRepo.save(userEntity);
         return UserModel.toModel(userEntity);
+    }
+
+    public void checkTrottleRequest(HttpServletRequest request, String type) throws TooManyAttemptsException {
+        Object storredAttempts = request.getSession().getAttribute(type + "-attempts");
+        boolean isFirstAttempt = storredAttempts == null;
+        if (isFirstAttempt) {
+            setFirstAttempt(request, type);
+        } else {
+            checkTrottleRequests(storredAttempts, request, type);
+        }
+    }
+
+    private void setFirstAttempt(HttpServletRequest request, String type) {
+        Date time = new Date();
+        RequestAttemptModel newAttempt = new RequestAttemptModel(type, 1, time.getTime());
+        request.getSession().setAttribute(type + "-attempts", newAttempt);
+    }
+
+    private void checkTrottleRequests(Object storredAttempts, HttpServletRequest request,
+                                      String type) throws TooManyAttemptsException {
+        RequestAttemptModel attemptModel = (RequestAttemptModel) storredAttempts;
+        Date time = new Date();
+        int limitAttempts = type.equals("login") || type.equals("registration") ? 5 : 1;
+        boolean isLimitAttemt = attemptModel.getAttemptCount() >= limitAttempts;
+        boolean isAttemptExpired = attemptModel.getLastAttemptTime() + 120000 < time.getTime();
+        if (isLimitAttemt && isAttemptExpired) {
+            setFirstAttempt(request, type);
+        }
+        if (isLimitAttemt && !isAttemptExpired) {
+            long remainingMillisecondsTime =
+                    attemptModel.getLastAttemptTime() + 120000 - time.getTime();
+            long seconds = (remainingMillisecondsTime / 1000) % 60;
+            long minutes = (remainingMillisecondsTime / 1000) / 60;
+            String remainingStringTime = String.format("%02d:%02d", minutes, seconds);
+            throw new TooManyAttemptsException(remainingStringTime);
+        }
+        if (!isLimitAttemt) {
+            attemptModel.setAttemptCount(attemptModel.getAttemptCount() + 1);
+            attemptModel.setLastAttemptTime(time.getTime());
+            request.getSession().setAttribute(type + "-attempts", attemptModel);
+        }
     }
 }

@@ -40,6 +40,7 @@ public class AuthController {
                                            HttpServletRequest request,
                                            HttpServletResponse response) {
         try {
+            authService.checkTrottleRequest(request, "login");
             UserModel returnedUser = authService.login(user);
             authService.sessionAuthentication(request, response, user.getEmail(),
                     user.getPassword());
@@ -52,6 +53,7 @@ public class AuthController {
     @PostMapping("/registration")
     public ResponseEntity<TextResponseModel> sendRegistrationCode(@RequestBody UserRegistrationModel user, HttpServletRequest request) {
         try {
+            authService.checkTrottleRequest(request, "registration");
             emailSenderService.sendRegitrationCode(user);
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Confirmation " + "email was sent to: " + user.getEmail(), true));
         } catch (Exception e) {
@@ -62,6 +64,7 @@ public class AuthController {
     @PostMapping("/restore-password")
     public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email, HttpServletRequest request) {
         try {
+            authService.checkTrottleRequest(request, "restore-password");
             emailSenderService.sendRestorePasswordCode(email.getEmail());
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Restore " +
                     "password " + "email was succesfuly sent", true));
@@ -73,6 +76,7 @@ public class AuthController {
     @PostMapping("/email")
     public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmition(@RequestBody EmailModel email, HttpServletRequest request, Authentication authentication) {
         try {
+            authService.checkTrottleRequest(request, "edit-email");
             emailSenderService.sendEditUserEmailCode(authentication, email);
             return ResponseEntity.ok().body(TextResponseModel.toTextResponseModel("Confirmation " + "for email change was sent to: " + email.getEmail(), true));
         } catch (Exception e) {
