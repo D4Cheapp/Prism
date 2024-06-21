@@ -1,4 +1,4 @@
-package com.messenger.prism.exception.auth;
+package com.messenger.prism.exception;
 
 public class TooManyAttemptsException extends Exception {
 

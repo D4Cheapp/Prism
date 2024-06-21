@@ -1,4 +1,4 @@
-package com.messenger.prism.exception.auth.email;
+package com.messenger.prism.exception.auth.password;
 
 public class EmptyPasswordException extends Exception {
     public EmptyPasswordException() {

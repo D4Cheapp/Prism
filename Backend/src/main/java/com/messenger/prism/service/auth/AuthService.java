@@ -2,9 +2,9 @@ package com.messenger.prism.service.auth;
 
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
-import com.messenger.prism.exception.auth.TooManyAttemptsException;
+import com.messenger.prism.exception.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
-import com.messenger.prism.exception.auth.email.EmptyPasswordException;
+import com.messenger.prism.exception.auth.password.EmptyPasswordException;
 import com.messenger.prism.exception.auth.password.*;
 import com.messenger.prism.model.auth.*;
 import jakarta.servlet.http.HttpServletRequest;

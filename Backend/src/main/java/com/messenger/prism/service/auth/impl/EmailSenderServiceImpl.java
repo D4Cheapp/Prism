@@ -6,7 +6,7 @@ import com.messenger.prism.exception.auth.ActivationCodeExpireException;
 import com.messenger.prism.exception.auth.UserAlreadyExistException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.email.EmptyEmailException;
-import com.messenger.prism.exception.auth.email.EmptyPasswordException;
+import com.messenger.prism.exception.auth.password.EmptyPasswordException;
 import com.messenger.prism.exception.auth.email.IncorectEmailException;
 import com.messenger.prism.exception.auth.password.IncorrectConfirmPasswordException;
 import com.messenger.prism.exception.auth.password.PasswordIsTooWeakException;

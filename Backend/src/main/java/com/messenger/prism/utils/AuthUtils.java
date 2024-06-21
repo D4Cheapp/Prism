@@ -4,7 +4,7 @@ package com.messenger.prism.utils;
 import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.auth.email.EmptyEmailException;
-import com.messenger.prism.exception.auth.email.EmptyPasswordException;
+import com.messenger.prism.exception.auth.password.EmptyPasswordException;
 import com.messenger.prism.exception.auth.email.IncorectEmailException;
 import com.messenger.prism.exception.auth.password.PasswordIsTooWeakException;
 import com.messenger.prism.exception.auth.password.TooLongPasswordException;
