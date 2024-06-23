@@ -1,0 +1,43 @@
+version: "3.7"
+
+services:
+  redis:
+    container_name: "compose-redis"
+    image: redis
+    restart: always
+    volumes:
+      - ./redis-data:/data
+    hostname: "redis"
+    ports:
+      - "6379:6379"
+  postgres:
+    volumes:
+      - ./postgres-data:/data
+    container_name: "compose-postgres"
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_LOGIN}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: Prism
+  app:
+    container_name: "spring-prism-backend-docker"
+    image: "spring-prism-backend-docker"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/Prism
+      DB_LOGIN: ${DB_LOGIN}
+      DB_PASSWORD: ${DB_PASSWORD}
+      EMAIL_LOGIN: ${EMAIL_LOGIN}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+      SERVER_PORT: ${SERVER_PORT}
+      POSTGRES_USER: ${DB_LOGIN}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      REDIS_HOST: "redis"
+      REDIS_PORT: ${REDIS_PORT}
