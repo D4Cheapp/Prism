@@ -12,13 +12,13 @@ public class Auth {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @NotNull
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String email;
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String password;
     @NotNull
-    @Check(constraints = "role IN ('USER', 'ADMIN')")
+    @Check(constraints = "role IN ('USER', 'DEVELOPER')")
+    @Column(nullable = false)
     private String role;
 }

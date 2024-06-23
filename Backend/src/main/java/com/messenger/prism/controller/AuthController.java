@@ -75,8 +75,7 @@ public class AuthController {
     }
 
     @PatchMapping("/registration")
-    public ResponseEntity<TextResponseModel> confirmRegistration(AuthConfirmModel confirmModel,
-                                                                 HttpServletRequest request) throws ActivationCodeExpireException {
+    public ResponseEntity<TextResponseModel> confirmRegistration(@RequestBody AuthConfirmModel confirmModel, HttpServletRequest request) throws ActivationCodeExpireException {
         ActivationCodeModel activationCodeModel =
                 emailSenderService.getUserByActivationCode(confirmModel.getCode());
         UserModel returnedUser = authService.saveUserAfterConfirm(activationCodeModel);
@@ -86,8 +85,7 @@ public class AuthController {
     }
 
     @PatchMapping("/email")
-    public ResponseEntity<TextResponseModel> confirmEmail(AuthConfirmModel confirmModel,
-                                                          HttpServletRequest request) throws ActivationCodeExpireException {
+    public ResponseEntity<TextResponseModel> confirmEmail(@RequestBody AuthConfirmModel confirmModel, HttpServletRequest request) throws ActivationCodeExpireException {
         ActivationCodeModel activationCodeModel =
                 emailSenderService.getUserByActivationCode(confirmModel.getCode());
         UserModel returnedUser = authService.saveUserAfterConfirm(activationCodeModel);
@@ -98,10 +96,8 @@ public class AuthController {
 
     @PatchMapping("/restore-password")
     public ResponseEntity<TextResponseModel> confirmPasswordRestore(@RequestBody RestorePasswordModel passwordModel) throws ActivationCodeExpireException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, TooLongPasswordException, TooShortPasswordException {
-        ActivationCodeModel activationCodeModel =
-                emailSenderService.getUserByActivationCode(passwordModel.getCode());
         UserModel returnedUser = authService.restoreUserPassword(passwordModel.getCode(),
-                activationCodeModel, passwordModel);
+                passwordModel);
         emailSenderService.deleteActivationCode(passwordModel.getCode());
         return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Password " + "was " +
                 "changed successfully", true), HttpStatus.OK);

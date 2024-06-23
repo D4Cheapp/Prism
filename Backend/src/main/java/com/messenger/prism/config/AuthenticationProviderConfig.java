@@ -27,13 +27,11 @@ public class AuthenticationProviderConfig implements AuthenticationProvider {
         if (isUserAlreadyExists) {
             throw new BadCredentialsException("User already exists");
         }
-        boolean isPasswordInorrect = !(passwordEncoder.matches(password,
-                user.getPassword()));
+        boolean isPasswordInorrect = !(passwordEncoder.matches(password, user.getPassword()));
         if (isPasswordInorrect) {
             throw new BadCredentialsException("Incorrect password");
         }
-        return new UsernamePasswordAuthenticationToken(email, password,
-                new ArrayList<>());
+        return new UsernamePasswordAuthenticationToken(email, password, new ArrayList<>());
     }
 
     @Override

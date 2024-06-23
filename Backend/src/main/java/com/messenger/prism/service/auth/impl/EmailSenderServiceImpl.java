@@ -6,19 +6,15 @@ import com.messenger.prism.exception.auth.ActivationCodeExpireException;
 import com.messenger.prism.exception.auth.UserAlreadyExistException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.email.EmptyEmailException;
-import com.messenger.prism.exception.auth.password.EmptyPasswordException;
 import com.messenger.prism.exception.auth.email.IncorectEmailException;
-import com.messenger.prism.exception.auth.password.IncorrectConfirmPasswordException;
-import com.messenger.prism.exception.auth.password.PasswordIsTooWeakException;
-import com.messenger.prism.exception.auth.password.TooLongPasswordException;
-import com.messenger.prism.exception.auth.password.TooShortPasswordException;
+import com.messenger.prism.exception.auth.password.*;
 import com.messenger.prism.model.auth.ActivationCodeModel;
 import com.messenger.prism.model.auth.EmailModel;
 import com.messenger.prism.model.auth.UserRegistrationModel;
 import com.messenger.prism.repository.ActicationCodeRepo;
 import com.messenger.prism.repository.AuthRepo;
 import com.messenger.prism.service.auth.EmailSenderService;
-import com.messenger.prism.utils.AuthUtils;
+import com.messenger.prism.util.AuthUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -77,8 +73,8 @@ public class EmailSenderServiceImpl implements EmailSenderService {
         }
         AuthUtils.checkEmailValidity(editData.getEmail());
         storedUser.get().setEmail(editData.getEmail());
-        this.saveActivationCode(storedUser.get(), "Activation code for confirm " + "your" + " " +
-                "email ");
+        this.saveActivationCode(storedUser.get(),
+                "Activation code for confirm " + "your" + " " + "email ");
     }
 
     public void sendRegitrationCode(UserRegistrationModel user) throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException {
