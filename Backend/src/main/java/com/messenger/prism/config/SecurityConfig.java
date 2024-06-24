@@ -41,9 +41,12 @@ public class SecurityConfig {
             String emailConfirmPath = "/auth/email";
             String swaggerPath = "/swagger-ui/*";
             String swaggerDocPath = "/api-doc";
-            String swaggerDocPath2 = "/api-doc/*";
+            String swaggerDocChilds = "/api-doc/*";
+            String actuatorChilds = "/actuator/*";
+            String actuatorPath = "/actuator";
             request.requestMatchers(loginPath, registrationPath, restorePasswordConfirmPath,
-                    emailConfirmPath, swaggerPath, swaggerDocPath, swaggerDocPath2).permitAll();
+                    emailConfirmPath, swaggerPath, swaggerDocPath, swaggerDocChilds, actuatorPath
+                    , actuatorChilds).permitAll();
             request.anyRequest().authenticated();
         }).build();
     }

@@ -1,10 +1,10 @@
-package com.messenger.prism.utils;
+package com.messenger.prism.util;
 
 
 import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.auth.email.EmptyEmailException;
-import com.messenger.prism.exception.auth.email.EmptyPasswordException;
+import com.messenger.prism.exception.auth.password.EmptyPasswordException;
 import com.messenger.prism.exception.auth.email.IncorectEmailException;
 import com.messenger.prism.exception.auth.password.PasswordIsTooWeakException;
 import com.messenger.prism.exception.auth.password.TooLongPasswordException;
@@ -32,7 +32,7 @@ public class AuthUtils {
     public static void checkPasswordValidity(String password) throws TooLongPasswordException,
             TooShortPasswordException, EmptyPasswordException, PasswordIsTooWeakException {
         boolean isPasswordShort = password.length() < 6;
-        boolean isPasswordTooLong = password.length() > 16;
+        boolean isPasswordTooLong = password.length() > 25;
         boolean isPasswordEmpty = password.isEmpty();
         if (isPasswordEmpty) {
             throw new EmptyPasswordException();
@@ -52,16 +52,16 @@ public class AuthUtils {
         boolean isPasswordIncluidesNumbers = password.matches(".*[0-9].*");
         boolean isPasswordIncluidesSpecialCharacters = password.matches(".*[!@#$%^&*()].*");
         if (!isPasswordIncludesCapitalLetters) {
-            throw new PasswordIsTooWeakException("must include at least one capital letter");
+            throw new PasswordIsTooWeakException("capital letter");
         }
         if (!isPasswordIncluidesLowerLetters) {
-            throw new PasswordIsTooWeakException("must include at least one lower letter");
+            throw new PasswordIsTooWeakException("lower letter");
         }
         if (!isPasswordIncluidesNumbers) {
-            throw new PasswordIsTooWeakException("must include at least one number");
+            throw new PasswordIsTooWeakException("number");
         }
         if (!isPasswordIncluidesSpecialCharacters) {
-            throw new PasswordIsTooWeakException("must include at least one special character");
+            throw new PasswordIsTooWeakException("special character");
         }
     }
 

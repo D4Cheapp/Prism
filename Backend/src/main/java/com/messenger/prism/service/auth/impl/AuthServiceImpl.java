@@ -2,15 +2,14 @@ package com.messenger.prism.service.auth.impl;
 
 import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
+import com.messenger.prism.exception.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
-import com.messenger.prism.exception.auth.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
-import com.messenger.prism.exception.auth.email.EmptyPasswordException;
 import com.messenger.prism.exception.auth.password.*;
 import com.messenger.prism.model.auth.*;
 import com.messenger.prism.repository.AuthRepo;
 import com.messenger.prism.service.auth.AuthService;
-import com.messenger.prism.utils.AuthUtils;
+import com.messenger.prism.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
@@ -108,8 +107,7 @@ public class AuthServiceImpl implements AuthService {
         return UserModel.toModel(storedUser.get());
     }
 
-    public UserModel restoreUserPassword(String code, ActivationCodeModel user,
-                                         RestorePasswordModel passwords) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
+    public UserModel restoreUserPassword(String code, RestorePasswordModel passwords) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
         ActivationCodeModel storedUser = emailSenderService.getUserByActivationCode(code);
         boolean isPasswordsNotSame =
                 !passwords.getConfirmPassword().equals(passwords.getPassword());
