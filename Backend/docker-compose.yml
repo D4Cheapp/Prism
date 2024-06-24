@@ -1,30 +1,9 @@
 version: "3.7"
 
 services:
-  redis:
-    container_name: "compose-redis"
-    image: redis
-    restart: always
-    volumes:
-      - ./redis-data:/data
-    hostname: "redis"
-    ports:
-      - "6379:6379"
-  postgres:
-    volumes:
-      - ./postgres-data:/data
-    container_name: "compose-postgres"
-    image: postgres
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: ${DB_LOGIN}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: Prism
   app:
-    container_name: "spring-prism-backend-docker"
-    image: "spring-prism-backend-docker"
+    container_name: "prism-backend"
+    image: "prism-backend"
     ports:
       - "8080:8080"
     depends_on:
@@ -39,5 +18,46 @@ services:
       SERVER_PORT: ${SERVER_PORT}
       POSTGRES_USER: ${DB_LOGIN}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
-      REDIS_HOST: "redis"
+      REDIS_HOST: redis
       REDIS_PORT: ${REDIS_PORT}
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    hostname: redis
+    ports:
+      - "6379:6379"
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DB_LOGIN}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: Prism
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana:/etc/grafana/provisioning
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+    ports:
+      - "3030:3000"
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    hostname: prometheus
+    depends_on:
+      - app
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+
