@@ -47,10 +47,10 @@ public class EmailSenderServiceImplTest {
         this.authUtilsMock.when(() -> AuthUtils.checkPermission(ArgumentMatchers.any(),
                 ArgumentMatchers.any(), ArgumentMatchers.any())).thenAnswer(i -> null);
         Assertions.assertThrows(UserNotFoundException.class,
-                () -> emailSenderService.sendEditUserEmailCode(null, currentUser));
+                () -> emailSenderService.sendEditUserEmailCode(currentUser, null, null));
         Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(storedUser));
         Assertions.assertThrows(UserAlreadyExistException.class,
-                () -> emailSenderService.sendEditUserEmailCode(null, currentUser));
+                () -> emailSenderService.sendEditUserEmailCode(currentUser, null, null));
     }
 
     @Test
@@ -62,17 +62,17 @@ public class EmailSenderServiceImplTest {
         Mockito.when(authRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(new Auth());
         this.authUtilsMock.when(() -> AuthUtils.checkEmailValidity(ArgumentMatchers.anyString())).thenAnswer(i -> null);
         Assertions.assertThrows(UserAlreadyExistException.class,
-                () -> emailSenderService.sendRegitrationCode(user));
+                () -> emailSenderService.sendRegitrationCode(user, null));
         user.setConfirmPassword("123456123");
         Mockito.when(authRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(null);
         Assertions.assertThrows(IncorrectConfirmPasswordException.class,
-                () -> emailSenderService.sendRegitrationCode(user));
+                () -> emailSenderService.sendRegitrationCode(user, null));
     }
 
     @Test
     void testSendRestorePasswordCode() {
         Mockito.when(authRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(null);
         Assertions.assertThrows(UserNotFoundException.class,
-                () -> emailSenderService.sendRestorePasswordCode("test1@gmail.com"));
+                () -> emailSenderService.sendRestorePasswordCode("test1@gmail.com", null));
     }
 }

@@ -4,6 +4,7 @@ import com.messenger.prism.entity.Auth;
 import com.messenger.prism.exception.PermissionsException;
 import com.messenger.prism.exception.TooManyAttemptsException;
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
+import com.messenger.prism.exception.auth.IncorrectConfirmCodeException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.password.*;
 import com.messenger.prism.model.auth.*;
@@ -38,7 +39,7 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private AuthenticationProvider authenticationProvider;
 
-    public void deleteSession(HttpServletRequest request) {
+    public void deactivateSession(HttpServletRequest request) {
         request.getSession(false).invalidate();
     }
 
@@ -107,11 +108,15 @@ public class AuthServiceImpl implements AuthService {
         return UserModel.toModel(storedUser.get());
     }
 
-    public UserModel restoreUserPassword(String code, RestorePasswordModel passwords) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException {
-        ActivationCodeModel storedUser = emailSenderService.getUserByActivationCode(code);
+    public UserModel restoreUserPassword(String email, RestorePasswordModel passwords) throws ActivationCodeExpireException, IncorrectConfirmPasswordException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, IncorrectConfirmCodeException {
+        ActivationCodeModel storedUser = emailSenderService.getUserByEmail(email);
         boolean isPasswordsNotSame =
                 !passwords.getConfirmPassword().equals(passwords.getPassword());
+        boolean isIncorrectCode = !storedUser.getCode().equals(passwords.getCode());
         AuthUtils.checkPasswordValidity(passwords.getPassword());
+        if (isIncorrectCode) {
+            throw new IncorrectConfirmCodeException();
+        }
         if (isPasswordsNotSame) {
             throw new IncorrectConfirmPasswordException();
         }
@@ -120,7 +125,11 @@ public class AuthServiceImpl implements AuthService {
         return UserModel.toModel(ActivationCodeModel.toAuth(storedUser));
     }
 
-    public UserModel saveUserAfterConfirm(ActivationCodeModel user) {
+    public UserModel saveUserAfterConfirm(ActivationCodeModel user, String code) throws IncorrectConfirmCodeException {
+        boolean isActivationCodeIncorrect = !code.equals(user.getCode());
+        if (isActivationCodeIncorrect) {
+            throw new IncorrectConfirmCodeException();
+        }
         Auth userEntity = ActivationCodeModel.toAuth(user);
         storeUserRepo.save(userEntity);
         return UserModel.toModel(userEntity);
