@@ -90,7 +90,7 @@ public class AuthServiceImplTest {
         RestorePasswordModel passwords = new RestorePasswordModel();
         passwords.setPassword("test");
         passwords.setConfirmPassword("test2");
-        Mockito.when(emailSenderService.getUserByActivationCode(ArgumentMatchers.anyString())).thenReturn(user);
+        Mockito.when(emailSenderService.getUserByEmail(ArgumentMatchers.anyString())).thenReturn(user);
         this.authUtilsMock.when(() -> AuthUtils.checkPasswordValidity(ArgumentMatchers.anyString())).thenAnswer(i -> null);
         Assertions.assertThrows(IncorrectConfirmPasswordException.class,
                 () -> authService.restoreUserPassword("123", passwords));

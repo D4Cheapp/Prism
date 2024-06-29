@@ -1,12 +1,14 @@
 package com.messenger.prism.advice;
 
 import com.messenger.prism.exception.auth.ActivationCodeExpireException;
+import com.messenger.prism.exception.auth.IncorrectConfirmCodeException;
 import com.messenger.prism.exception.auth.UserAlreadyExistException;
 import com.messenger.prism.exception.auth.UserNotFoundException;
 import com.messenger.prism.exception.auth.email.EmptyEmailException;
 import com.messenger.prism.exception.auth.email.IncorectEmailException;
 import com.messenger.prism.exception.auth.password.*;
 import com.messenger.prism.model.TextResponseModel;
+import jakarta.mail.internet.AddressException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,7 +20,8 @@ public class AuthAdvice {
             EmptyEmailException.class, EmptyPasswordException.class, IncorectEmailException.class
             , IncorrectConfirmPasswordException.class, IncorrectPasswordException.class,
             PasswordIsTooWeakException.class, TooLongPasswordException.class,
-            TooShortPasswordException.class, UserNotFoundException.class})
+            TooShortPasswordException.class, UserNotFoundException.class, AddressException.class,
+            IncorrectConfirmCodeException.class})
     public ResponseEntity<TextResponseModel> handleException(Exception exception) {
         return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Error" + ": " + exception.getMessage(), false), HttpStatus.BAD_REQUEST);
     }
