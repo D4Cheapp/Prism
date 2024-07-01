@@ -1,0 +1,47 @@
+version: "3.7"
+name: prism-messenger
+services:
+  app:
+    container_name: "prism-messenger"
+    image: "prism-messenger"
+    build: ./
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../../.env
+    depends_on:
+      - neo4j
+      - minio
+  neo4j:
+    container_name: neo4j
+    image: neo4j
+    restart: always
+    ports:
+      - "7687:7687"
+      - "7474:7474"
+      - "7473:7473"
+    env_file:
+      - ../../.env
+  minio:
+    image: minio/minio
+    container_name: minio
+    restart: always
+    command: server /data --console-address :9001
+    env_file:
+      - ../../.env
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+  minio-bucket:
+    image: minio/mc
+    container_name: minio-bucket
+    depends_on:
+      - minio
+    env_file:
+      - ../../.env
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        /usr/bin/mc config host add local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+        /usr/bin/mc mb -p local/prism-bucket;
