@@ -48,7 +48,6 @@ public class AuthController {
     public ResponseEntity<TextResponseModel> sendRegistrationCode(@RequestBody UserRegistrationModel user, HttpServletRequest request) throws EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, TooLongPasswordException, TooShortPasswordException, TooManyAttemptsException {
         authService.checkTrottleRequest(request, "registration");
         emailSenderService.sendRegitrationCode(user, request);
-        rabbitMQService.createUserProfile(user.getEmail());
         return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Confirmation " +
                 "email was sent to: " + user.getEmail(), true), HttpStatus.OK);
     }
@@ -77,6 +76,7 @@ public class AuthController {
                 confirmModel.getCode());
         emailSenderService.deleteActivationCode(confirmEmail);
         request.getSession().removeAttribute("confirmEmail");
+        rabbitMQService.createUserProfile(confirmEmail);
         return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User was " + "created "
                 + "successfully", true), HttpStatus.CREATED);
     }
