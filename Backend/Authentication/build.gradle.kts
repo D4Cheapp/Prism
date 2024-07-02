@@ -22,6 +22,7 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("org.springframework.amqp:spring-rabbit:3.1.6")
     implementation("ch.qos.logback:logback-core:1.5.6")
     implementation("io.lettuce:lettuce-core")
     implementation("io.micrometer:micrometer-registry-prometheus")

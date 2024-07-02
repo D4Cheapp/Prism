@@ -3,11 +3,10 @@ name: prism-core
 services:
   rabbitmq:
     container_name: rabbitmq
-    image: rabbitmq
+    image: rabbitmq:management
     ports:
       - "5672:5672"
       - "15672:15672"
-    hostname: rabbitmq
     restart: always
     env_file:
       - ../.env
@@ -32,5 +31,3 @@ services:
       - "9091:9091"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
-

@@ -7,6 +7,7 @@ import com.prism.authentication.exception.password.*;
 import com.prism.authentication.model.*;
 import com.prism.authentication.service.impl.AuthServiceImpl;
 import com.prism.authentication.service.impl.EmailSenderServiceImpl;
+import com.prism.authentication.service.impl.RabbitMQServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,6 +25,8 @@ public class AuthController {
     private AuthServiceImpl authService;
     @Autowired
     private EmailSenderServiceImpl emailSenderService;
+    @Autowired
+    private RabbitMQServiceImpl rabbitMQService;
 
     @GetMapping("/user")
     public ResponseEntity<UserModel> getCurrentAuthenticatedUser(Authentication authentication) throws UserNotFoundException {
@@ -45,6 +48,7 @@ public class AuthController {
     public ResponseEntity<TextResponseModel> sendRegistrationCode(@RequestBody UserRegistrationModel user, HttpServletRequest request) throws EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, TooLongPasswordException, TooShortPasswordException, TooManyAttemptsException {
         authService.checkTrottleRequest(request, "registration");
         emailSenderService.sendRegitrationCode(user, request);
+        rabbitMQService.createUserProfile(user.getEmail());
         return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Confirmation " +
                 "email was sent to: " + user.getEmail(), true), HttpStatus.OK);
     }

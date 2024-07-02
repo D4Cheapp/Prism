@@ -18,6 +18,7 @@ repositories {
 dependencies {
     compileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+    implementation("org.springframework.amqp:spring-rabbit:3.1.6")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
     implementation("org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0")
     implementation("ch.qos.logback:logback-core:1.5.6")
