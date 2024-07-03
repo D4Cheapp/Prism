@@ -20,9 +20,7 @@ public class OpenApiConfiguration {
         prodServer.setUrl("https://workable-wolf-greatly.ngrok-free.app/prism/v1/");
         prodServer.setDescription("Production Server");
 
-        Info info =
-                new Info().title("Prism Messenger API").version("1.0").description("Prism " +
-                        "messenger " + "API" + " documentation");
+        Info info = new Info().title("Prism Messenger API").version("1.0").description("Prism " + "messenger " + "API" + " documentation");
         return new OpenAPI().info(info).servers(List.of(devServer, prodServer));
     }
 }

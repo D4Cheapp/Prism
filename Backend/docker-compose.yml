@@ -4,6 +4,9 @@ services:
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management
+    hostname: rabbitmq
+    networks:
+      - prism-network
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -14,20 +17,28 @@ services:
     container_name: grafana
     image: grafana/grafana
     restart: always
+    networks:
+      - prism-network
+    ports:
+      - "3030:3000"
     depends_on:
       - prometheus
     volumes:
       - ./grafana:/etc/grafana/provisioning
     env_file:
       - ../.env
-    ports:
-      - "3030:3000"
   prometheus:
     container_name: prometheus
     image: prom/prometheus
     hostname: prometheus
+    networks:
+      - prism-network
     ports:
       - "9090:9090"
       - "9091:9091"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
+networks:
+  prism-network:
+    external:
+      name: prism-network

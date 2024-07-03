@@ -1,12 +1,13 @@
-package com.prism.messenger.service.Profile.impl;
+package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.repository.ProfileRepository;
-import com.prism.messenger.service.Profile.ProfileService;
+import com.prism.messenger.service.profile.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 public class ProfileServiceImpl implements ProfileService {
@@ -22,7 +23,7 @@ public class ProfileServiceImpl implements ProfileService {
         profileRepository.save(profile);
     }
 
-    public Profile getCurrentProfile(String email) {
+    public Optional<Profile> getCurrentProfile(String email) {
         return profileRepository.findByEmail(email);
     }
 }

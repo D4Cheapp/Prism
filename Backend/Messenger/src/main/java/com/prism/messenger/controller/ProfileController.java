@@ -1,7 +1,7 @@
 package com.prism.messenger.controller;
 
 import com.prism.messenger.entity.Profile;
-import com.prism.messenger.service.Profile.impl.ProfileServiceImpl;
+import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +10,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @Tag(name = "Profile")
 @RestController
@@ -21,7 +23,7 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<Profile> getProfile(Authentication authentication) {
         String email = authentication.getName();
-        Profile currentProfile = profileService.getCurrentProfile(email);
-        return new ResponseEntity<>(currentProfile, HttpStatus.OK);
+        Optional<Profile> currentProfile = profileService.getCurrentProfile(email);
+        return new ResponseEntity<>(currentProfile.orElseGet(Profile::new), HttpStatus.OK);
     }
 }
