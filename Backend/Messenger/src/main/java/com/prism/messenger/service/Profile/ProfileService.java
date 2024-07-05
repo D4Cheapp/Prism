@@ -1,5 +1,6 @@
 package com.prism.messenger.service.profile;
 
+import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
 import com.prism.messenger.exception.profile.CreateProfileException;
 import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
@@ -16,10 +17,20 @@ import java.security.NoSuchAlgorithmException;
 
 public interface ProfileService {
 
+  FullProfileInfoModel getCurrentProfile(String email)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
   void createProfile(String email) throws CreateProfileException;
 
   void deleteProfile(String email) throws DeleteUserProfileException;
 
-  FullProfileInfoModel getCurrentProfile(String email)
-      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+  void addFriend(String email, String friendTag)
+      throws ProfileNotExistException, AddCurrentProfileToFriendException;
+
+  void deleteFriend(String email, String friendTag)
+      throws ProfileNotExistException, AddCurrentProfileToFriendException;
+
+  void blockUser(String email, String userTag) throws ProfileNotExistException;
+
+  void unBlockUser(String email, String userTag) throws ProfileNotExistException;
 }

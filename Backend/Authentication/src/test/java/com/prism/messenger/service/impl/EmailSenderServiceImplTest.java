@@ -1,4 +1,4 @@
-package com.prism.messenger.service.auth.impl;
+package com.prism.messenger.service.impl;
 
 import com.prism.messenger.entity.Auth;
 import com.prism.messenger.exception.UserAlreadyExistException;
@@ -7,9 +7,7 @@ import com.prism.messenger.exception.password.IncorrectConfirmPasswordException;
 import com.prism.messenger.model.EmailModel;
 import com.prism.messenger.model.UserRegistrationModel;
 import com.prism.messenger.repository.AuthRepo;
-import com.prism.messenger.service.impl.EmailSenderServiceImpl;
 import com.prism.messenger.util.AuthUtils;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,19 +41,19 @@ public class EmailSenderServiceImplTest {
   }
 
   @Test
-  void testSendEditUserEmailCode() {
+  void testSendEditUserEmailCode() throws UserNotFoundException {
     Auth storedUser = new Auth();
     EmailModel currentUser = new EmailModel();
     currentUser.setId(1);
     currentUser.setEmail("test@gmail.com");
-    Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.empty());
+    Mockito.when(AuthUtils.getUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
+        .thenReturn(null);
     Mockito.when(authRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(storedUser);
     this.authUtilsMock.when(
         () -> AuthUtils.checkPermission(ArgumentMatchers.any(), ArgumentMatchers.any(),
             ArgumentMatchers.any())).thenAnswer(i -> null);
-    Assertions.assertThrows(UserNotFoundException.class,
-        () -> emailSenderService.sendEditUserEmailCode(currentUser, null, null));
-    Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(storedUser));
+    Mockito.when(AuthUtils.getUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
+        .thenReturn(storedUser);
     Assertions.assertThrows(UserAlreadyExistException.class,
         () -> emailSenderService.sendEditUserEmailCode(currentUser, null, null));
   }

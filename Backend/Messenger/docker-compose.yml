@@ -15,7 +15,7 @@ services:
     ports:
       - "8080:8080"
     env_file:
-      - ../../.env
+      - ../../backend.env
     environment:
       RABBITMQ_DEFAULT_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
       URL_NEO4J: neo4j://neo4j:7687
@@ -33,7 +33,7 @@ services:
       - "7474:7474"
       - "7473:7473"
     env_file:
-      - ../../.env
+      - ../../backend.env
   minio:
     container_name: minio
     image: minio/minio:latest
@@ -46,7 +46,7 @@ services:
       - "9001:9001"
     command: server /data --console-address :9001
     env_file:
-      - ../../.env
+      - ../../backend.env
     entrypoint: >
       /bin/sh -c '
         isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }

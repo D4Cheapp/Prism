@@ -3,6 +3,7 @@ package com.prism.messenger.util;
 
 import com.prism.messenger.entity.Auth;
 import com.prism.messenger.exception.PermissionsException;
+import com.prism.messenger.exception.UserNotFoundException;
 import com.prism.messenger.exception.email.EmptyEmailException;
 import com.prism.messenger.exception.email.IncorectEmailException;
 import com.prism.messenger.exception.password.EmptyPasswordException;
@@ -16,12 +17,20 @@ import org.springframework.security.core.Authentication;
 
 public class AuthUtils {
 
-  public static void checkPermission(Authentication authentication, Optional<Auth> storedUser,
+  public static Auth getUser(Integer id, AuthRepo storeUserRepo) throws UserNotFoundException {
+    Optional<Auth> storedUser = storeUserRepo.findById(id);
+    boolean isUserNotFound = storedUser.isEmpty();
+    if (isUserNotFound) {
+      throw new UserNotFoundException();
+    }
+    return storedUser.get();
+  }
+
+  public static void checkPermission(Authentication authentication, Auth storedUser,
       AuthRepo storeUserRepo) throws PermissionsException {
     Auth currentUser = storeUserRepo.findByEmail(authentication.getName());
     boolean isCurrentUserNotDeveloper = !currentUser.getRole().equals("DEVELOPER");
-    boolean isNotCurrentUserToDelete =
-        storedUser.isPresent() && !(Objects.equals(currentUser.getId(), storedUser.get().getId()));
+    boolean isNotCurrentUserToDelete = !(Objects.equals(currentUser.getId(), storedUser.getId()));
     boolean isUserHaveNotPermission = isCurrentUserNotDeveloper && isNotCurrentUserToDelete;
     if (isUserHaveNotPermission) {
       throw new PermissionsException();

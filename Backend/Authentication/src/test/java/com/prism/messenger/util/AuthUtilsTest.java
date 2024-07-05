@@ -9,7 +9,6 @@ import com.prism.messenger.exception.password.PasswordIsTooWeakException;
 import com.prism.messenger.exception.password.TooLongPasswordException;
 import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.repository.AuthRepo;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,7 +39,7 @@ public class AuthUtilsTest {
     storedUser.setRole("USER");
     Mockito.when(storeUserRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(currentUser);
     Assertions.assertThrows(PermissionsException.class,
-        () -> AuthUtils.checkPermission(auth, Optional.of(storedUser), storeUserRepo));
+        () -> AuthUtils.checkPermission(auth, storedUser, storeUserRepo));
   }
 
   @Test

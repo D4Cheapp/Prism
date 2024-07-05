@@ -3,7 +3,7 @@ package com.prism.messenger.model.profile;
 import lombok.Data;
 
 @Data
-public class ChangeProfileTagModel {
+public class TagModel {
 
-  private String newTag;
+  private String tag;
 }

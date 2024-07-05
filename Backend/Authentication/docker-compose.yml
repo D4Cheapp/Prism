@@ -14,7 +14,7 @@ services:
       - redis
       - postgres
     env_file:
-      - ../../.env
+      - ../../backend.env
     environment:
       RABBITMQ_DEFAULT_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
       POSTGRES_URL: jdbc:postgresql://postgres:5432/Prism
@@ -29,7 +29,7 @@ services:
       - "6379:6379"
     restart: always
     env_file:
-      - ../../.env
+      - ../../backend.env
   postgres:
     container_name: postgres
     image: postgres
@@ -39,7 +39,7 @@ services:
     networks:
       - prism-auth-network
     env_file:
-      - ../../.env
+      - ../../backend.env
     environment:
       POSTGRES_DB: Prism
 networks:

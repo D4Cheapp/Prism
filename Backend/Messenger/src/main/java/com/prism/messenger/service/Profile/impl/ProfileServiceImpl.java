@@ -1,6 +1,7 @@
 package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
+import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
 import com.prism.messenger.exception.profile.CreateProfileException;
 import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
@@ -8,6 +9,7 @@ import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.repository.ProfileRepository;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
 import com.prism.messenger.service.profile.ProfileService;
+import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -18,7 +20,6 @@ import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,17 +33,12 @@ public class ProfileServiceImpl implements ProfileService {
 
   public FullProfileInfoModel getCurrentProfile(String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
-    boolean isProfileNotFound = profile.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
-    boolean isProfilePictureNotFound = profile.get().getProfilePicturePath() == null;
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    boolean isProfilePictureNotFound = profile.getProfilePicturePath() == null;
     if (isProfilePictureNotFound) {
       return new FullProfileInfoModel(profile, null);
     }
-    return new FullProfileInfoModel(profile,
-        minioService.getFile(profile.get().getProfilePicturePath()));
+    return new FullProfileInfoModel(profile, minioService.getFile(profile.getProfilePicturePath()));
   }
 
   public void createProfile(String email) throws CreateProfileException {
@@ -61,15 +57,45 @@ public class ProfileServiceImpl implements ProfileService {
 
   public void deleteProfile(String email) throws DeleteUserProfileException {
     try {
-      Optional<Profile> profile = profileRepository.findByEmail(email);
-      boolean isProfileNotFound = profile.isEmpty();
-      if (isProfileNotFound) {
-        throw new DeleteUserProfileException();
-      }
-      profileRepository.deleteById(profile.get().getTag());
+      Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+      profileRepository.deleteByTag(profile.getTag());
       minioService.deleteFolder("profiles/" + email + "/");
     } catch (Exception e) {
       throw new DeleteUserProfileException();
+    }
+  }
+
+  public void addFriend(String email, String friendTag)
+      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    checkIsFriendACurrentProfile(profile, friendTag);
+    profileRepository.addFriend(email, friendTag);
+    profileRepository.unBlockUser(email, friendTag);
+  }
+
+  public void deleteFriend(String email, String friendTag)
+      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    checkIsFriendACurrentProfile(profile, friendTag);
+    profileRepository.deleteFriend(email, friendTag);
+  }
+
+  public void blockUser(String email, String userTag) throws ProfileNotExistException {
+    Profile profile = ProfileUtil.getProfileByTag(userTag, profileRepository);
+    profileRepository.deleteFriend(email, userTag);
+    profileRepository.blockUser(email, userTag);
+  }
+
+  public void unBlockUser(String email, String userTag) throws ProfileNotExistException {
+    Profile profile = ProfileUtil.getProfileByTag(userTag, profileRepository);
+    profileRepository.unBlockUser(email, userTag);
+  }
+
+  private void checkIsFriendACurrentProfile(Profile profile, String friendTag)
+      throws AddCurrentProfileToFriendException {
+    boolean isFriendIsACurrentProfile = friendTag.equals(profile.getTag());
+    if (isFriendIsACurrentProfile) {
+      throw new AddCurrentProfileToFriendException();
     }
   }
 }

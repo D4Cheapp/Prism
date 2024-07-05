@@ -26,7 +26,6 @@ import com.prism.messenger.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.util.Date;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -79,14 +78,9 @@ public class AuthServiceImpl implements AuthService {
 
   public void deleteUser(HttpServletRequest request, Authentication authentication, Integer id)
       throws UserNotFoundException, PermissionsException {
-    Optional<Auth> storedUser = storeUserRepo.findById(id);
-    boolean isUserNotFound = storeUserRepo.findById(id).isEmpty();
-    if (isUserNotFound) {
-      throw new UserNotFoundException();
-    }
+    Auth storedUser = AuthUtils.getUser(id, storeUserRepo);
     AuthUtils.checkPermission(authentication, storedUser, storeUserRepo);
-    boolean isCurrentUser =
-        storedUser.map(auth -> auth.getEmail().equals(authentication.getName())).orElse(false);
+    boolean isCurrentUser = storedUser.getEmail().equals(authentication.getName());
     if (isCurrentUser) {
       this.deactivateSession(request);
     }
@@ -105,22 +99,18 @@ public class AuthServiceImpl implements AuthService {
 
   public UserModel editUserPassword(Authentication authentication, EditPasswordModel passwords)
       throws PermissionsException, UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, IncorrectPasswordException {
-    Optional<Auth> storedUser = storeUserRepo.findById(passwords.getId());
-    boolean isUserNotFound = storedUser.isEmpty();
+    Auth storedUser = AuthUtils.getUser(passwords.getId(), storeUserRepo);
     AuthUtils.checkPermission(authentication, storedUser, storeUserRepo);
-    if (isUserNotFound) {
-      throw new UserNotFoundException();
-    }
     boolean isOldPasswordIncorrect = !encoder.matches(passwords.getOldPassword(),
-        storedUser.get().getPassword());
+        storedUser.getPassword());
     if (isOldPasswordIncorrect) {
       throw new IncorrectPasswordException();
     }
     passwords.setNewPassword(passwords.getNewPassword().trim());
     AuthUtils.checkPasswordValidity(passwords.getNewPassword());
-    storedUser.get().setPassword(encoder.encode(passwords.getNewPassword()));
-    storeUserRepo.save(storedUser.get());
-    return UserModel.toModel(storedUser.get());
+    storedUser.setPassword(encoder.encode(passwords.getNewPassword()));
+    storeUserRepo.save(storedUser);
+    return UserModel.toModel(storedUser);
   }
 
   public UserModel restoreUserPassword(String email, RestorePasswordModel passwords)

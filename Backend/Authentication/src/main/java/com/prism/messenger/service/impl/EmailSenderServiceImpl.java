@@ -20,7 +20,6 @@ import com.prism.messenger.repository.AuthRepo;
 import com.prism.messenger.service.auth.impl.auth.EmailSenderService;
 import com.prism.messenger.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
@@ -65,21 +64,17 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   public void sendEditUserEmailCode(EmailModel editData, Authentication authentication,
       HttpServletRequest request)
       throws PermissionsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException {
-    Optional<Auth> storedUser = storeUserRepo.findById(editData.getId());
+    Auth storedUser = AuthUtils.getUser(editData.getId(), storeUserRepo);
     Auth changedEmailUser = storeUserRepo.findByEmail(editData.getEmail());
-    boolean isUserNotFound = storedUser.isEmpty();
-    boolean isLoginAlreadyExists = changedEmailUser != null;
+    boolean isEmailAlreadyExists = changedEmailUser != null;
     AuthUtils.checkPermission(authentication, storedUser, storeUserRepo);
-    if (isUserNotFound) {
-      throw new UserNotFoundException();
-    }
-    if (isLoginAlreadyExists) {
+    if (isEmailAlreadyExists) {
       throw new UserAlreadyExistException();
     }
     AuthUtils.checkEmailValidity(editData.getEmail());
-    storedUser.get().setEmail(editData.getEmail());
+    storedUser.setEmail(editData.getEmail());
     request.getSession().setAttribute("confirmEmail", editData.getEmail());
-    this.saveActivationCode(storedUser.get(), "Activation code for confirm your email ");
+    this.saveActivationCode(storedUser, "Activation code for confirm your email ");
   }
 
   public void sendRegitrationCode(UserRegistrationModel user, HttpServletRequest request)

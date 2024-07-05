@@ -1,5 +1,6 @@
 package com.prism.messenger.advice;
 
+import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
@@ -15,7 +16,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class ProfileAdvice {
 
   @ExceptionHandler({IncorrectPhoneNumberException.class, PhoneNumberAlreadyExistException.class,
-      StatusIsTooLongException.class, TagAlreadyExistException.class})
+      StatusIsTooLongException.class, TagAlreadyExistException.class,
+      AddCurrentProfileToFriendException.class})
   public ResponseEntity<TextResponseModel> handleProfileValidationException(Exception exception) {
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Error: " + exception.getMessage(), false),

@@ -13,6 +13,7 @@ import com.prism.messenger.model.rabbitMQ.RabbitMQChangeEmailMessageModel;
 import com.prism.messenger.repository.ProfileRepository;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
 import com.prism.messenger.service.profile.ChangeProfileInfoService;
+import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -52,88 +53,68 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
 
   public Profile changeProfileName(String email, String name)
       throws ProfileNotExistException, ProfileNameIsTooLongException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
-    boolean isProfileNotFound = profile.isEmpty();
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
     boolean isNameTooLong = name.length() > 100;
     if (isNameTooLong) {
       throw new ProfileNameIsTooLongException();
     }
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
-    profile.get().setName(name);
+    profile.setName(name);
     profileRepository.changeProfileName(email, name);
-    return profile.get();
+    return profile;
   }
 
   public Profile changeProfilePhoneNumber(String email, String phoneNumber)
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
-    boolean isProfileNotFound = profile.isEmpty();
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
     boolean isPhoneExist = phoneNumber.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
     String resultPhoneNumber;
     if (isPhoneExist) {
       resultPhoneNumber = null;
     } else {
       resultPhoneNumber = phoneNumberValidation(phoneNumber);
     }
-    profile.get().setPhoneNumber(resultPhoneNumber);
+    profile.setPhoneNumber(resultPhoneNumber);
     profileRepository.changeProfilePhoneNumber(email, resultPhoneNumber);
-    return profile.get();
+    return profile;
   }
 
   public Profile changeProfileTag(String email, String newTag)
       throws ProfileNotExistException, TagAlreadyExistException, PermissionsException {
-    Optional<Profile> oldProfile = profileRepository.findByEmail(email);
-    Optional<Profile> newProfile = profileRepository.findById(newTag);
-    boolean isOldProfileNotFound = oldProfile.isEmpty();
+    Profile oldProfile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Optional<Profile> newProfile = profileRepository.findByTag(newTag);
     boolean isNewProfileExist = newProfile.isPresent();
     boolean isTagInorrect = !newTag.startsWith("@");
+    boolean isIncorrectPermission = !oldProfile.getEmail().equals(email);
     if (isTagInorrect) {
       newTag = "@" + newTag;
     }
     if (isNewProfileExist) {
       throw new TagAlreadyExistException();
     }
-    if (isOldProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
-    boolean isIncorrectPermission = !oldProfile.get().getEmail().equals(email);
     if (isIncorrectPermission) {
       throw new PermissionsException();
     }
-    profileRepository.changeTag(oldProfile.get().getTag(), newTag);
-    oldProfile.get().setTag(newTag);
-    return oldProfile.get();
+    profileRepository.changeTag(oldProfile.getTag(), newTag);
+    oldProfile.setTag(newTag);
+    return oldProfile;
   }
 
   public Profile changeProfileStatus(String email, String status)
       throws ProfileNotExistException, StatusIsTooLongException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
-    boolean isProfileNotFound = profile.isEmpty();
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
     boolean isStatusTooLong = status.length() > 100;
     boolean isStatusEmpty = status.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
     if (isStatusTooLong) {
       throw new StatusIsTooLongException();
     }
-    profile.get().setStatus(status);
+    profile.setStatus(status);
     profileRepository.changeProfileStatus(email, status);
-    return profile.get();
+    return profile;
   }
 
   public Profile changeProfilePicture(String email, MultipartFile picture)
       throws ProfileNotExistException, IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
-    boolean isProfileNotFound = profile.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
+    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
     String profilePicturePath = "profiles/" + email + "/profilePicture.jpg";
     if (picture.isEmpty()) {
       minioService.deleteFile(profilePicturePath);
@@ -141,9 +122,9 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
     } else {
       minioService.addFile(profilePicturePath, picture);
     }
-    profile.get().setProfilePicturePath(profilePicturePath);
+    profile.setProfilePicturePath(profilePicturePath);
     profileRepository.changeProfilePicture(email, profilePicturePath);
-    return profile.get();
+    return profile;
   }
 
   private String phoneNumberValidation(String phoneNumber)

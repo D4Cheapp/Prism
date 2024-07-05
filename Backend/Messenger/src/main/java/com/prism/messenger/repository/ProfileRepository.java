@@ -10,6 +10,9 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
   @Query("MATCH (p:Profile {email: $email}) RETURN p")
   Optional<Profile> findByEmail(String email);
 
+  @Query("MATCH (p:Profile {tag: $tag}) RETURN p")
+  Optional<Profile> findByTag(String tag);
+
   @Query("MATCH (p:Profile {phoneNumber: $phoneNumber}) RETURN p")
   Optional<Profile> findByPhoneNumber(String phoneNumber);
 
@@ -30,4 +33,20 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
 
   @Query("MATCH (p:Profile {email: $email}) SET p.name = $name")
   void changeProfileName(String email, String name);
+
+  @Query("MATCH (p:Profile {email: $email}) MATCH (f:Profile {tag: $userTag}) WHERE NOT (p)-[:BLOCK]->(f) CREATE (p)-[:BLOCK]->(f)")
+  void blockUser(String email, String userTag);
+
+  @Query("MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile {tag: $userTag}) DELETE r")
+  void unBlockUser(String email, String userTag);
+
+  @Query(
+      "MATCH (p:Profile {email: $email}) MATCH (f:Profile {tag: $friendTag}) WHERE NOT (p)-[:FRIEND]->(f) CREATE (p)-[:FRIEND]->(f)")
+  void addFriend(String email, String friendTag);
+
+  @Query("MATCH (p:Profile {email: $email})-[r:FRIEND]->(f:Profile {tag: $friendTag}) DELETE r")
+  void deleteFriend(String email, String friendTag);
+
+  @Query("MATCH (p:Profile {tag: $tag}) DETACH DELETE p")
+  void deleteByTag(String tag);
 }

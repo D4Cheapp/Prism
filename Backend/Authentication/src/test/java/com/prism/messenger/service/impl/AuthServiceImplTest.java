@@ -1,4 +1,4 @@
-package com.prism.messenger.service.auth.impl;
+package com.prism.messenger.service.impl;
 
 import com.prism.messenger.entity.Auth;
 import com.prism.messenger.exception.ActivationCodeExpireException;
@@ -10,10 +10,7 @@ import com.prism.messenger.model.EditPasswordModel;
 import com.prism.messenger.model.RestorePasswordModel;
 import com.prism.messenger.model.UserLoginModel;
 import com.prism.messenger.repository.AuthRepo;
-import com.prism.messenger.service.impl.AuthServiceImpl;
-import com.prism.messenger.service.impl.EmailSenderServiceImpl;
 import com.prism.messenger.util.AuthUtils;
-import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -65,18 +62,7 @@ public class AuthServiceImplTest {
   }
 
   @Test
-  void testDeleteUser() {
-    Auth storedUser = new Auth();
-    storedUser.setId(1);
-    Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.empty());
-    this.authUtilsMock.when(() -> AuthUtils.checkPermission(ArgumentMatchers.any(),
-        ArgumentMatchers.any(), ArgumentMatchers.any())).thenAnswer(i -> null);
-    Assertions.assertThrows(UserNotFoundException.class, () -> authService.deleteUser(null,
-        null, 1));
-  }
-
-  @Test
-  void testEditUserPassword() {
+  void testEditUserPassword() throws UserNotFoundException {
     EditPasswordModel passwords = new EditPasswordModel();
     passwords.setId(1);
     passwords.setOldPassword("test1");
@@ -84,10 +70,8 @@ public class AuthServiceImplTest {
     storedUser.setPassword(encoder.encode("test"));
     this.authUtilsMock.when(() -> AuthUtils.checkPermission(ArgumentMatchers.any(),
         ArgumentMatchers.any(), ArgumentMatchers.any())).thenAnswer(i -> null);
-    Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.empty());
-    Assertions.assertThrows(UserNotFoundException.class,
-        () -> authService.editUserPassword(null, passwords));
-    Mockito.when(authRepo.findById(ArgumentMatchers.anyInt())).thenReturn(Optional.of(storedUser));
+    Mockito.when(AuthUtils.getUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))
+        .thenReturn(storedUser);
     Assertions.assertThrows(IncorrectPasswordException.class,
         () -> authService.editUserPassword(null, passwords));
   }

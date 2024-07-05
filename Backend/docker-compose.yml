@@ -12,7 +12,7 @@ services:
       - "15672:15672"
     restart: always
     env_file:
-      - ../.env
+      - ../backend.env
   grafana:
     container_name: grafana
     image: grafana/grafana
@@ -26,7 +26,7 @@ services:
     volumes:
       - ./grafana:/etc/grafana/provisioning
     env_file:
-      - ../.env
+      - ../backend.env
   prometheus:
     container_name: prometheus
     image: prom/prometheus
