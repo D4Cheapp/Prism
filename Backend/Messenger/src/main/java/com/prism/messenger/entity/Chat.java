@@ -8,7 +8,8 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Data
 @Node("Chat")
 public class Chat {
-    @Id
-    @GeneratedValue(generatorRef = "chattag")
-    private String tag;
+
+  @Id
+  @GeneratedValue(generatorRef = "chattag")
+  private String tag;
 }

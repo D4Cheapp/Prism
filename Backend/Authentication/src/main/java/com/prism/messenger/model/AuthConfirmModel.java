@@ -4,5 +4,6 @@ import lombok.Data;
 
 @Data
 public class AuthConfirmModel {
-    private String code;
+
+  private String code;
 }

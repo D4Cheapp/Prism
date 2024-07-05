@@ -22,7 +22,7 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.5.6")
     implementation("io.micrometer:micrometer-registry-prometheus")
     implementation("org.springframework.boot:spring-boot-starter-actuator:3.3.1")
-    implementation("io.minio:minio:8.4.6")
+    implementation("io.minio:minio:8.5.11")
     implementation("org.springframework.boot:spring-boot-starter-data-neo4j")
     implementation("redis.clients:jedis:5.1.3")
     implementation("io.lettuce:lettuce-core")

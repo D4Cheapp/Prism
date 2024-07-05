@@ -44,7 +44,7 @@ services:
       POSTGRES_DB: Prism
 networks:
   prism-network:
-    external:
-      name: prism-network
+    external: true
+    name: prism-network
   prism-auth-network:
     name: prism-auth-network

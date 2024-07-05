@@ -1,9 +1,10 @@
 package com.prism.messenger.service;
 
-import com.prism.messenger.model.RabbitMQMessageModel;
-
 public interface RabbitMQService {
-    void createUserProfile(String email);
 
-    void consumeMessage(RabbitMQMessageModel message);
+  void createUserProfile(String email);
+
+  void deleteUserProfile(String email);
+
+  void changeProfileEmail(String oldEmail, String newEmail);
 }

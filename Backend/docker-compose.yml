@@ -40,5 +40,5 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 networks:
   prism-network:
-    external:
-      name: prism-network
+    external: true
+    name: prism-network

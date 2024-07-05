@@ -13,26 +13,28 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
-    @Value("${spring.redis.host}")
-    private String redisHost;
-    @Value("${spring.redis.port}")
-    private int redisPort;
 
-    @Bean
-    public JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(redisHost, redisPort);
-        return new JedisConnectionFactory(redisStandaloneConfiguration);
-    }
+  @Value("${spring.redis.host}")
+  private String redisHost;
+  @Value("${spring.redis.port}")
+  private int redisPort;
 
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory());
-        template.setKeySerializer(new StringRedisSerializer());
-        template.setHashKeySerializer(new JdkSerializationRedisSerializer());
-        template.setValueSerializer(new JdkSerializationRedisSerializer());
-        template.setEnableTransactionSupport(true);
-        template.afterPropertiesSet();
-        return template;
-    }
+  @Bean
+  public JedisConnectionFactory jedisConnectionFactory() {
+    RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(
+        redisHost, redisPort);
+    return new JedisConnectionFactory(redisStandaloneConfiguration);
+  }
+
+  @Bean
+  public RedisTemplate<String, Object> redisTemplate() {
+    RedisTemplate<String, Object> template = new RedisTemplate<>();
+    template.setConnectionFactory(jedisConnectionFactory());
+    template.setKeySerializer(new StringRedisSerializer());
+    template.setHashKeySerializer(new JdkSerializationRedisSerializer());
+    template.setValueSerializer(new JdkSerializationRedisSerializer());
+    template.setEnableTransactionSupport(true);
+    template.afterPropertiesSet();
+    return template;
+  }
 }

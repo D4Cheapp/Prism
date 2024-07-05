@@ -36,7 +36,7 @@ services:
       - ../../.env
   minio:
     container_name: minio
-    image: minio/minio
+    image: minio/minio:latest
     restart: always
     hostname: minio
     networks:
@@ -47,24 +47,22 @@ services:
     command: server /data --console-address :9001
     env_file:
       - ../../.env
-  minio-bucket:
-    container_name: minio-bucket
-    image: minio/mc
-    networks:
-      - prism-messenger-network
-    depends_on:
-      - minio
-    env_file:
-      - ../../.env
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        /usr/bin/mc config host add local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-        /usr/bin/mc mb -p local/prism-bucket;
+    entrypoint: >
+      /bin/sh -c '
+        isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }
+        minio $0 "$@" --quiet & echo $! > /tmp/minio.pid
+        while ! isAlive; do sleep 0.1; done
+        mc alias set minio http://127.0.0.1:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}
+        mc mb minio/${MINIO_DEFAULT_BUCKET} || true 
+        mc admin user add minio ${MINIO_USER} ${MINIO_PASSWORD}
+        mc admin policy attach minio readwrite --user=${MINIO_USER}
+        mc mb minio/${MINIO_DEFAULT_BUCKET}/profiles
+        kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid
+        while isAlive; do sleep 0.1; done
+        exec minio $0 "$@" '
 networks:
   prism-network:
-    external:
-      name: prism-network
+    external: true
+    name: prism-network
   prism-messenger-network:
     name: prism-messenger-network
