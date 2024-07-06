@@ -1,6 +1,6 @@
 package com.prism.messenger.advice;
 
-import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
+import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
@@ -17,7 +17,7 @@ public class ProfileAdvice {
 
   @ExceptionHandler({IncorrectPhoneNumberException.class, PhoneNumberAlreadyExistException.class,
       StatusIsTooLongException.class, TagAlreadyExistException.class,
-      AddCurrentProfileToFriendException.class})
+      AddCurrentProfileToCurrentProfileException.class})
   public ResponseEntity<TextResponseModel> handleProfileValidationException(Exception exception) {
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Error: " + exception.getMessage(), false),

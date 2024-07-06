@@ -11,11 +11,13 @@ public class FullProfileInfoModel {
   private String name;
   private String phoneNumber;
   private String status;
+  private RelationsBetweenUserModel relationWithCurrentProfile;
   private byte[] profilePicture;
   private boolean isOnline;
   private long lastOnlineTime;
 
-  public FullProfileInfoModel(Profile profileModel, byte[] profilePicture) {
+  public FullProfileInfoModel(Profile profileModel, byte[] profilePicture,
+      RelationsBetweenUserModel relationWithCurrentProfile) {
     this.tag = profileModel.getTag();
     this.email = profileModel.getEmail();
     this.name = profileModel.getName();
@@ -24,5 +26,6 @@ public class FullProfileInfoModel {
     this.isOnline = profileModel.isOnline();
     this.lastOnlineTime = profileModel.getLastOnlineTime();
     this.profilePicture = profilePicture;
+    this.relationWithCurrentProfile = relationWithCurrentProfile;
   }
 }

@@ -2,7 +2,7 @@ package com.prism.messenger.controller;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.PermissionsException;
-import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
+import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNameIsTooLongException;
@@ -15,6 +15,8 @@ import com.prism.messenger.model.profile.ChangeProfilePhoneModel;
 import com.prism.messenger.model.profile.ChangeProfileStatusModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ProfileModel;
+import com.prism.messenger.model.profile.RecieveProfileListModel;
+import com.prism.messenger.model.profile.RequestProfileListModel;
 import com.prism.messenger.model.profile.TagModel;
 import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
 import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
@@ -35,6 +37,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,31 +63,82 @@ public class ProfileController {
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
   }
 
+  @GetMapping("/{tag}")
+  public ResponseEntity<FullProfileInfoModel> getProfileByTag(@PathVariable String tag,
+      Authentication authentication)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    FullProfileInfoModel currentProfile = profileService.getProfileByTag(tag, email);
+    return new ResponseEntity<>(currentProfile, HttpStatus.OK);
+  }
+
+  @GetMapping("/block-list")
+  public ResponseEntity<RecieveProfileListModel> getBlockList(
+      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+    String email = authentication.getName();
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    RecieveProfileListModel profileBockList = profileService.getBlockList(email, page, size);
+    return new ResponseEntity<>(profileBockList, HttpStatus.OK);
+  }
+
+  @GetMapping("/friend-list")
+  public ResponseEntity<RecieveProfileListModel> getFriendList(
+      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+    String email = authentication.getName();
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    RecieveProfileListModel currentProfile = profileService.getFriendList(email, page, size);
+    return new ResponseEntity<>(currentProfile, HttpStatus.OK);
+  }
+
+  @GetMapping("/sended-friend-requests")
+  public ResponseEntity<RecieveProfileListModel> getSendedFriendRequestList(
+      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+    String email = authentication.getName();
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    RecieveProfileListModel sendedRequests = profileService.getSendedFriendRequestList(email, page,
+        size);
+    return new ResponseEntity<>(sendedRequests, HttpStatus.OK);
+  }
+
+  @GetMapping("/friend-requests")
+  public ResponseEntity<RecieveProfileListModel> getFriendRequestList(
+      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+    String email = authentication.getName();
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    RecieveProfileListModel friendRequests = profileService.getFriendRequestsList(email, page,
+        size);
+    return new ResponseEntity<>(friendRequests, HttpStatus.OK);
+  }
+
   @PostMapping("/friend")
   public ResponseEntity<TextResponseModel> addFriend(@RequestBody TagModel friendTag,
       Authentication authentication)
-      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
     profileService.addFriend(email, friendTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
         HttpStatus.OK);
   }
 
-  @DeleteMapping("/friend")
-  public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody TagModel friendTag,
-      Authentication authentication)
-      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+  @PostMapping("/friend-decline")
+  public ResponseEntity<TextResponseModel> friendRequestDecline(@RequestBody TagModel friendTag,
+      Authentication authentication) {
     String email = authentication.getName();
-    profileService.deleteFriend(email, friendTag.getTag());
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
-        HttpStatus.OK);
+    profileService.declineFriendRequest(email, friendTag.getTag());
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
   }
 
   @PostMapping("/block")
-  public ResponseEntity<TextResponseModel> blockUser(@RequestBody TagModel friendTag,
-      Authentication authentication) throws ProfileNotExistException {
+  public ResponseEntity<TextResponseModel> blockUser(@RequestBody TagModel userTag,
+      Authentication authentication)
+      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    profileService.blockUser(email, friendTag.getTag());
+    profileService.blockUser(email, userTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User blocked", true),
         HttpStatus.OK);
   }
@@ -118,8 +172,8 @@ public class ProfileController {
   }
 
   @PatchMapping("/tag")
-  public ResponseEntity<ProfileModel> changeProfileTag(
-      @RequestBody TagModel profileTag, Authentication authentication)
+  public ResponseEntity<ProfileModel> changeProfileTag(@RequestBody TagModel profileTag,
+      Authentication authentication)
       throws ProfileNotExistException, TagAlreadyExistException, PermissionsException {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfileTag(email, profileTag.getTag());
@@ -143,5 +197,15 @@ public class ProfileController {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfilePicture(email, profilePicture);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
+  }
+
+  @DeleteMapping("/friend")
+  public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody TagModel friendTag,
+      Authentication authentication)
+      throws ProfileNotExistException {
+    String email = authentication.getName();
+    profileService.deleteFriend(email, friendTag.getTag());
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
+        HttpStatus.OK);
   }
 }

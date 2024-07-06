@@ -1,11 +1,14 @@
 package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
-import com.prism.messenger.exception.profile.AddCurrentProfileToFriendException;
+import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.CreateProfileException;
 import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
+import com.prism.messenger.model.profile.ProfileModel;
+import com.prism.messenger.model.profile.RecieveProfileListModel;
+import com.prism.messenger.model.profile.RelationsBetweenUserModel;
 import com.prism.messenger.repository.ProfileRepository;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
 import com.prism.messenger.service.profile.ProfileService;
@@ -19,7 +22,10 @@ import io.minio.errors.XmlParserException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +40,17 @@ public class ProfileServiceImpl implements ProfileService {
   public FullProfileInfoModel getCurrentProfile(String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
-    boolean isProfilePictureNotFound = profile.getProfilePicturePath() == null;
-    if (isProfilePictureNotFound) {
-      return new FullProfileInfoModel(profile, null);
-    }
-    return new FullProfileInfoModel(profile, minioService.getFile(profile.getProfilePicturePath()));
+    byte[] profilePhoto = loadPictureInProfileModel(profile);
+    return new FullProfileInfoModel(profile, profilePhoto, null);
+  }
+
+  public FullProfileInfoModel getProfileByTag(String tag, String email)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    Profile profile = ProfileUtil.getProfileByTag(tag, profileRepository);
+    byte[] profilePhoto = loadPictureInProfileModel(profile);
+    RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(tag,
+        email);
+    return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);
   }
 
   public void createProfile(String email) throws CreateProfileException {
@@ -66,22 +78,23 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   public void addFriend(String email, String friendTag)
-      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
-    checkIsFriendACurrentProfile(profile, friendTag);
+    checkIsUserACurrentProfile(profile, friendTag);
     profileRepository.addFriend(email, friendTag);
     profileRepository.unBlockUser(email, friendTag);
   }
 
   public void deleteFriend(String email, String friendTag)
-      throws ProfileNotExistException, AddCurrentProfileToFriendException {
+      throws ProfileNotExistException {
     Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
-    checkIsFriendACurrentProfile(profile, friendTag);
     profileRepository.deleteFriend(email, friendTag);
   }
 
-  public void blockUser(String email, String userTag) throws ProfileNotExistException {
+  public void blockUser(String email, String userTag)
+      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     Profile profile = ProfileUtil.getProfileByTag(userTag, profileRepository);
+    checkIsUserACurrentProfile(profile, userTag);
     profileRepository.deleteFriend(email, userTag);
     profileRepository.blockUser(email, userTag);
   }
@@ -91,11 +104,74 @@ public class ProfileServiceImpl implements ProfileService {
     profileRepository.unBlockUser(email, userTag);
   }
 
-  private void checkIsFriendACurrentProfile(Profile profile, String friendTag)
-      throws AddCurrentProfileToFriendException {
-    boolean isFriendIsACurrentProfile = friendTag.equals(profile.getTag());
-    if (isFriendIsACurrentProfile) {
-      throw new AddCurrentProfileToFriendException();
+  public RecieveProfileListModel getFriendList(String email, Integer page, Integer size) {
+    Optional<Integer> totalCount = profileRepository.getFriendsCount(email);
+    Optional<List<Profile>> friendList = profileRepository.getFriendList(email, page * size, size);
+    return convertToListModel(friendList, totalCount);
+  }
+
+  public RecieveProfileListModel getFriendRequestsList(String email, Integer page, Integer size) {
+    Optional<Integer> totalCount = profileRepository.getFriendRequestsCount(email);
+    Optional<List<Profile>> friendList = profileRepository.getFriendRequestsList(email, page * size,
+        size);
+    return convertToListModel(friendList, totalCount);
+  }
+
+  public RecieveProfileListModel getSendedFriendRequestList(String email, Integer page,
+      Integer size) {
+    Optional<Integer> totalCount = profileRepository.getSendedFriendRequestCount(email);
+    Optional<List<Profile>> friendList = profileRepository.getSendedFriendRequest(email,
+        page * size, size);
+    return convertToListModel(friendList, totalCount);
+  }
+
+  public RecieveProfileListModel getBlockList(String email, Integer page, Integer size) {
+    Optional<Integer> totalCount = profileRepository.getBlockListCount(email);
+    Optional<List<Profile>> blockList = profileRepository.getBlockList(email, page * size, size);
+    return convertToListModel(blockList, totalCount);
+  }
+
+  public void declineFriendRequest(String email, String tag) {
+    profileRepository.declineFriendRequest(email, tag);
+  }
+
+  private void checkIsUserACurrentProfile(Profile profile, String friendTag)
+      throws AddCurrentProfileToCurrentProfileException {
+    boolean isRequestedUserIsACurrentProfile = friendTag.equals(profile.getTag());
+    if (isRequestedUserIsACurrentProfile) {
+      throw new AddCurrentProfileToCurrentProfileException();
+    }
+  }
+
+  private RelationsBetweenUserModel loadRelationsWithCurrentProfile(String tag, String email) {
+    Optional<String> relationsToUser = profileRepository.getRelationToUser(email, tag);
+    Optional<String> relationsFromUser = profileRepository.getRelationFromUser(email, tag);
+    return new RelationsBetweenUserModel(relationsToUser.orElse(null),
+        relationsFromUser.orElse(null));
+  }
+
+  private byte[] loadPictureInProfileModel(Profile profile)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    boolean isProfilePictureNotFound = profile.getProfilePicturePath() == null;
+    if (isProfilePictureNotFound) {
+      return null;
+    }
+    return minioService.getFile(profile.getProfilePicturePath());
+  }
+
+  private RecieveProfileListModel convertToListModel(Optional<List<Profile>> profileList,
+      Optional<Integer> totalCount) {
+    boolean isTotalCountEmpty = (totalCount.isPresent() && totalCount.get() == 0);
+    boolean isProfileListNotEmpty =
+        totalCount.isPresent() && profileList.isPresent() && !isTotalCountEmpty;
+    if (isProfileListNotEmpty) {
+      List<ProfileModel> ProfileModelList = new ArrayList<>();
+      for (Profile profile : profileList.get()) {
+        ProfileModelList.add(ProfileModel.toModel(profile));
+      }
+      return new RecieveProfileListModel(totalCount.get(), ProfileModelList);
+    } else {
+      return new RecieveProfileListModel(0, null);
     }
   }
 }
