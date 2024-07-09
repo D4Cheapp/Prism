@@ -18,8 +18,8 @@ import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.model.profile.RecieveProfileListModel;
 import com.prism.messenger.model.profile.RequestProfileListModel;
 import com.prism.messenger.model.profile.TagModel;
-import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
-import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
+import com.prism.messenger.service.Profile.impl.ChangeProfileInfoServiceImpl;
+import com.prism.messenger.service.Profile.impl.ProfileServiceImpl;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -73,6 +73,26 @@ public class ProfileController {
     String email = authentication.getName();
     FullProfileInfoModel currentProfile = profileService.getProfileByTag(tag, email);
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get profile by phone number")
+  @GetMapping("/phone/{telephone}")
+  public ResponseEntity<FullProfileInfoModel> searchProfileByPhoneNumber(
+      @PathVariable String telephone, Authentication authentication)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    FullProfileInfoModel foundedProfiles = profileService.getProfileByTelephone(telephone, email);
+    return new ResponseEntity<>(foundedProfiles, HttpStatus.OK);
+  }
+
+  @Operation(summary = "Search profile by tag")
+  @GetMapping("/search/{tag}")
+  public ResponseEntity<RecieveProfileListModel> searchProfileByTag(@PathVariable String tag,
+      @RequestBody RequestProfileListModel requestProfileListModel) {
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    RecieveProfileListModel foundedProfiles = profileService.searchProfileByTag(tag, page, size);
+    return new ResponseEntity<>(foundedProfiles, HttpStatus.OK);
   }
 
   @Operation(summary = "Get blocked profile list ")
@@ -218,8 +238,7 @@ public class ProfileController {
   @Operation(summary = "Delete friend")
   @DeleteMapping("/friend")
   public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody TagModel friendTag,
-      Authentication authentication)
-      throws ProfileNotExistException {
+      Authentication authentication) throws ProfileNotExistException {
     String email = authentication.getName();
     profileService.deleteFriend(email, friendTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),

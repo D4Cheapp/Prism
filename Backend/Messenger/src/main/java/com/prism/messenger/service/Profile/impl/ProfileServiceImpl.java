@@ -1,4 +1,4 @@
-package com.prism.messenger.service.profile.impl;
+package com.prism.messenger.service.Profile.impl;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
@@ -10,8 +10,8 @@ import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.model.profile.RecieveProfileListModel;
 import com.prism.messenger.model.profile.RelationsBetweenUserModel;
 import com.prism.messenger.repository.ProfileRepository;
+import com.prism.messenger.service.Profile.ProfileService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
-import com.prism.messenger.service.profile.ProfileService;
 import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -53,6 +53,15 @@ public class ProfileServiceImpl implements ProfileService {
     return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);
   }
 
+  public FullProfileInfoModel getProfileByTelephone(String telephone, String email)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    Profile profile = ProfileUtil.getProfileByPhone(telephone, profileRepository);
+    byte[] profilePhoto = loadPictureInProfileModel(profile);
+    RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(
+        profile.getTag(), email);
+    return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);
+  }
+
   public void createProfile(String email) throws CreateProfileException {
     try {
       Profile profile = new Profile();
@@ -85,8 +94,7 @@ public class ProfileServiceImpl implements ProfileService {
     profileRepository.unBlockUser(email, friendTag);
   }
 
-  public void deleteFriend(String email, String friendTag)
-      throws ProfileNotExistException {
+  public void deleteFriend(String email, String friendTag) throws ProfileNotExistException {
     Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
     profileRepository.deleteFriend(email, friendTag);
   }
@@ -129,6 +137,12 @@ public class ProfileServiceImpl implements ProfileService {
     Optional<Integer> totalCount = profileRepository.getBlockListCount(email);
     Optional<List<Profile>> blockList = profileRepository.getBlockList(email, page * size, size);
     return convertToListModel(blockList, totalCount);
+  }
+
+  public RecieveProfileListModel searchProfileByTag(String tag, Integer page, Integer size) {
+    Optional<Integer> totalCount = profileRepository.getSearchProfileByTagCount(tag);
+    Optional<List<Profile>> searchList = profileRepository.searchProfileByTag(tag, page, size);
+    return convertToListModel(searchList, totalCount);
   }
 
   public void declineFriendRequest(String email, String tag) {

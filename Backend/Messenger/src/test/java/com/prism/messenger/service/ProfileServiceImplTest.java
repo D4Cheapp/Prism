@@ -1,7 +1,7 @@
 package com.prism.messenger.service;
 
 
-import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
+import com.prism.messenger.service.Profile.impl.ChangeProfileInfoServiceImpl;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;

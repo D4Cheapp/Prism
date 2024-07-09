@@ -62,6 +62,9 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
   @Query("MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile) RETURN COUNT(f)")
   Optional<Integer> getBlockListCount(String email);
 
+  @Query("MATCH (p:Profile) WHERE p.tag CONTAINS $tag RETURN COUNT(p)")
+  Optional<Integer> getSearchProfileByTagCount(String tag);
+
   @Query("MATCH (p:Profile {email: $email})-[:FRIEND]->(f:Profile) WHERE (p)<-[:FRIEND]-(f)  RETURN f SKIP $skip LIMIT $limit ")
   Optional<List<Profile>> getFriendList(String email, Integer skip, Integer limit);
 
@@ -72,7 +75,10 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
   Optional<List<Profile>> getSendedFriendRequest(String email, Integer skip, Integer limit);
 
   @Query("MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile) RETURN f SKIP $skip LIMIT $limit")
-  Optional<List<Profile>> getBlockList(String email, Integer page, Integer size);
+  Optional<List<Profile>> getBlockList(String email, Integer skip, Integer limit);
+
+  @Query("MATCH (p:Profile) WHERE p.tag CONTAINS $tag RETURN p SKIP $skip LIMIT $limit")
+  Optional<List<Profile>> searchProfileByTag(String tag, Integer skip, Integer limit);
 
   @Query("MATCH (p:Profile {email: $email})-[r]->(f:Profile {tag: $userTag}) RETURN TYPE(r)")
   Optional<String> getRelationToUser(String email, String userTag);

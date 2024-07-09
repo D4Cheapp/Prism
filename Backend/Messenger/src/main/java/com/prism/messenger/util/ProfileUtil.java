@@ -26,4 +26,14 @@ public class ProfileUtil {
     }
     return profile.get();
   }
+
+  public static Profile getProfileByPhone(String phone, ProfileRepository profileRepository)
+      throws ProfileNotExistException {
+    Optional<Profile> profile = profileRepository.findByPhoneNumber(phone);
+    boolean isProfileNotFound = profile.isEmpty();
+    if (isProfileNotFound) {
+      throw new ProfileNotExistException();
+    }
+    return profile.get();
+  }
 }

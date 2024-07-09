@@ -16,6 +16,7 @@ import com.prism.messenger.exception.password.TooLongPasswordException;
 import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.model.ActivationCodeModel;
 import com.prism.messenger.model.AuthConfirmModel;
+import com.prism.messenger.model.DeleteUserModel;
 import com.prism.messenger.model.EditPasswordModel;
 import com.prism.messenger.model.EmailModel;
 import com.prism.messenger.model.RestorePasswordModel;
@@ -38,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -177,11 +177,11 @@ public class AuthController {
   }
 
   @Operation(summary = "Delete user")
-  @DeleteMapping("/user/{id}")
-  public ResponseEntity<TextResponseModel> deleteUser(@PathVariable Integer id,
+  @DeleteMapping("/user")
+  public ResponseEntity<TextResponseModel> deleteUser(@RequestBody DeleteUserModel profile,
       Authentication authentication, HttpServletRequest request)
       throws UserNotFoundException, PermissionsException {
-    authService.deleteUser(request, authentication, id);
+    authService.deleteUser(request, authentication, profile.getId());
     rabbitMQService.deleteUserProfile(authentication.getName());
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Successful deletion", true), HttpStatus.OK);

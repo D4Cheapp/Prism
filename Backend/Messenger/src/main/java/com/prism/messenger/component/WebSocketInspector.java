@@ -1,6 +1,6 @@
 package com.prism.messenger.component;
 
-import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
+import com.prism.messenger.service.Profile.impl.ProfileServiceImpl;
 import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
