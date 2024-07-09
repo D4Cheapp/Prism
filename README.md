@@ -2,7 +2,7 @@
 
 ### Функции приложения
 
-- [ ]  Авторизация/регистрация/удаление пользователей
+- [x]  Авторизация/регистрация/удаление пользователей
 - [ ]  Обновление пароля/логина
 - [ ]  Добавление/удаление чатов и групп
 - [ ]  Добавление/изменение/удаление названия/иконки чата
@@ -16,16 +16,18 @@
 
 ### Запуск приложения
 
-- Добавить файл переменных окружения .env
-  в папку Backend
-- cd Backend
-- docker compose up --env-file .env
+- Добавить файлы переменных окружения backend.env и frontend.env
+- docker network create prism-network
+- docker compose -f ./Backend/docker-compose.yml --env-file backend.env up
+- docker compose -f ./Backend/Authentication/docker-compose.yml --env-file backend.env up
+- docker compose -f ./Backend/Messenger/docker-compose.yml --env-file backend.env up
 - Запустить файл index.html из папки Frontend
 
 ### Полезные ссылки
 
 - [Grafana monitoring](http://localhost:3030)
-- [Check server status](http://localhost:8080/prism/v1/actuator/health)
+- [Check auth server status](http://localhost:8090/prism/v1/actuator/health)
+- [Check messenger server status](http://localhost:8080/prism/v1/actuator/health)
 - [API endpoints](http://localhost:8080/prism/v1/swagger-ui/index.html)
 
 ### Backend технологии
@@ -38,6 +40,7 @@
 - **Neo4j** - графическая база данных,
   использующая свойства графов для организации и
   управления данными.
+-  **Minio** - s3 база данных для хранения файлов пользователей
 - **Docker** - платформа для создания,
   развертывания и управления контейнерами.
 - **Prometheus** - система мониторинга и

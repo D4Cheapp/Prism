@@ -1,5 +1,10 @@
 scrape_configs:
-  - job_name: 'prism_monitoring'
+  - job_name: 'prism_authentication'
+    scrape_interval: 5s
+    metrics_path: '/prism/v1/actuator/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8090' ]
+  - job_name: 'prism_messenger'
     scrape_interval: 5s
     metrics_path: '/prism/v1/actuator/prometheus'
     static_configs:

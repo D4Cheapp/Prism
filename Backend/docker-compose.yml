@@ -1,63 +1,44 @@
 version: "3.7"
-
+name: prism-core
 services:
-  app:
-    container_name: "prism-backend"
-    image: "prism-backend"
+  rabbitmq:
+    container_name: rabbitmq
+    image: rabbitmq:management
+    hostname: rabbitmq
+    networks:
+      - prism-network
     ports:
-      - "8080:8080"
-    depends_on:
-      - redis
-      - postgres
-    environment:
-      DB_URL: jdbc:postgresql://postgres:5432/Prism
-      DB_LOGIN: ${DB_LOGIN}
-      DB_PASSWORD: ${DB_PASSWORD}
-      EMAIL_LOGIN: ${EMAIL_LOGIN}
-      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-      SERVER_PORT: ${SERVER_PORT}
-      POSTGRES_USER: ${DB_LOGIN}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      REDIS_HOST: redis
-      REDIS_PORT: ${REDIS_PORT}
-  redis:
-    container_name: redis
-    image: redis
+      - "5672:5672"
+      - "15672:15672"
     restart: always
-    hostname: redis
-    ports:
-      - "6379:6379"
-  postgres:
-    container_name: postgres
-    image: postgres
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: ${DB_LOGIN}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: Prism
+    env_file:
+      - ../backend.env
   grafana:
     container_name: grafana
     image: grafana/grafana
+    restart: always
+    networks:
+      - prism-network
+    ports:
+      - "3030:3000"
     depends_on:
       - prometheus
     volumes:
       - ./grafana:/etc/grafana/provisioning
-    environment:
-      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME}
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
-    ports:
-      - "3030:3000"
+    env_file:
+      - ../backend.env
   prometheus:
     container_name: prometheus
     image: prom/prometheus
     hostname: prometheus
-    depends_on:
-      - app
+    networks:
+      - prism-network
     ports:
       - "9090:9090"
+      - "9091:9091"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
-
+networks:
+  prism-network:
+    external: true
+    name: prism-network

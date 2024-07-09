@@ -1,0 +1,50 @@
+version: "3.7"
+name: prism-authentication
+services:
+  app:
+    container_name: prism-authentication
+    image: d4c/prism-authentication:latest
+    build: ./
+    networks:
+      - prism-network
+      - prism-auth-network
+    ports:
+      - "8090:8090"
+    depends_on:
+      - redis
+      - postgres
+    env_file:
+      - ../../backend.env
+    environment:
+      RABBITMQ_DEFAULT_URL: amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672
+      POSTGRES_URL: jdbc:postgresql://postgres:5432/Prism
+      REDIS_HOST: redis
+  redis:
+    container_name: redis
+    image: redis
+    hostname: redis
+    networks:
+      - prism-network
+    ports:
+      - "6379:6379"
+    restart: always
+    env_file:
+      - ../../backend.env
+  postgres:
+    container_name: postgres
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    networks:
+      - prism-auth-network
+    env_file:
+      - ../../backend.env
+    environment:
+      POSTGRES_DB: Prism
+networks:
+  prism-network:
+    external: true
+    name: prism-network
+  prism-auth-network:
+    name: prism-auth-network
