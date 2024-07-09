@@ -1,4 +1,4 @@
-package com.prism.messenger.service.profile.impl;
+package com.prism.messenger.service.Profile.impl;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.PermissionsException;
@@ -11,8 +11,8 @@ import com.prism.messenger.exception.profile.StatusIsTooLongException;
 import com.prism.messenger.exception.profile.TagAlreadyExistException;
 import com.prism.messenger.model.rabbitMQ.RabbitMQChangeEmailMessageModel;
 import com.prism.messenger.repository.ProfileRepository;
+import com.prism.messenger.service.Profile.ChangeProfileInfoService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
-import com.prism.messenger.service.profile.ChangeProfileInfoService;
 import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;

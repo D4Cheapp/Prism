@@ -1,4 +1,4 @@
-package com.prism.messenger.service.profile;
+package com.prism.messenger.service.Profile;
 
 import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.CreateProfileException;
@@ -22,6 +22,9 @@ public interface ProfileService {
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 
   FullProfileInfoModel getProfileByTag(String tag, String email)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
+  FullProfileInfoModel getProfileByTelephone(String telephone, String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 
   void createProfile(String email) throws CreateProfileException;
@@ -52,4 +55,6 @@ public interface ProfileService {
   void setOnlineConnectedStatus(String email);
 
   void setOnlineDisconnectedStatus(String email);
+
+  RecieveProfileListModel searchProfileByTag(String tag, Integer page, Integer size);
 }

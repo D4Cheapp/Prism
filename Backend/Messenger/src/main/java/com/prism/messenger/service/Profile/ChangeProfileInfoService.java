@@ -1,4 +1,4 @@
-package com.prism.messenger.service.profile;
+package com.prism.messenger.service.Profile;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.FileIsEmptyException;
