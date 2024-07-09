@@ -1,6 +1,19 @@
 version: "3.7"
 name: prism-core
 services:
+  swagger:
+    container_name: swagger
+    image: swaggerapi/swagger-ui
+    restart: always
+    networks:
+      - prism-network
+    ports:
+      - "2222:2222"
+    environment:
+      PORT: 2222
+      CONFIG_URL: /swagger-config.yaml
+    volumes:
+      - ./swagger-config.yaml:/usr/share/nginx/html/swagger-config.yaml
   rabbitmq:
     container_name: rabbitmq
     image: rabbitmq:management

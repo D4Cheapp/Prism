@@ -26,9 +26,7 @@
 ### Полезные ссылки
 
 - [Grafana monitoring](http://localhost:3030)
-- [Check auth server status](http://localhost:8090/prism/v1/actuator/health)
-- [Check messenger server status](http://localhost:8080/prism/v1/actuator/health)
-- [API endpoints](http://localhost:8080/prism/v1/swagger-ui/index.html)
+- [API endpoints](http://localhost:2222)
 
 ### Backend технологии
 

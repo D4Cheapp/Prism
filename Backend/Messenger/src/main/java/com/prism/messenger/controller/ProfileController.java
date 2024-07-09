@@ -26,6 +26,7 @@ import io.minio.errors.InternalException;
 import io.minio.errors.InvalidResponseException;
 import io.minio.errors.ServerException;
 import io.minio.errors.XmlParserException;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -55,6 +56,7 @@ public class ProfileController {
   @Autowired
   private ProfileServiceImpl profileService;
 
+  @Operation(summary = "Get current profile")
   @GetMapping
   public ResponseEntity<FullProfileInfoModel> getCurrentProfile(Authentication authentication)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -63,6 +65,7 @@ public class ProfileController {
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
   }
 
+  @Operation(summary = "Get profile by tag")
   @GetMapping("/{tag}")
   public ResponseEntity<FullProfileInfoModel> getProfileByTag(@PathVariable String tag,
       Authentication authentication)
@@ -72,6 +75,7 @@ public class ProfileController {
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
   }
 
+  @Operation(summary = "Get blocked profile list ")
   @GetMapping("/block-list")
   public ResponseEntity<RecieveProfileListModel> getBlockList(
       @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
@@ -82,6 +86,7 @@ public class ProfileController {
     return new ResponseEntity<>(profileBockList, HttpStatus.OK);
   }
 
+  @Operation(summary = "Get friend profile list ")
   @GetMapping("/friend-list")
   public ResponseEntity<RecieveProfileListModel> getFriendList(
       @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
@@ -92,6 +97,7 @@ public class ProfileController {
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
   }
 
+  @Operation(summary = "Get sended friend request list ")
   @GetMapping("/sended-friend-requests")
   public ResponseEntity<RecieveProfileListModel> getSendedFriendRequestList(
       @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
@@ -103,6 +109,7 @@ public class ProfileController {
     return new ResponseEntity<>(sendedRequests, HttpStatus.OK);
   }
 
+  @Operation(summary = "Get friend request list ")
   @GetMapping("/friend-requests")
   public ResponseEntity<RecieveProfileListModel> getFriendRequestList(
       @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
@@ -114,6 +121,7 @@ public class ProfileController {
     return new ResponseEntity<>(friendRequests, HttpStatus.OK);
   }
 
+  @Operation(summary = "Add friend")
   @PostMapping("/friend")
   public ResponseEntity<TextResponseModel> addFriend(@RequestBody TagModel friendTag,
       Authentication authentication)
@@ -124,6 +132,7 @@ public class ProfileController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Decline friend request")
   @PostMapping("/friend-decline")
   public ResponseEntity<TextResponseModel> friendRequestDecline(@RequestBody TagModel friendTag,
       Authentication authentication) {
@@ -133,6 +142,7 @@ public class ProfileController {
         TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
   }
 
+  @Operation(summary = "Block user")
   @PostMapping("/block")
   public ResponseEntity<TextResponseModel> blockUser(@RequestBody TagModel userTag,
       Authentication authentication)
@@ -143,6 +153,7 @@ public class ProfileController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Unblock user")
   @PostMapping("/unblock")
   public ResponseEntity<TextResponseModel> unBlockUser(@RequestBody TagModel friendTag,
       Authentication authentication) throws ProfileNotExistException {
@@ -152,6 +163,7 @@ public class ProfileController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Change profile name")
   @PatchMapping("/name")
   public ResponseEntity<ProfileModel> changeProfileEmail(
       @RequestBody ChangeProfileNameModel profileName, Authentication authentication)
@@ -161,6 +173,7 @@ public class ProfileController {
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
+  @Operation(summary = "Change profile phone")
   @PatchMapping("/phone")
   public ResponseEntity<ProfileModel> changeProfilePhone(
       @RequestBody ChangeProfilePhoneModel profilePhone, Authentication authentication)
@@ -171,6 +184,7 @@ public class ProfileController {
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
+  @Operation(summary = "Change profile tag")
   @PatchMapping("/tag")
   public ResponseEntity<ProfileModel> changeProfileTag(@RequestBody TagModel profileTag,
       Authentication authentication)
@@ -180,6 +194,7 @@ public class ProfileController {
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
+  @Operation(summary = "Change profile status")
   @PatchMapping("/status")
   public ResponseEntity<ProfileModel> changeProfileStatus(
       @RequestBody ChangeProfileStatusModel profileStatus, Authentication authentication)
@@ -190,6 +205,7 @@ public class ProfileController {
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
+  @Operation(summary = "Change profile picture")
   @PatchMapping("/profile-picture")
   public ResponseEntity<ProfileModel> changeProfilePicture(
       @RequestParam("file") MultipartFile profilePicture, Authentication authentication)
@@ -199,6 +215,7 @@ public class ProfileController {
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
+  @Operation(summary = "Delete friend")
   @DeleteMapping("/friend")
   public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody TagModel friendTag,
       Authentication authentication)

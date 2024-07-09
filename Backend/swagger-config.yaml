@@ -1,0 +1,10 @@
+swagger: 3.0
+urls:
+  - url: http://localhost:8090/prism/v1/api-doc
+    name: "Prism Authentication API"
+  - url: http://localhost:8080/prism/v1/api-doc
+    name: "Prism Messenger API"
+info:
+  version: "1.0"
+  title: "Prism API"
+  description: "Prism API"
