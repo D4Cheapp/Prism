@@ -48,4 +48,8 @@ public interface ProfileService {
   RecieveProfileListModel getSendedFriendRequestList(String email, Integer page, Integer size);
 
   void declineFriendRequest(String email, String tag);
+
+  void setOnlineConnectedStatus(String email);
+
+  void setOnlineDisconnectedStatus(String email);
 }

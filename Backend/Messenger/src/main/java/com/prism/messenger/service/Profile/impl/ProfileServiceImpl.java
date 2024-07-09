@@ -135,6 +135,16 @@ public class ProfileServiceImpl implements ProfileService {
     profileRepository.declineFriendRequest(email, tag);
   }
 
+  public void setOnlineConnectedStatus(String email) {
+    profileRepository.setIsOnlineStatus(email, true);
+  }
+
+  public void setOnlineDisconnectedStatus(String email) {
+    long lastOnlineTime = new Date().getTime();
+    profileRepository.setIsOnlineStatus(email, false);
+    profileRepository.setLastOnlineTime(email, lastOnlineTime);
+  }
+
   private void checkIsUserACurrentProfile(Profile profile, String friendTag)
       throws AddCurrentProfileToCurrentProfileException {
     boolean isRequestedUserIsACurrentProfile = friendTag.equals(profile.getTag());

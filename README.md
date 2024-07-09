@@ -16,11 +16,11 @@
 
 ### Запуск приложения
 
-- Добавить файл переменных окружения .env
+- Добавить файлы переменных окружения backend.env и frontend.env
 - docker network create prism-network
-- docker compose --project-directory ./Backend --env-file .env up
-- docker compose --project-directory ./Backend/Authentication --env-file .env up
-- docker compose --project-directory ./Backend/Messenger --env-file .env up
+- docker compose -f ./Backend/docker-compose.yml --env-file backend.env up
+- docker compose -f ./Backend/Authentication/docker-compose.yml --env-file backend.env up
+- docker compose -f ./Backend/Messenger/docker-compose.yml --env-file backend.env up
 - Запустить файл index.html из папки Frontend
 
 ### Полезные ссылки

@@ -82,4 +82,10 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
 
   @Query("MATCH (p:Profile {email: $email})<-[r]-(f:Profile {tag: $userTag}) WHERE NOT (p)-[:FRIEND]->(f) DELETE r")
   void declineFriendRequest(String email, String userTag);
+
+  @Query("MATCH (p:Profile {email: $email}) SET p.isOnline = $isOnline")
+  void setIsOnlineStatus(String email, boolean isOnline);
+
+  @Query("MATCH (p:Profile {email: $email}) SET p.lastOnlineTime = $lastOnlineTime")
+  void setLastOnlineTime(String email, long lastOnlineTime);
 }
