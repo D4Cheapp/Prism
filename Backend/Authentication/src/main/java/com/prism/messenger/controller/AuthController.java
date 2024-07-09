@@ -26,6 +26,7 @@ import com.prism.messenger.model.UserRegistrationModel;
 import com.prism.messenger.service.impl.AuthServiceImpl;
 import com.prism.messenger.service.impl.EmailSenderServiceImpl;
 import com.prism.messenger.service.impl.RabbitMQServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -55,6 +56,7 @@ public class AuthController {
   @Autowired
   private RabbitMQServiceImpl rabbitMQService;
 
+  @Operation(summary = "Get current authenticated user")
   @GetMapping("/user")
   public ResponseEntity<UserModel> getCurrentAuthenticatedUser(Authentication authentication)
       throws UserNotFoundException {
@@ -62,6 +64,7 @@ public class AuthController {
     return new ResponseEntity<>(currentUser, HttpStatus.OK);
   }
 
+  @Operation(summary = "Login")
   @PostMapping("/login")
   public ResponseEntity<UserModel> login(@RequestBody UserLoginModel user,
       HttpServletRequest request, HttpServletResponse response)
@@ -72,6 +75,7 @@ public class AuthController {
     return new ResponseEntity<>(returnedUser, HttpStatus.OK);
   }
 
+  @Operation(summary = "Registration")
   @PostMapping("/registration")
   public ResponseEntity<TextResponseModel> sendRegistrationCode(
       @RequestBody UserRegistrationModel user, HttpServletRequest request)
@@ -83,6 +87,7 @@ public class AuthController {
             true), HttpStatus.OK);
   }
 
+  @Operation(summary = "Send restore password email")
   @PostMapping("/restore-password")
   public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email,
       HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
@@ -93,6 +98,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Send edit user email confirmation")
   @PostMapping("/email")
   public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmition(
       @RequestBody EmailModel email, HttpServletRequest request, Authentication authentication)
@@ -104,6 +110,7 @@ public class AuthController {
   }
 
   @Transactional
+  @Operation(summary = "Confirm registration")
   @PatchMapping("/registration")
   public ResponseEntity<TextResponseModel> confirmRegistration(
       @RequestBody AuthConfirmModel confirmModel, HttpServletRequest request)
@@ -120,6 +127,7 @@ public class AuthController {
         HttpStatus.CREATED);
   }
 
+  @Operation(summary = "Confirm edit user email")
   @PatchMapping("/email")
   public ResponseEntity<TextResponseModel> confirmEmail(@RequestBody AuthConfirmModel confirmModel,
       HttpServletRequest request)
@@ -136,6 +144,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Confirm password restore")
   @PatchMapping("/restore-password")
   public ResponseEntity<TextResponseModel> confirmPasswordRestore(
       @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request)
@@ -149,6 +158,7 @@ public class AuthController {
         HttpStatus.OK);
   }
 
+  @Operation(summary = "Edit user password")
   @PatchMapping("/password")
   public ResponseEntity<UserModel> sendEditUserPasswordConfirmition(
       @RequestBody EditPasswordModel passwords, Authentication authentication)
@@ -157,6 +167,7 @@ public class AuthController {
     return new ResponseEntity<>(returnedUser, HttpStatus.OK);
   }
 
+  @Operation(summary = "Logout")
   @DeleteMapping("/logout")
   public ResponseEntity<TextResponseModel> logout(Authentication authentication,
       HttpServletRequest request, HttpServletResponse response) {
@@ -165,6 +176,7 @@ public class AuthController {
         TextResponseModel.toTextResponseModel("Successful logout", true), HttpStatus.OK);
   }
 
+  @Operation(summary = "Delete user")
   @DeleteMapping("/user/{id}")
   public ResponseEntity<TextResponseModel> deleteUser(@PathVariable Integer id,
       Authentication authentication, HttpServletRequest request)
