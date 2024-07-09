@@ -1,7 +1,7 @@
 package com.prism.messenger.repository;
 
 import com.prism.messenger.entity.Profile;
-import java.util.List;
+import com.prism.messenger.model.profile.QueryRecieveProfileListModel;
 import java.util.Optional;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
@@ -50,35 +50,28 @@ public interface ProfileRepository extends Neo4jRepository<Profile, String> {
   @Query("MATCH (p:Profile {tag: $tag}) DETACH DELETE p")
   void deleteByTag(String tag);
 
-  @Query("MATCH (p:Profile {email: $email})-[:FRIEND]->(f:Profile) WHERE (p)<-[:FRIEND]-(f) RETURN COUNT(f)")
-  Optional<Integer> getFriendsCount(String email);
+  @Query("MATCH (p:Profile {email: $email})-[:FRIEND]->(f:Profile) WHERE (p)<-[:FRIEND]-(f)  "
+      + "RETURN COUNT(f) AS totalCount, COLLECT(f) AS profiles SKIP $skip LIMIT $limit ")
+  Optional<QueryRecieveProfileListModel> getFriendList(String email, Integer skip, Integer limit);
 
-  @Query("MATCH (p:Profile {email: $email})<-[:FRIEND]-(f:Profile) WHERE NOT (p)-[:FRIEND]->(f) RETURN COUNT(f)")
-  Optional<Integer> getFriendRequestsCount(String email);
+  @Query("MATCH (p:Profile {email: $email})<-[:FRIEND]-(f:Profile) WHERE NOT (p)-[:FRIEND]->(f) "
+      + "RETURN COUNT(f) AS totalCount, COLLECT(f) AS profiles SKIP $skip LIMIT $limit")
+  Optional<QueryRecieveProfileListModel> getFriendRequestsList(String email, Integer skip,
+      Integer limit);
 
-  @Query("MATCH (p:Profile {email: $email})-[r:FRIEND]->(f:Profile) WHERE NOT (p)<-[:FRIEND]-(f)  RETURN COUNT(f)")
-  Optional<Integer> getSendedFriendRequestCount(String email);
+  @Query("MATCH (p:Profile {email: $email})-[r:FRIEND]->(f:Profile) WHERE NOT (p)<-[:FRIEND]-(f) "
+      + " RETURN COUNT(f) AS totalCount, COLLECT(f) AS profiles SKIP $skip LIMIT $limit")
+  Optional<QueryRecieveProfileListModel> getSendedFriendRequest(String email, Integer skip,
+      Integer limit);
 
-  @Query("MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile) RETURN COUNT(f)")
-  Optional<Integer> getBlockListCount(String email);
+  @Query(
+      "MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile) RETURN COUNT(f), COLLECT(f) AS profiles SKIP $skip "
+          + "LIMIT $limit")
+  Optional<QueryRecieveProfileListModel> getBlockList(String email, Integer skip, Integer limit);
 
-  @Query("MATCH (p:Profile) WHERE p.tag CONTAINS $tag RETURN COUNT(p)")
-  Optional<Integer> getSearchProfileByTagCount(String tag);
-
-  @Query("MATCH (p:Profile {email: $email})-[:FRIEND]->(f:Profile) WHERE (p)<-[:FRIEND]-(f)  RETURN f SKIP $skip LIMIT $limit ")
-  Optional<List<Profile>> getFriendList(String email, Integer skip, Integer limit);
-
-  @Query("MATCH (p:Profile {email: $email})<-[:FRIEND]-(f:Profile) WHERE NOT (p)-[:FRIEND]->(f) RETURN f SKIP $skip LIMIT $limit")
-  Optional<List<Profile>> getFriendRequestsList(String email, Integer skip, Integer limit);
-
-  @Query("MATCH (p:Profile {email: $email})-[r:FRIEND]->(f:Profile) WHERE NOT (p)<-[:FRIEND]-(f)  RETURN f SKIP $skip LIMIT $limit")
-  Optional<List<Profile>> getSendedFriendRequest(String email, Integer skip, Integer limit);
-
-  @Query("MATCH (p:Profile {email: $email})-[r:BLOCK]->(f:Profile) RETURN f SKIP $skip LIMIT $limit")
-  Optional<List<Profile>> getBlockList(String email, Integer skip, Integer limit);
-
-  @Query("MATCH (p:Profile) WHERE p.tag CONTAINS $tag RETURN p SKIP $skip LIMIT $limit")
-  Optional<List<Profile>> searchProfileByTag(String tag, Integer skip, Integer limit);
+  @Query("MATCH (p:Profile) WHERE p.tag CONTAINS $tag RETURN COUNT(p) AS totalCount, COLLECT(p) AS profiles SKIP $skip LIMIT $limit")
+  Optional<QueryRecieveProfileListModel> searchProfileByTag(String tag, Integer skip,
+      Integer limit);
 
   @Query("MATCH (p:Profile {email: $email})-[r]->(f:Profile {tag: $userTag}) RETURN TYPE(r)")
   Optional<String> getRelationToUser(String email, String userTag);

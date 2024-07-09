@@ -7,6 +7,7 @@ import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ProfileModel;
+import com.prism.messenger.model.profile.QueryRecieveProfileListModel;
 import com.prism.messenger.model.profile.RecieveProfileListModel;
 import com.prism.messenger.model.profile.RelationsBetweenUserModel;
 import com.prism.messenger.repository.ProfileRepository;
@@ -113,36 +114,34 @@ public class ProfileServiceImpl implements ProfileService {
   }
 
   public RecieveProfileListModel getFriendList(String email, Integer page, Integer size) {
-    Optional<Integer> totalCount = profileRepository.getFriendsCount(email);
-    Optional<List<Profile>> friendList = profileRepository.getFriendList(email, page * size, size);
-    return convertToListModel(friendList, totalCount);
+    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getFriendList(email,
+        page * size, size);
+    return convertToListModel(friendList);
   }
 
   public RecieveProfileListModel getFriendRequestsList(String email, Integer page, Integer size) {
-    Optional<Integer> totalCount = profileRepository.getFriendRequestsCount(email);
-    Optional<List<Profile>> friendList = profileRepository.getFriendRequestsList(email, page * size,
-        size);
-    return convertToListModel(friendList, totalCount);
+    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getFriendRequestsList(
+        email, page * size, size);
+    return convertToListModel(friendList);
   }
 
   public RecieveProfileListModel getSendedFriendRequestList(String email, Integer page,
       Integer size) {
-    Optional<Integer> totalCount = profileRepository.getSendedFriendRequestCount(email);
-    Optional<List<Profile>> friendList = profileRepository.getSendedFriendRequest(email,
-        page * size, size);
-    return convertToListModel(friendList, totalCount);
+    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getSendedFriendRequest(
+        email, page * size, size);
+    return convertToListModel(friendList);
   }
 
   public RecieveProfileListModel getBlockList(String email, Integer page, Integer size) {
-    Optional<Integer> totalCount = profileRepository.getBlockListCount(email);
-    Optional<List<Profile>> blockList = profileRepository.getBlockList(email, page * size, size);
-    return convertToListModel(blockList, totalCount);
+    Optional<QueryRecieveProfileListModel> blockList = profileRepository.getBlockList(email,
+        page * size, size);
+    return convertToListModel(blockList);
   }
 
   public RecieveProfileListModel searchProfileByTag(String tag, Integer page, Integer size) {
-    Optional<Integer> totalCount = profileRepository.getSearchProfileByTagCount(tag);
-    Optional<List<Profile>> searchList = profileRepository.searchProfileByTag(tag, page, size);
-    return convertToListModel(searchList, totalCount);
+    Optional<QueryRecieveProfileListModel> searchList = profileRepository.searchProfileByTag(tag,
+        page, size);
+    return convertToListModel(searchList);
   }
 
   public void declineFriendRequest(String email, String tag) {
@@ -183,17 +182,16 @@ public class ProfileServiceImpl implements ProfileService {
     return minioService.getFile(profile.getProfilePicturePath());
   }
 
-  private RecieveProfileListModel convertToListModel(Optional<List<Profile>> profileList,
-      Optional<Integer> totalCount) {
-    boolean isTotalCountEmpty = (totalCount.isPresent() && totalCount.get() == 0);
-    boolean isProfileListNotEmpty =
-        totalCount.isPresent() && profileList.isPresent() && !isTotalCountEmpty;
+  private RecieveProfileListModel convertToListModel(
+      Optional<QueryRecieveProfileListModel> profileList) {
+    boolean isTotalCountEmpty = (profileList.isPresent() && profileList.get().getTotalCount() == 0);
+    boolean isProfileListNotEmpty = profileList.isPresent() && !isTotalCountEmpty;
     if (isProfileListNotEmpty) {
       List<ProfileModel> ProfileModelList = new ArrayList<>();
-      for (Profile profile : profileList.get()) {
+      for (Profile profile : profileList.get().getProfiles()) {
         ProfileModelList.add(ProfileModel.toModel(profile));
       }
-      return new RecieveProfileListModel(totalCount.get(), ProfileModelList);
+      return new RecieveProfileListModel(profileList.get().getTotalCount(), ProfileModelList);
     } else {
       return new RecieveProfileListModel(0, null);
     }
