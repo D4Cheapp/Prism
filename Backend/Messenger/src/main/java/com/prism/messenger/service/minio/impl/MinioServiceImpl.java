@@ -34,7 +34,7 @@ public class MinioServiceImpl implements MinioService {
   public void deleteFolder(String path)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     Iterable<Result<Item>> objectsList = minioClient.listObjects(
-        ListObjectsArgs.builder().bucket(bucketName).prefix(path).build());
+        ListObjectsArgs.builder().bucket(bucketName).prefix(path + "/").build());
     for (Result<Item> result : objectsList) {
       Item item = result.get();
       minioClient.removeObject(
@@ -50,14 +50,14 @@ public class MinioServiceImpl implements MinioService {
 
   public void createFolder(String path)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(path)
+    minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(path + "/")
         .stream(new ByteArrayInputStream(new byte[]{}), 0, -1).build());
   }
 
   public void copyFromFolder(String from, String to)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     Iterable<Result<Item>> objectsList = minioClient.listObjects(
-        ListObjectsArgs.builder().bucket(bucketName).prefix(from).build());
+        ListObjectsArgs.builder().bucket(bucketName).prefix(from + "/").build());
     for (Result<Item> result : objectsList) {
       Item item = result.get();
       String[] parts = item.objectName().split("/");
@@ -65,7 +65,7 @@ public class MinioServiceImpl implements MinioService {
       byte[] bytes = minioClient.getObject(
               GetObjectArgs.builder().bucket(bucketName).object(item.objectName()).build())
           .readAllBytes();
-      minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(to + fileName)
+      minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(to + "/" + fileName)
           .stream(new ByteArrayInputStream(bytes), 0, -1).build());
     }
   }

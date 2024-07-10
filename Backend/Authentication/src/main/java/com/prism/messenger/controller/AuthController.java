@@ -30,7 +30,6 @@ import com.prism.messenger.service.impl.RabbitMQServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -67,9 +66,9 @@ public class AuthController {
   @Operation(summary = "Login")
   @PostMapping("/login")
   public ResponseEntity<UserModel> login(@RequestBody UserLoginModel user,
-      HttpServletRequest request, HttpServletResponse response)
+      HttpServletRequest request)
       throws TooManyAttemptsException, UserNotFoundException, IncorrectPasswordException {
-    authService.checkTrottleRequest(request, "login");
+    authService.checkThrottleRequest(request, "login");
     UserModel returnedUser = authService.login(user);
     authService.sessionAuthentication(request, user.getEmail(), user.getPassword());
     return new ResponseEntity<>(returnedUser, HttpStatus.OK);
@@ -79,9 +78,9 @@ public class AuthController {
   @PostMapping("/registration")
   public ResponseEntity<TextResponseModel> sendRegistrationCode(
       @RequestBody UserRegistrationModel user, HttpServletRequest request)
-      throws EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, TooLongPasswordException, TooShortPasswordException, TooManyAttemptsException {
-    authService.checkTrottleRequest(request, "registration");
-    emailSenderService.sendRegitrationCode(user, request);
+      throws TooManyAttemptsException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, TooLongPasswordException, TooShortPasswordException {
+    authService.checkThrottleRequest(request, "registration");
+    emailSenderService.sendRegistrationCode(user, request);
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Confirmation email was sent to: " + user.getEmail(),
             true), HttpStatus.OK);
@@ -91,19 +90,19 @@ public class AuthController {
   @PostMapping("/restore-password")
   public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email,
       HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
-    authService.checkTrottleRequest(request, "restore-password");
+    authService.checkThrottleRequest(request, "restore-password");
     emailSenderService.sendRestorePasswordCode(email.getEmail(), request);
     return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Restore password email was succesfuly sent", true),
+        TextResponseModel.toTextResponseModel("Restore password email was successfully sent", true),
         HttpStatus.OK);
   }
 
   @Operation(summary = "Send edit user email confirmation")
   @PostMapping("/email")
-  public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmition(
+  public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmation(
       @RequestBody EmailModel email, HttpServletRequest request, Authentication authentication)
       throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, PermissionsException {
-    authService.checkTrottleRequest(request, "edit-email");
+    authService.checkThrottleRequest(request, "edit-email");
     emailSenderService.sendEditUserEmailCode(email, authentication, request);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel(
         "Confirmation for email change was sent to: " + email.getEmail(), true), HttpStatus.OK);
@@ -112,7 +111,7 @@ public class AuthController {
   @Transactional
   @Operation(summary = "Confirm registration")
   @PatchMapping("/registration")
-  public ResponseEntity<TextResponseModel> confirmRegistration(
+  public ResponseEntity<UserModel> confirmRegistration(
       @RequestBody AuthConfirmModel confirmModel, HttpServletRequest request)
       throws ActivationCodeExpireException, IncorrectConfirmCodeException {
     String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
@@ -122,9 +121,7 @@ public class AuthController {
     rabbitMQService.createUserProfile(confirmEmail);
     emailSenderService.deleteActivationCode(confirmEmail);
     request.getSession().removeAttribute("confirmEmail");
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("User was created successfully", true),
-        HttpStatus.CREATED);
+    return new ResponseEntity<>(returnedUser, HttpStatus.CREATED);
   }
 
   @Operation(summary = "Confirm edit user email")
@@ -146,21 +143,19 @@ public class AuthController {
 
   @Operation(summary = "Confirm password restore")
   @PatchMapping("/restore-password")
-  public ResponseEntity<TextResponseModel> confirmPasswordRestore(
+  public ResponseEntity<UserModel> confirmPasswordRestore(
       @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request)
       throws ActivationCodeExpireException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, TooLongPasswordException, TooShortPasswordException, IncorrectConfirmCodeException {
     String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
     UserModel returnedUser = authService.restoreUserPassword(confirmEmail, passwordModel);
     emailSenderService.deleteActivationCode(passwordModel.getCode());
     request.getSession().removeAttribute("confirmEmail");
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Password was changed successfully", true),
-        HttpStatus.OK);
+    return new ResponseEntity<>(returnedUser, HttpStatus.OK);
   }
 
   @Operation(summary = "Edit user password")
   @PatchMapping("/password")
-  public ResponseEntity<UserModel> sendEditUserPasswordConfirmition(
+  public ResponseEntity<UserModel> sendEditUserPasswordConfirmation(
       @RequestBody EditPasswordModel passwords, Authentication authentication)
       throws UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectPasswordException, TooLongPasswordException, PermissionsException, TooShortPasswordException {
     UserModel returnedUser = authService.editUserPassword(authentication, passwords);
@@ -169,8 +164,7 @@ public class AuthController {
 
   @Operation(summary = "Logout")
   @DeleteMapping("/logout")
-  public ResponseEntity<TextResponseModel> logout(Authentication authentication,
-      HttpServletRequest request, HttpServletResponse response) {
+  public ResponseEntity<TextResponseModel> logout(HttpServletRequest request) {
     authService.deactivateSession(request);
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Successful logout", true), HttpStatus.OK);

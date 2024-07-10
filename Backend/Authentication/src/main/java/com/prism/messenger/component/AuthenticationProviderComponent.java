@@ -1,4 +1,4 @@
-package com.prism.messenger.config;
+package com.prism.messenger.component;
 
 import com.prism.messenger.entity.Auth;
 import com.prism.messenger.repository.AuthRepo;
@@ -10,8 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
 
-public class AuthenticationProviderConfig implements AuthenticationProvider {
+@Component
+public class AuthenticationProviderComponent implements AuthenticationProvider {
 
   @Autowired
   private AuthRepo repository;
@@ -27,8 +29,8 @@ public class AuthenticationProviderConfig implements AuthenticationProvider {
     if (isUserAlreadyExists) {
       throw new BadCredentialsException("User already exists");
     }
-    boolean isPasswordInorrect = !(passwordEncoder.matches(password, user.getPassword()));
-    if (isPasswordInorrect) {
+    boolean isPasswordIncorrect = !(passwordEncoder.matches(password, user.getPassword()));
+    if (isPasswordIncorrect) {
       throw new BadCredentialsException("Incorrect password");
     }
     return new UsernamePasswordAuthenticationToken(email, password, new ArrayList<>());

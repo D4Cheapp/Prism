@@ -1,4 +1,4 @@
-package com.prism.messenger.service.auth.impl.auth;
+package com.prism.messenger.service;
 
 import com.prism.messenger.entity.Auth;
 import com.prism.messenger.exception.ActivationCodeExpireException;
@@ -15,27 +15,24 @@ import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.model.ActivationCodeModel;
 import com.prism.messenger.model.EmailModel;
 import com.prism.messenger.model.UserRegistrationModel;
-import jakarta.mail.internet.AddressException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 
 public interface EmailSenderService {
 
-  void saveActivationCode(Auth account, String message)
-      throws AddressException, IncorectEmailException;
+  void saveActivationCode(Auth account, String message);
 
-  ActivationCodeModel getUserByEmail(String email)
-      throws NoSuchFieldException, ActivationCodeExpireException;
+  ActivationCodeModel getUserByEmail(String email) throws ActivationCodeExpireException;
 
-  void sendRegitrationCode(UserRegistrationModel user, HttpServletRequest request)
-      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException, AddressException;
+  void sendRegistrationCode(UserRegistrationModel user, HttpServletRequest request)
+      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException;
 
 
   void sendEditUserEmailCode(EmailModel email, Authentication authentication,
       HttpServletRequest request)
-      throws PermissionsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, AddressException, ActivationCodeExpireException;
+      throws UserNotFoundException, PermissionsException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException;
 
 
   void sendRestorePasswordCode(String email, HttpServletRequest request)
-      throws UserNotFoundException, AddressException, IncorectEmailException;
+      throws UserNotFoundException;
 }

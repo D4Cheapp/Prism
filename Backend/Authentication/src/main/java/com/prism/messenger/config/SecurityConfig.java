@@ -1,5 +1,6 @@
 package com.prism.messenger.config;
 
+import com.prism.messenger.component.AuthenticationProviderComponent;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +24,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationProvider authenticationProvider() {
-    return new AuthenticationProviderConfig();
+    return new AuthenticationProviderComponent();
   }
 
   @Bean
@@ -43,12 +44,12 @@ public class SecurityConfig {
           String emailConfirmPath = "/auth/email";
           String swaggerPath = "/swagger-ui/*";
           String swaggerDocPath = "/api-doc";
-          String swaggerDocChilds = "/api-doc/*";
-          String actuatorChilds = "/actuator/*";
+          String swaggerDocChildren = "/api-doc/*";
+          String actuatorChildren = "/actuator/*";
           String actuatorPath = "/actuator";
           request.requestMatchers(loginPath, registrationPath, restorePasswordConfirmPath,
-              emailConfirmPath, swaggerPath, swaggerDocPath, swaggerDocChilds, actuatorPath,
-              actuatorChilds).permitAll();
+              emailConfirmPath, swaggerPath, swaggerDocPath, swaggerDocChildren, actuatorPath,
+              actuatorChildren).permitAll();
           request.anyRequest().authenticated();
         }).build();
   }

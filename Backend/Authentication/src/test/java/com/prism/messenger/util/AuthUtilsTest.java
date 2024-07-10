@@ -64,10 +64,10 @@ public class AuthUtilsTest {
     Exception passwordMustIncludeLowerLetter = Assertions.assertThrows(
         PasswordIsTooWeakException.class, () -> AuthUtils.isPasswordTooWeak("A12123345678"));
     Exception passwordMustIncludeNumbers = Assertions.assertThrows(PasswordIsTooWeakException.class,
-        () -> AuthUtils.isPasswordTooWeak("Aaadwwdadwa"));
+        () -> AuthUtils.isPasswordTooWeak("Headwater"));
     Exception passwordMustIncludeSpecialCharacters = Assertions.assertThrows(
         PasswordIsTooWeakException.class, () -> AuthUtils.isPasswordTooWeak("Aa1234567812"));
-    Assertions.assertAll("Check passord weakness",
+    Assertions.assertAll("Check password weakness",
         () -> Assertions.assertEquals(passwordMustIncludeCapitalLetter.getMessage(),
             weakPasswordError + "capital letter"),
         () -> Assertions.assertEquals(passwordMustIncludeLowerLetter.getMessage(),

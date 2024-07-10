@@ -35,11 +35,11 @@ public class SecurityConfig {
         })).authorizeHttpRequests(request -> {
           String swaggerPath = "/swagger-ui/*";
           String swaggerDocPath = "/api-doc";
-          String swaggerDocChilds = "/api-doc/*";
-          String actuatorChilds = "/actuator/*";
+          String swaggerDocChildren = "/api-doc/*";
+          String actuatorChildren = "/actuator/*";
           String actuatorPath = "/actuator";
-          request.requestMatchers(swaggerPath, swaggerDocPath, swaggerDocChilds, actuatorPath,
-              actuatorChilds).permitAll();
+          request.requestMatchers(swaggerPath, swaggerDocPath, swaggerDocChildren, actuatorPath,
+              actuatorChildren).permitAll();
           request.anyRequest().authenticated();
         }).build();
   }

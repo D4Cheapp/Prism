@@ -1,6 +1,7 @@
-package com.prism.messenger.service.Profile.impl;
+package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
+import com.prism.messenger.exception.EmptyParameterException;
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.profile.ChangeProfileEmailException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
@@ -11,8 +12,8 @@ import com.prism.messenger.exception.profile.StatusIsTooLongException;
 import com.prism.messenger.exception.profile.TagAlreadyExistException;
 import com.prism.messenger.model.rabbitMQ.RabbitMQChangeEmailMessageModel;
 import com.prism.messenger.repository.ProfileRepository;
-import com.prism.messenger.service.Profile.ChangeProfileInfoService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
+import com.prism.messenger.service.profile.ChangeProfileInfoService;
 import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -36,15 +37,14 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
   @Autowired
   private MinioServiceImpl minioService;
 
-  public void changeProfileEmail(Object message)
-      throws ChangeProfileEmailException {
+  public void changeProfileEmail(Object message) throws ChangeProfileEmailException {
     try {
       RabbitMQChangeEmailMessageModel changeEmailMessage = (RabbitMQChangeEmailMessageModel) message;
       String oldEmail = changeEmailMessage.getOldEmail();
       String newEmail = changeEmailMessage.getNewEmail();
-      minioService.createFolder("profiles/" + newEmail + "/");
-      minioService.copyFromFolder("profiles/" + oldEmail + "/", "profiles/" + newEmail + "/");
-      minioService.deleteFolder("profiles/" + oldEmail + "/");
+      minioService.createFolder("profiles/" + newEmail);
+      minioService.copyFromFolder("profiles/" + oldEmail, "profiles/" + newEmail);
+      minioService.deleteFolder("profiles/" + oldEmail);
       profileRepository.changeEmail(oldEmail, newEmail);
     } catch (Exception e) {
       throw new ChangeProfileEmailException();
@@ -53,7 +53,7 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
 
   public Profile changeProfileName(String email, String name)
       throws ProfileNotExistException, ProfileNameIsTooLongException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     boolean isNameTooLong = name.length() > 100;
     if (isNameTooLong) {
       throw new ProfileNameIsTooLongException();
@@ -65,7 +65,7 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
 
   public Profile changeProfilePhoneNumber(String email, String phoneNumber)
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     boolean isPhoneExist = phoneNumber.isEmpty();
     String resultPhoneNumber;
     if (isPhoneExist) {
@@ -80,12 +80,12 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
 
   public Profile changeProfileTag(String email, String newTag)
       throws ProfileNotExistException, TagAlreadyExistException, PermissionsException {
-    Profile oldProfile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile oldProfile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     Optional<Profile> newProfile = profileRepository.findByTag(newTag);
     boolean isNewProfileExist = newProfile.isPresent();
-    boolean isTagInorrect = !newTag.startsWith("@");
+    boolean isTagIncorrect = !newTag.startsWith("@");
     boolean isIncorrectPermission = !oldProfile.getEmail().equals(email);
-    if (isTagInorrect) {
+    if (isTagIncorrect) {
       newTag = "@" + newTag;
     }
     if (isNewProfileExist) {
@@ -100,10 +100,13 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
   }
 
   public Profile changeProfileStatus(String email, String status)
-      throws ProfileNotExistException, StatusIsTooLongException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+      throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException {
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     boolean isStatusTooLong = status.length() > 100;
     boolean isStatusEmpty = status.isEmpty();
+    if (isStatusEmpty) {
+      throw new EmptyParameterException();
+    }
     if (isStatusTooLong) {
       throw new StatusIsTooLongException();
     }
@@ -114,7 +117,7 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
 
   public Profile changeProfilePicture(String email, MultipartFile picture)
       throws ProfileNotExistException, IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     String profilePicturePath = "profiles/" + email + "/profilePicture.jpg";
     if (picture.isEmpty()) {
       minioService.deleteFile(profilePicturePath);

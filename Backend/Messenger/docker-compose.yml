@@ -57,6 +57,8 @@ services:
         mc admin user add minio ${MINIO_USER} ${MINIO_PASSWORD}
         mc admin policy attach minio readwrite --user=${MINIO_USER}
         mc mb minio/${MINIO_DEFAULT_BUCKET}/profiles
+        mc mb minio/${MINIO_DEFAULT_BUCKET}/chats
+        mc mb minio/${MINIO_DEFAULT_BUCKET}/groups
         kill -s INT $(cat /tmp/minio.pid) && rm /tmp/minio.pid
         while isAlive; do sleep 0.1; done
         exec minio $0 "$@" '

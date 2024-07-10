@@ -1,11 +1,11 @@
-package com.prism.messenger.service.Profile;
+package com.prism.messenger.service.profile;
 
 import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.CreateProfileException;
 import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
-import com.prism.messenger.model.profile.RecieveProfileListModel;
+import com.prism.messenger.model.profile.ReceiveProfileListModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -34,21 +34,20 @@ public interface ProfileService {
   void addFriend(String email, String friendTag)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
 
-  void deleteFriend(String email, String friendTag)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
+  void deleteFriend(String email, String friendTag);
 
   void blockUser(String email, String userTag)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
 
-  void unBlockUser(String email, String userTag) throws ProfileNotExistException;
+  void unBlockUser(String email, String userTag);
 
-  RecieveProfileListModel getFriendList(String email, Integer page, Integer size);
+  ReceiveProfileListModel getFriendList(String email, Integer page, Integer size);
 
-  RecieveProfileListModel getBlockList(String email, Integer page, Integer size);
+  ReceiveProfileListModel getBlockList(String email, Integer page, Integer size);
 
-  RecieveProfileListModel getFriendRequestsList(String email, Integer page, Integer size);
+  ReceiveProfileListModel getFriendRequestsList(String email, Integer page, Integer size);
 
-  RecieveProfileListModel getSendedFriendRequestList(String email, Integer page, Integer size);
+  ReceiveProfileListModel getSentFriendRequestList(String email, Integer page, Integer size);
 
   void declineFriendRequest(String email, String tag);
 
@@ -56,5 +55,5 @@ public interface ProfileService {
 
   void setOnlineDisconnectedStatus(String email);
 
-  RecieveProfileListModel searchProfileByTag(String tag, Integer page, Integer size);
+  ReceiveProfileListModel searchProfileByTag(String tag, Integer page, Integer size);
 }

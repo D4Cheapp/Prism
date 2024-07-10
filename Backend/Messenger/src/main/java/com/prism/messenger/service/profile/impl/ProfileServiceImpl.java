@@ -1,4 +1,4 @@
-package com.prism.messenger.service.Profile.impl;
+package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
@@ -7,12 +7,12 @@ import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ProfileModel;
-import com.prism.messenger.model.profile.QueryRecieveProfileListModel;
-import com.prism.messenger.model.profile.RecieveProfileListModel;
+import com.prism.messenger.model.profile.QueryReceiveProfileListModel;
+import com.prism.messenger.model.profile.ReceiveProfileListModel;
 import com.prism.messenger.model.profile.RelationsBetweenUserModel;
 import com.prism.messenger.repository.ProfileRepository;
-import com.prism.messenger.service.Profile.ProfileService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
+import com.prism.messenger.service.profile.ProfileService;
 import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -40,23 +40,23 @@ public class ProfileServiceImpl implements ProfileService {
 
   public FullProfileInfoModel getCurrentProfile(String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     byte[] profilePhoto = loadPictureInProfileModel(profile);
     return new FullProfileInfoModel(profile, profilePhoto, null);
   }
 
   public FullProfileInfoModel getProfileByTag(String tag, String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Profile profile = ProfileUtil.getProfileByTag(tag, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(tag, profileRepository::findByTag);
     byte[] profilePhoto = loadPictureInProfileModel(profile);
     RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(tag,
         email);
     return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);
   }
 
-  public FullProfileInfoModel getProfileByTelephone(String telephone, String email)
+  public FullProfileInfoModel getProfileByTelephone(String phoneNumber, String email)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Profile profile = ProfileUtil.getProfileByPhone(telephone, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(phoneNumber, profileRepository::findByPhoneNumber);
     byte[] profilePhoto = loadPictureInProfileModel(profile);
     RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(
         profile.getTag(), email);
@@ -71,7 +71,7 @@ public class ProfileServiceImpl implements ProfileService {
       profile.setName("username" + email.hashCode());
       profile.setLastOnlineTime(new Date().getTime());
       profileRepository.save(profile);
-      minioService.createFolder("profiles/" + email + "/");
+      minioService.createFolder("profiles/" + email);
     } catch (Exception e) {
       throw new CreateProfileException();
     }
@@ -79,9 +79,9 @@ public class ProfileServiceImpl implements ProfileService {
 
   public void deleteProfile(String email) throws DeleteUserProfileException {
     try {
-      Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+      Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
       profileRepository.deleteByTag(profile.getTag());
-      minioService.deleteFolder("profiles/" + email + "/");
+      minioService.deleteFolder("profiles/" + email);
     } catch (Exception e) {
       throw new DeleteUserProfileException();
     }
@@ -89,57 +89,55 @@ public class ProfileServiceImpl implements ProfileService {
 
   public void addFriend(String email, String friendTag)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     checkIsUserACurrentProfile(profile, friendTag);
     profileRepository.addFriend(email, friendTag);
     profileRepository.unBlockUser(email, friendTag);
   }
 
-  public void deleteFriend(String email, String friendTag) throws ProfileNotExistException {
-    Profile profile = ProfileUtil.getProfileByEmail(email, profileRepository);
+  public void deleteFriend(String email, String friendTag) {
     profileRepository.deleteFriend(email, friendTag);
   }
 
   public void blockUser(String email, String userTag)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
-    Profile profile = ProfileUtil.getProfileByTag(userTag, profileRepository);
+    Profile profile = ProfileUtil.getProfileBy(userTag, profileRepository::findByTag);
     checkIsUserACurrentProfile(profile, userTag);
     profileRepository.deleteFriend(email, userTag);
     profileRepository.blockUser(email, userTag);
   }
 
-  public void unBlockUser(String email, String userTag) throws ProfileNotExistException {
-    Profile profile = ProfileUtil.getProfileByTag(userTag, profileRepository);
+  public void unBlockUser(String email, String userTag) {
     profileRepository.unBlockUser(email, userTag);
   }
 
-  public RecieveProfileListModel getFriendList(String email, Integer page, Integer size) {
-    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getFriendList(email,
+  public ReceiveProfileListModel getFriendList(String email, Integer page, Integer size) {
+    Optional<QueryReceiveProfileListModel> friendList = profileRepository.getFriendList(email,
         page * size, size);
     return convertToListModel(friendList);
   }
 
-  public RecieveProfileListModel getFriendRequestsList(String email, Integer page, Integer size) {
-    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getFriendRequestsList(
+  public ReceiveProfileListModel getFriendRequestsList(String email, Integer page, Integer size) {
+    Optional<QueryReceiveProfileListModel> friendList = profileRepository.getFriendRequestsList(
         email, page * size, size);
     return convertToListModel(friendList);
   }
 
-  public RecieveProfileListModel getSendedFriendRequestList(String email, Integer page,
+  public ReceiveProfileListModel getSentFriendRequestList(String email, Integer page,
       Integer size) {
-    Optional<QueryRecieveProfileListModel> friendList = profileRepository.getSendedFriendRequest(
+    Optional<QueryReceiveProfileListModel> friendList = profileRepository.getSentFriendRequest(
         email, page * size, size);
     return convertToListModel(friendList);
   }
 
-  public RecieveProfileListModel getBlockList(String email, Integer page, Integer size) {
-    Optional<QueryRecieveProfileListModel> blockList = profileRepository.getBlockList(email,
+  public ReceiveProfileListModel getBlockList(String email, Integer page, Integer size) {
+    Optional<QueryReceiveProfileListModel> blockList = profileRepository.getBlockList(email,
         page * size, size);
     return convertToListModel(blockList);
   }
 
-  public RecieveProfileListModel searchProfileByTag(String tag, Integer page, Integer size) {
-    Optional<QueryRecieveProfileListModel> searchList = profileRepository.searchProfileByTag(tag,
+  public ReceiveProfileListModel searchProfileByTag(String tag, Integer page, Integer size) {
+    Optional<QueryReceiveProfileListModel> searchList = profileRepository.searchProfileByTag(tag,
         page, size);
     return convertToListModel(searchList);
   }
@@ -182,8 +180,8 @@ public class ProfileServiceImpl implements ProfileService {
     return minioService.getFile(profile.getProfilePicturePath());
   }
 
-  private RecieveProfileListModel convertToListModel(
-      Optional<QueryRecieveProfileListModel> profileList) {
+  private ReceiveProfileListModel convertToListModel(
+      Optional<QueryReceiveProfileListModel> profileList) {
     boolean isTotalCountEmpty = (profileList.isPresent() && profileList.get().getTotalCount() == 0);
     boolean isProfileListNotEmpty = profileList.isPresent() && !isTotalCountEmpty;
     if (isProfileListNotEmpty) {
@@ -191,9 +189,9 @@ public class ProfileServiceImpl implements ProfileService {
       for (Profile profile : profileList.get().getProfiles()) {
         ProfileModelList.add(ProfileModel.toModel(profile));
       }
-      return new RecieveProfileListModel(profileList.get().getTotalCount(), ProfileModelList);
+      return new ReceiveProfileListModel(profileList.get().getTotalCount(), ProfileModelList);
     } else {
-      return new RecieveProfileListModel(0, null);
+      return new ReceiveProfileListModel(0, null);
     }
   }
 }

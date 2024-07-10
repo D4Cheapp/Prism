@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ActicationCodeRepo {
+public class ActivationCodeRepo {
 
   @Autowired
   private RedisTemplate<String, Object> redisTemplate;

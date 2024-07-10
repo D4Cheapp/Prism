@@ -1,7 +1,7 @@
-package com.prism.messenger.service.Profile;
+package com.prism.messenger.service.profile;
 
 import com.prism.messenger.entity.Profile;
-import com.prism.messenger.exception.FileIsEmptyException;
+import com.prism.messenger.exception.EmptyParameterException;
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.profile.ChangeProfileEmailException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
@@ -32,11 +32,11 @@ public interface ChangeProfileInfoService {
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException;
 
   Profile changeProfileTag(String email, String newTag)
-      throws ProfileNotExistException, TagAlreadyExistException, PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+      throws ProfileNotExistException, TagAlreadyExistException, PermissionsException;
 
   Profile changeProfileStatus(String email, String status)
-      throws ProfileNotExistException, StatusIsTooLongException;
+      throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException;
 
   Profile changeProfilePicture(String email, MultipartFile picture)
-      throws FileIsEmptyException, ProfileNotExistException, IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+      throws ProfileNotExistException, IOException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }
