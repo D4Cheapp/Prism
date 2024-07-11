@@ -15,6 +15,8 @@ public class Group extends Chat {
 
   @Property("name")
   private String name;
+  @Property("description")
+  private String description;
   @Property("picturePath")
   private String picturePath;
   @Relationship(type = "ADMIN", direction = Relationship.Direction.OUTGOING)

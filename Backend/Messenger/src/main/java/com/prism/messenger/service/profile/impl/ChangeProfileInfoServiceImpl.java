@@ -2,7 +2,6 @@ package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.EmptyParameterException;
-import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.profile.ChangeProfileEmailException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
@@ -79,20 +78,16 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
   }
 
   public Profile changeProfileTag(String email, String newTag)
-      throws ProfileNotExistException, TagAlreadyExistException, PermissionsException {
+      throws ProfileNotExistException, TagAlreadyExistException {
     Profile oldProfile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
     Optional<Profile> newProfile = profileRepository.findByTag(newTag);
     boolean isNewProfileExist = newProfile.isPresent();
     boolean isTagIncorrect = !newTag.startsWith("@");
-    boolean isIncorrectPermission = !oldProfile.getEmail().equals(email);
     if (isTagIncorrect) {
       newTag = "@" + newTag;
     }
     if (isNewProfileExist) {
       throw new TagAlreadyExistException();
-    }
-    if (isIncorrectPermission) {
-      throw new PermissionsException();
     }
     profileRepository.changeTag(oldProfile.getTag(), newTag);
     oldProfile.setTag(newTag);

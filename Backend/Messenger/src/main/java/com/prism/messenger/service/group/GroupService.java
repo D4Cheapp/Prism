@@ -1,8 +1,9 @@
 package com.prism.messenger.service.group;
 
+import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
-import com.prism.messenger.model.group.CreateGroupModel;
-import com.prism.messenger.model.group.GroupModel;
+import com.prism.messenger.model.dialog.CreateGroupModel;
+import com.prism.messenger.model.dialog.GroupModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -17,4 +18,7 @@ public interface GroupService {
 
   GroupModel createGroup(String email, CreateGroupModel createGroupModel)
       throws IOException, EmptyGroupNameException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
+  void deleteGroup(String email, String dialogId)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }

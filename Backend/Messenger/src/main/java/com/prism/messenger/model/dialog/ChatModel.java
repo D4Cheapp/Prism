@@ -1,4 +1,4 @@
-package com.prism.messenger.model.chat;
+package com.prism.messenger.model.dialog;
 
 import com.prism.messenger.entity.Chat;
 import com.prism.messenger.model.profile.FullProfileInfoModel;

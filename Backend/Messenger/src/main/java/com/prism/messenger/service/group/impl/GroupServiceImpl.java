@@ -1,8 +1,9 @@
 package com.prism.messenger.service.group.impl;
 
+import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
-import com.prism.messenger.model.group.CreateGroupModel;
-import com.prism.messenger.model.group.GroupModel;
+import com.prism.messenger.model.dialog.CreateGroupModel;
+import com.prism.messenger.model.dialog.GroupModel;
 import com.prism.messenger.repository.GroupRepository;
 import com.prism.messenger.service.group.GroupService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
@@ -36,6 +37,16 @@ public class GroupServiceImpl implements GroupService {
       addUserToGroup(memberTag, uniqueGroupId);
     }
     return GroupModel.toModel(createGroupModel, uniqueGroupId);
+  }
+
+  public void deleteGroup(String email, String dialogId)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    boolean isGroupAdmin = groupRepository.isGroupAdmin(email, dialogId);
+    if (!isGroupAdmin) {
+      throw new PermissionsException("only group admin can delete group");
+    }
+    minioService.deleteFolder("groups/" + dialogId);
+    groupRepository.deleteGroup(dialogId);
   }
 
   private void addUserToGroup(String memberTag, String groupId) {

@@ -2,9 +2,12 @@ package com.prism.messenger.controller;
 
 import static org.springframework.http.HttpStatus.OK;
 
+import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.model.chat.ChatModel;
+import com.prism.messenger.model.TextResponseModel;
+import com.prism.messenger.model.dialog.ChatModel;
+import com.prism.messenger.model.dialog.DialogIdModel;
 import com.prism.messenger.model.profile.TagModel;
 import com.prism.messenger.service.chat.impl.ChatServiceImpl;
 import io.minio.errors.ErrorResponseException;
@@ -21,6 +24,7 @@ import java.security.NoSuchAlgorithmException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,12 +39,21 @@ public class ChatController {
   private ChatServiceImpl chatService;
 
   @Operation(summary = "Create chat with user")
-  @PostMapping("/create")
+  @PostMapping
   public ResponseEntity<ChatModel> createChat(@RequestBody TagModel interlocutor,
       Authentication authentication)
       throws ProfileNotExistException, ChatAlreadyExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     String email = authentication.getName();
     ChatModel chat = chatService.createChat(email, interlocutor.getTag());
     return new ResponseEntity<>(chat, OK);
+  }
+
+  @DeleteMapping
+  public ResponseEntity<TextResponseModel> deleteChat(@RequestBody DialogIdModel dialogIdModel,
+      Authentication authentication)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, PermissionsException, InternalException {
+    String email = authentication.getName();
+    chatService.deleteChat(email, dialogIdModel.getDialogId());
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Chat deleted", true), OK);
   }
 }

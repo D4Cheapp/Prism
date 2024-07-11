@@ -16,4 +16,10 @@ public interface ChatRepository extends Neo4jRepository<Chat, String> {
 
   @Query("MATCH (p:Profile {email: $email}) MATCH (f:Profile {tag: $interlocutorTag}) CREATE (c:Chat {id: $chatId}) CREATE (p)<-[:MEMBER]-(c) CREATE (c)-[:MEMBER]->(f) RETURN c")
   Optional<Chat> createChat(String chatId, String email, String interlocutorTag);
+
+  @Query("MATCH (c:Chat)-[:MEMBER]->(p:Profile {email: $email}) WHERE c.id = $dialogId RETURN COUNT(p) = 1")
+  Optional<Boolean> isUserInChat(String email, String dialogId);
+
+  @Query("MATCH (c:Chat)-[mr:MEMBER]->(:Profile) WHERE c.id = $dialogId DELETE mr DETACH DELETE c")
+  void deleteChat(String dialogId);
 }

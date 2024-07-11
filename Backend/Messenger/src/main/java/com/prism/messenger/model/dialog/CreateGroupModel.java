@@ -1,4 +1,4 @@
-package com.prism.messenger.model.group;
+package com.prism.messenger.model.dialog;
 
 import java.util.List;
 import lombok.Data;

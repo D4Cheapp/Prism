@@ -1,9 +1,10 @@
 package com.prism.messenger.service.chat.impl;
 
 import com.prism.messenger.entity.Chat;
+import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.model.chat.ChatModel;
+import com.prism.messenger.model.dialog.ChatModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.repository.ChatRepository;
 import com.prism.messenger.service.chat.ChatService;
@@ -47,5 +48,16 @@ public class ChatServiceImpl implements ChatService {
     Optional<Chat> savedChat = chatRepository.createChat(uniqueChatId, email, interlocutorTag);
     minioService.createFolder("chats/" + uniqueChatId);
     return new ChatModel(savedChat, interlocutorProfile);
+  }
+
+  public void deleteChat(String email, String dialogId)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    Optional<Boolean> isUserInChat = chatRepository.isUserInChat(email, dialogId);
+    boolean isUserHavePermissions = isUserInChat.isPresent() && isUserInChat.get();
+    if (!isUserHavePermissions) {
+      throw new PermissionsException("only user in chat can delete chat");
+    }
+    minioService.deleteFolder("chats/" + dialogId);
+    chatRepository.deleteChat(dialogId);
   }
 }

@@ -14,6 +14,15 @@ public interface GroupRepository extends Neo4jRepository<Group, String> {
   @Query("MATCH (p:Profile {tag: $memberTag}) MATCH (g:Group) WHERE g.id = $groupId CREATE (p)<-[:MEMBER]-(g)")
   void addUserToGroup(String memberTag, String groupId);
 
-  @Query("MATCH (p:Profile {email: $email}) CREATE (g:Group) SET g.id = $groupModel SET g.name = $groupName CREATE (p)<-[:ADMIN]-(g)")
-  void createGroup(String groupModel, String groupName, String email);
+  @Query("MATCH (p:Profile {email: $email}) CREATE (g:Group) SET g.id = $groupId SET g.name = "
+      + "$groupName CREATE (p)<-[:ADMIN]-(g)")
+  void createGroup(String groupId, String groupName, String email);
+
+  @Query("MATCH (g:Group)-[:ADMIN]-(p:Profile {email: $email}) WHERE g.id = $groupId RETURN COUNT(p) = 1")
+  boolean isGroupAdmin(String email, String groupId);
+
+  @Query(
+      "MATCH (g:Group)-[mr:MEMBER]->(p:Profile) WHERE g.id = $groupId OPTIONAL MATCH (g)-[messageR:MESSAGE]->"
+          + "(m:Message) DELETE mr, messageR DETACH DELETE m, g")
+  void deleteGroup(String groupId);
 }
