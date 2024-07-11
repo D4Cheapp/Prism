@@ -2,7 +2,6 @@ package com.prism.messenger.controller;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.EmptyParameterException;
-import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
@@ -11,14 +10,10 @@ import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.exception.profile.StatusIsTooLongException;
 import com.prism.messenger.exception.profile.TagAlreadyExistException;
 import com.prism.messenger.model.TextResponseModel;
-import com.prism.messenger.model.profile.ChangeProfileNameModel;
-import com.prism.messenger.model.profile.ChangeProfilePhoneModel;
-import com.prism.messenger.model.profile.ChangeProfileStatusModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.model.profile.ReceiveProfileListModel;
 import com.prism.messenger.model.profile.RequestProfileListModel;
-import com.prism.messenger.model.profile.TagModel;
 import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
 import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
 import io.minio.errors.ErrorResponseException;
@@ -144,42 +139,43 @@ public class ProfileController {
 
   @Operation(summary = "Add friend")
   @PostMapping("/friend")
-  public ResponseEntity<TextResponseModel> addFriend(@RequestBody TagModel friendTag,
+  public ResponseEntity<TextResponseModel> addFriend(@RequestParam("friendTag") String friendTag,
       Authentication authentication)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    profileService.addFriend(email, friendTag.getTag());
+    profileService.addFriend(email, friendTag);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
         HttpStatus.OK);
   }
 
   @Operation(summary = "Decline friend request")
   @PostMapping("/friend-decline")
-  public ResponseEntity<TextResponseModel> friendRequestDecline(@RequestBody TagModel friendTag,
+  public ResponseEntity<TextResponseModel> friendRequestDecline(
+      @RequestParam("friendTag") String friendTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.declineFriendRequest(email, friendTag.getTag());
+    profileService.declineFriendRequest(email, friendTag);
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
   }
 
   @Operation(summary = "Block user")
   @PostMapping("/block")
-  public ResponseEntity<TextResponseModel> blockUser(@RequestBody TagModel userTag,
+  public ResponseEntity<TextResponseModel> blockUser(@RequestParam("userTag") String userTag,
       Authentication authentication)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    profileService.blockUser(email, userTag.getTag());
+    profileService.blockUser(email, userTag);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User blocked", true),
         HttpStatus.OK);
   }
 
   @Operation(summary = "Unblock user")
   @PostMapping("/unblock")
-  public ResponseEntity<TextResponseModel> unBlockUser(@RequestBody TagModel friendTag,
+  public ResponseEntity<TextResponseModel> unBlockUser(@RequestParam("userTag") String userTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.unBlockUser(email, friendTag.getTag());
+    profileService.unBlockUser(email, userTag);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User unblocked", true),
         HttpStatus.OK);
   }
@@ -187,42 +183,42 @@ public class ProfileController {
   @Operation(summary = "Change profile name")
   @PatchMapping("/name")
   public ResponseEntity<ProfileModel> changeProfileEmail(
-      @RequestBody ChangeProfileNameModel profileName, Authentication authentication)
+      @RequestParam("name") String profileName, Authentication authentication)
       throws ProfileNotExistException, ProfileNameIsTooLongException {
     String email = authentication.getName();
-    Profile profile = changeProfileInfoService.changeProfileName(email, profileName.getName());
+    Profile profile = changeProfileInfoService.changeProfileName(email, profileName);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile phone")
   @PatchMapping("/phone")
   public ResponseEntity<ProfileModel> changeProfilePhone(
-      @RequestBody ChangeProfilePhoneModel profilePhone, Authentication authentication)
+      @RequestParam("phoneNumber") String profilePhone, Authentication authentication)
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfilePhoneNumber(email,
-        profilePhone.getPhoneNumber());
+        profilePhone);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile tag")
   @PatchMapping("/tag")
-  public ResponseEntity<ProfileModel> changeProfileTag(@RequestBody TagModel profileTag,
+  public ResponseEntity<ProfileModel> changeProfileTag(@RequestParam("tag") String profileTag,
       Authentication authentication)
-      throws ProfileNotExistException, TagAlreadyExistException, PermissionsException {
+      throws ProfileNotExistException, TagAlreadyExistException {
     String email = authentication.getName();
-    Profile profile = changeProfileInfoService.changeProfileTag(email, profileTag.getTag());
+    Profile profile = changeProfileInfoService.changeProfileTag(email, profileTag);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile status")
   @PatchMapping("/status")
   public ResponseEntity<ProfileModel> changeProfileStatus(
-      @RequestBody ChangeProfileStatusModel profileStatus, Authentication authentication)
+      @RequestParam("status") String profileStatus, Authentication authentication)
       throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfileStatus(email,
-        profileStatus.getStatus());
+        profileStatus);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
@@ -238,10 +234,10 @@ public class ProfileController {
 
   @Operation(summary = "Delete friend")
   @DeleteMapping("/friend")
-  public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody TagModel friendTag,
+  public ResponseEntity<TextResponseModel> deleteFriend(@RequestParam("friendTag") String friendTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.deleteFriend(email, friendTag.getTag());
+    profileService.deleteFriend(email, friendTag);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
         HttpStatus.OK);
   }

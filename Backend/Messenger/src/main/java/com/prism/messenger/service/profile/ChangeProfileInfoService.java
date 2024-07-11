@@ -2,7 +2,6 @@ package com.prism.messenger.service.profile;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.EmptyParameterException;
-import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.profile.ChangeProfileEmailException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
@@ -32,7 +31,7 @@ public interface ChangeProfileInfoService {
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException;
 
   Profile changeProfileTag(String email, String newTag)
-      throws ProfileNotExistException, TagAlreadyExistException, PermissionsException;
+      throws ProfileNotExistException, TagAlreadyExistException;
 
   Profile changeProfileStatus(String email, String status)
       throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException;

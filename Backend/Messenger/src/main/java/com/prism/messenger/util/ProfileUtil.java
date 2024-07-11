@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public class ProfileUtil {
 
-  public static Profile getProfileBy(String arg, PheckIsProfileExistFunction method)
+  public static Profile getProfileBy(String arg, CheckIsProfileExistFunction method)
       throws ProfileNotExistException {
     Optional<Profile> profile = method.method(arg);
     boolean isProfileNotFound = profile.isEmpty();
@@ -17,7 +17,7 @@ public class ProfileUtil {
   }
 
   @FunctionalInterface
-  public interface PheckIsProfileExistFunction {
+  public interface CheckIsProfileExistFunction {
 
     Optional<Profile> method(String arg);
   }

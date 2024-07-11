@@ -3,7 +3,8 @@ package com.prism.messenger.model.dialog;
 import lombok.Data;
 
 @Data
-public class DialogIdModel {
+public class ProfileToGroupActionModel {
 
   private String dialogId;
+  private String profileTag;
 }

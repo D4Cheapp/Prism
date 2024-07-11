@@ -3,6 +3,7 @@ package com.prism.messenger.service.chat.impl;
 import com.prism.messenger.entity.Chat;
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
+import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.dialog.ChatModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
@@ -35,7 +36,7 @@ public class ChatServiceImpl implements ChatService {
   private MinioServiceImpl minioService;
 
   public ChatModel createChat(String email, String interlocutorTag)
-      throws ProfileNotExistException, ChatAlreadyExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+      throws ProfileNotExistException, ChatAlreadyExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, ChatCreatingException {
     Optional<Boolean> existedChat = chatRepository.checkIsChatExist(email, interlocutorTag);
     boolean isChatExist = existedChat.isPresent() && existedChat.get();
     if (isChatExist) {
@@ -46,8 +47,12 @@ public class ChatServiceImpl implements ChatService {
         email);
     String uniqueChatId = DialogUtils.generateDialogId(chatRepository::checkIsIdUnique);
     Optional<Chat> savedChat = chatRepository.createChat(uniqueChatId, email, interlocutorTag);
+    boolean isChatCreated = savedChat.isPresent();
+    if (!isChatCreated) {
+      throw new ChatCreatingException();
+    }
     minioService.createFolder("chats/" + uniqueChatId);
-    return new ChatModel(savedChat, interlocutorProfile);
+    return new ChatModel(savedChat.get(), interlocutorProfile);
   }
 
   public void deleteChat(String email, String dialogId)
