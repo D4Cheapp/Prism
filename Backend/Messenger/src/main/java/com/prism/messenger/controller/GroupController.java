@@ -10,12 +10,12 @@ import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.TextResponseModel;
-import com.prism.messenger.model.dialog.ChangeGroupDescriptionModel;
-import com.prism.messenger.model.dialog.ChangeGroupNameModel;
-import com.prism.messenger.model.dialog.ChangeGroupPhotoModel;
-import com.prism.messenger.model.dialog.CreateGroupModel;
-import com.prism.messenger.model.dialog.GroupModel;
-import com.prism.messenger.model.dialog.ProfileToGroupActionModel;
+import com.prism.messenger.model.group.ChangeGroupDescriptionModel;
+import com.prism.messenger.model.group.ChangeGroupNameModel;
+import com.prism.messenger.model.group.ChangeGroupPhotoModel;
+import com.prism.messenger.model.group.CreateGroupModel;
+import com.prism.messenger.model.group.GroupModel;
+import com.prism.messenger.model.group.GroupProfileModel;
 import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.service.group.impl.GroupServiceImpl;
 import io.minio.errors.ErrorResponseException;
@@ -58,15 +58,60 @@ public class GroupController {
     return new ResponseEntity<>(group, CREATED);
   }
 
+  @Operation(summary = "Delete group")
+  @DeleteMapping
+  public ResponseEntity<TextResponseModel> deleteGroup(@RequestParam("groupId") String groupId,
+      Authentication authentication)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    groupService.deleteGroup(email, groupId);
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Group deleted successfully", true), OK);
+  }
+
+  @Operation(summary = "Add group member")
+  @PostMapping("/member")
+  public ResponseEntity<TextResponseModel> addMemberToGroup(
+      @RequestBody GroupProfileModel groupModel, Authentication authentication)
+      throws PermissionsException {
+    String email = authentication.getName();
+    groupService.addUserToGroup(email, groupModel.getProfileTag(), groupModel.getGroupId());
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Group member added successfully", true), OK);
+  }
+
+  @Operation(summary = "Delete group member")
+  @DeleteMapping("/member")
+  public ResponseEntity<TextResponseModel> deleteMemberFromGroup(
+      @RequestBody GroupProfileModel groupModel, Authentication authentication)
+      throws PermissionsException {
+    String email = authentication.getName();
+    groupService.deleteUserFromGroup(email, groupModel.getProfileTag(), groupModel.getGroupId());
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Group member deleted successfully", true), OK);
+  }
+
   @Operation(summary = "Add group admin")
   @PostMapping("/admin")
   public ResponseEntity<ProfileModel> addGroupAdmin(
-      @RequestBody ProfileToGroupActionModel dialogIdModel, Authentication authentication)
+      @RequestBody GroupProfileModel dialogIdModel, Authentication authentication)
       throws PermissionsException, ProfileNotExistException {
     String email = authentication.getName();
     Profile admin = groupService.addGroupAdmin(email, dialogIdModel.getProfileTag(),
-        dialogIdModel.getDialogId());
+        dialogIdModel.getGroupId());
     return new ResponseEntity<>(ProfileModel.toModel(admin), OK);
+  }
+
+  @Operation(summary = "Delete group admin")
+  @DeleteMapping("/admin")
+  public ResponseEntity<TextResponseModel> deleteGroupAdmin(
+      @RequestBody GroupProfileModel dialogIdModel, Authentication authentication)
+      throws PermissionsException, ProfileNotExistException, DeleteLastAdminException {
+    String email = authentication.getName();
+    groupService.deleteGroupAdmin(email, dialogIdModel.getProfileTag(),
+        dialogIdModel.getGroupId());
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Group admin deleted successfully", true), OK);
   }
 
   @Operation(summary = "Add / change group name")
@@ -82,8 +127,8 @@ public class GroupController {
 
   @Operation(summary = "Add / change group photo")
   @PatchMapping("/photo")
-  public ResponseEntity<GroupModel> editGroupPhoto(
-      @RequestBody ChangeGroupPhotoModel groupModel, Authentication authentication)
+  public ResponseEntity<GroupModel> editGroupPhoto(@RequestBody ChangeGroupPhotoModel groupModel,
+      Authentication authentication)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, PermissionsException, GroupNotExistException, InternalException {
     String email = authentication.getName();
     GroupModel group = groupService.changeGroupPhoto(email, groupModel.getGroupId(),
@@ -100,29 +145,5 @@ public class GroupController {
     GroupModel group = groupService.changeGroupDescription(email, groupModel.getGroupId(),
         groupModel.getGroupDescription());
     return new ResponseEntity<>(group, OK);
-  }
-
-  @Operation(summary = "Delete group admin")
-  @DeleteMapping("/admin")
-  public ResponseEntity<TextResponseModel> deleteGroupAdmin(
-      @RequestBody ProfileToGroupActionModel dialogIdModel, Authentication authentication)
-      throws PermissionsException, ProfileNotExistException, DeleteLastAdminException {
-    String email = authentication.getName();
-    groupService.deleteGroupAdmin(email, dialogIdModel.getProfileTag(),
-        dialogIdModel.getDialogId());
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Group admin deleted successfully", true),
-        OK);
-  }
-
-  @Operation(summary = "Delete group")
-  @DeleteMapping
-  public ResponseEntity<TextResponseModel> deleteGroup(@RequestParam("groupId") String groupId,
-      Authentication authentication)
-      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    String email = authentication.getName();
-    groupService.deleteGroup(email, groupId);
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Group deleted successfully", true), OK);
   }
 }

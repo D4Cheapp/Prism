@@ -7,8 +7,8 @@ import com.prism.messenger.exception.group.DeleteLastAdminException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.model.dialog.CreateGroupModel;
-import com.prism.messenger.model.dialog.GroupModel;
+import com.prism.messenger.model.group.CreateGroupModel;
+import com.prism.messenger.model.group.GroupModel;
 import com.prism.messenger.repository.GroupRepository;
 import com.prism.messenger.service.group.GroupService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
@@ -37,11 +37,11 @@ public class GroupServiceImpl implements GroupService {
 
   public GroupModel createGroup(String email, CreateGroupModel createGroupModel)
       throws EmptyGroupNameException, ServerException, InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, IOException {
-    String uniqueGroupId = DialogUtils.generateDialogId(groupRepository::findOneById);
+    String uniqueGroupId = DialogUtils.generateDialogId(groupRepository::isGroupExist);
     groupRepository.createGroup(uniqueGroupId, createGroupModel.getGroupName(), email);
     minioService.createFolder("groups/" + uniqueGroupId);
     for (String memberTag : createGroupModel.getGroupMemberTags()) {
-      addUserToGroup(memberTag, uniqueGroupId);
+      groupRepository.addUserToGroup(memberTag, uniqueGroupId);
     }
     return GroupModel.toModel(createGroupModel, uniqueGroupId);
   }
@@ -109,8 +109,16 @@ public class GroupServiceImpl implements GroupService {
     return GroupModel.toModel(group.get(), photo);
   }
 
-  private void addUserToGroup(String memberTag, String groupId) {
+  public void addUserToGroup(String email, String memberTag, String groupId)
+      throws PermissionsException {
+    checkIsUserInGroup(email, groupId);
     groupRepository.addUserToGroup(memberTag, groupId);
+  }
+
+  public void deleteUserFromGroup(String email, String profileTag, String groupId)
+      throws PermissionsException {
+    checkAdminPermissions(email, groupId);
+    groupRepository.deleteGroupMember(groupId, profileTag);
   }
 
   private void checkAdminPermissions(String email, String dialogId) throws PermissionsException {
@@ -134,6 +142,14 @@ public class GroupServiceImpl implements GroupService {
     boolean isGroupEmpty = group.isEmpty();
     if (isGroupEmpty) {
       throw new GroupNotExistException();
+    }
+  }
+
+  private void checkIsUserInGroup(String email, String groupId) throws PermissionsException {
+    Optional<Boolean> isUserInGroup = groupRepository.isUserInGroup(email, groupId);
+    boolean isUserHavePermissions = isUserInGroup.isPresent() && isUserInGroup.get();
+    if (!isUserHavePermissions) {
+      throw new PermissionsException("you are not in the group");
     }
   }
 }

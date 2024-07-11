@@ -3,7 +3,6 @@ package com.prism.messenger.repository;
 import com.prism.messenger.entity.Group;
 import com.prism.messenger.entity.Profile;
 import java.util.Optional;
-import java.util.UUID;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.query.Query;
 
@@ -13,7 +12,7 @@ public interface GroupRepository extends Neo4jRepository<Group, String> {
   Optional<Group> findGroupById(String groupId);
 
   @Query("OPTIONAL MATCH (g:Group) WHERE g.id = $id RETURN COUNT(g) = 0")
-  Optional<Boolean> findOneById(UUID id);
+  Optional<Boolean> isGroupExist(String id);
 
   @Query("MATCH (p:Profile {tag: $memberTag}) MATCH (g:Group) WHERE g.id = $groupId CREATE (p)<-[:MEMBER]-(g)")
   void addUserToGroup(String memberTag, String groupId);
@@ -47,4 +46,10 @@ public interface GroupRepository extends Neo4jRepository<Group, String> {
 
   @Query("MATCH (g:Group) WHERE g.id = $groupId SET g.description = $groupDescription RETURN g")
   Optional<Group> changeGroupDescription(String groupId, String groupDescription);
+
+  @Query("MATCH (g:Group)-[:MEMBER]->(p:Profile {email: $email}) WHERE g.id = $groupId RETURN COUNT(g) = 1")
+  Optional<Boolean> isUserInGroup(String email, String groupId);
+
+  @Query("MATCH (g:Group)-[mr:MEMBER]->(p:Profile {tag: $profileTag}) WHERE g.id = $groupId DETACH DELETE mr")
+  void deleteGroupMember(String groupId, String profileTag);
 }

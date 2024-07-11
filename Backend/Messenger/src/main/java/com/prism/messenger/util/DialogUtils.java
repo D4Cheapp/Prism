@@ -10,7 +10,7 @@ public class DialogUtils {
     UUID uniqueChatId = null;
     while (!isUniqueId) {
       UUID chatId = UUID.randomUUID();
-      Optional<Boolean> isDialogIdUnique = repository.method(chatId);
+      Optional<Boolean> isDialogIdUnique = repository.method(String.valueOf(chatId));
       isUniqueId = isDialogIdUnique.isPresent() && isDialogIdUnique.get();
       if (isUniqueId) {
         uniqueChatId = chatId;
@@ -22,6 +22,6 @@ public class DialogUtils {
   @FunctionalInterface
   public interface CheckUniqueIdFunction {
 
-    Optional<Boolean> method(UUID chatId);
+    Optional<Boolean> method(String chatId);
   }
 }

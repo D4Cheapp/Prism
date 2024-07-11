@@ -4,7 +4,7 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.model.dialog.ChatModel;
+import com.prism.messenger.model.chat.ChatModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;

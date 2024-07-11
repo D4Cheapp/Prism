@@ -1,4 +1,4 @@
-package com.prism.messenger.model.dialog;
+package com.prism.messenger.model.group;
 
 import com.prism.messenger.entity.Group;
 import com.prism.messenger.exception.group.EmptyGroupNameException;

@@ -91,15 +91,25 @@ public class ProfileController {
     return new ResponseEntity<>(foundedProfiles, HttpStatus.OK);
   }
 
-  @Operation(summary = "Get blocked profile list ")
-  @GetMapping("/block-list")
-  public ResponseEntity<ReceiveProfileListModel> getBlockList(
-      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+  @Operation(summary = "Add friend")
+  @PostMapping("/friend")
+  public ResponseEntity<TextResponseModel> addFriend(@RequestParam("friendTag") String friendTag,
+      Authentication authentication)
+      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
-    ReceiveProfileListModel profileBockList = profileService.getBlockList(email, page, size);
-    return new ResponseEntity<>(profileBockList, HttpStatus.OK);
+    profileService.addFriend(email, friendTag);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
+        HttpStatus.OK);
+  }
+
+  @Operation(summary = "Delete friend")
+  @DeleteMapping("/friend")
+  public ResponseEntity<TextResponseModel> deleteFriend(@RequestParam("friendTag") String friendTag,
+      Authentication authentication) {
+    String email = authentication.getName();
+    profileService.deleteFriend(email, friendTag);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
+        HttpStatus.OK);
   }
 
   @Operation(summary = "Get friend profile list ")
@@ -125,6 +135,17 @@ public class ProfileController {
     return new ResponseEntity<>(sentRequests, HttpStatus.OK);
   }
 
+  @Operation(summary = "Decline friend request")
+  @PostMapping("/friend-decline")
+  public ResponseEntity<TextResponseModel> friendRequestDecline(
+      @RequestParam("friendTag") String friendTag,
+      Authentication authentication) {
+    String email = authentication.getName();
+    profileService.declineFriendRequest(email, friendTag);
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
+  }
+
   @Operation(summary = "Get friend request list ")
   @GetMapping("/friend-requests")
   public ResponseEntity<ReceiveProfileListModel> getFriendRequestList(
@@ -137,28 +158,6 @@ public class ProfileController {
     return new ResponseEntity<>(friendRequests, HttpStatus.OK);
   }
 
-  @Operation(summary = "Add friend")
-  @PostMapping("/friend")
-  public ResponseEntity<TextResponseModel> addFriend(@RequestParam("friendTag") String friendTag,
-      Authentication authentication)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
-    String email = authentication.getName();
-    profileService.addFriend(email, friendTag);
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
-        HttpStatus.OK);
-  }
-
-  @Operation(summary = "Decline friend request")
-  @PostMapping("/friend-decline")
-  public ResponseEntity<TextResponseModel> friendRequestDecline(
-      @RequestParam("friendTag") String friendTag,
-      Authentication authentication) {
-    String email = authentication.getName();
-    profileService.declineFriendRequest(email, friendTag);
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
-  }
-
   @Operation(summary = "Block user")
   @PostMapping("/block")
   public ResponseEntity<TextResponseModel> blockUser(@RequestParam("userTag") String userTag,
@@ -168,6 +167,17 @@ public class ProfileController {
     profileService.blockUser(email, userTag);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User blocked", true),
         HttpStatus.OK);
+  }
+
+  @Operation(summary = "Get blocked profile list ")
+  @GetMapping("/block-list")
+  public ResponseEntity<ReceiveProfileListModel> getBlockList(
+      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+    String email = authentication.getName();
+    Integer page = requestProfileListModel.getPage();
+    Integer size = requestProfileListModel.getSize();
+    ReceiveProfileListModel profileBockList = profileService.getBlockList(email, page, size);
+    return new ResponseEntity<>(profileBockList, HttpStatus.OK);
   }
 
   @Operation(summary = "Unblock user")
@@ -230,15 +240,5 @@ public class ProfileController {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfilePicture(email, profilePicture);
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
-  }
-
-  @Operation(summary = "Delete friend")
-  @DeleteMapping("/friend")
-  public ResponseEntity<TextResponseModel> deleteFriend(@RequestParam("friendTag") String friendTag,
-      Authentication authentication) {
-    String email = authentication.getName();
-    profileService.deleteFriend(email, friendTag);
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
-        HttpStatus.OK);
   }
 }

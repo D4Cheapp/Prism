@@ -64,6 +64,17 @@ public class AuthController {
     return new ResponseEntity<>(currentUser, OK);
   }
 
+  @Operation(summary = "Delete user")
+  @DeleteMapping("/user")
+  public ResponseEntity<TextResponseModel> deleteUser(@RequestParam("userId") int userId,
+      Authentication authentication, HttpServletRequest request)
+      throws UserNotFoundException, PermissionsException {
+    authService.deleteUser(request, authentication, userId);
+    rabbitMQService.deleteUserProfile(authentication.getName());
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Successful deletion", true), OK);
+  }
+
   @Operation(summary = "Login")
   @PostMapping("/login")
   public ResponseEntity<UserModel> login(@RequestBody UserLoginModel user,
@@ -87,28 +98,6 @@ public class AuthController {
             true), OK);
   }
 
-  @Operation(summary = "Send restore password email")
-  @PostMapping("/restore-password")
-  public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email,
-      HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
-    authService.checkThrottleRequest(request, "restore-password");
-    emailSenderService.sendRestorePasswordCode(email.getEmail(), request);
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Restore password email was successfully sent", true),
-        OK);
-  }
-
-  @Operation(summary = "Send edit user email confirmation")
-  @PostMapping("/email")
-  public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmation(
-      @RequestBody EmailModel email, HttpServletRequest request, Authentication authentication)
-      throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, PermissionsException {
-    authService.checkThrottleRequest(request, "edit-email");
-    emailSenderService.sendEditUserEmailCode(email, authentication, request);
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel(
-        "Confirmation for email change was sent to: " + email.getEmail(), true), OK);
-  }
-
   @Transactional
   @Operation(summary = "Confirm registration")
   @PatchMapping("/registration")
@@ -123,6 +112,40 @@ public class AuthController {
     emailSenderService.deleteActivationCode(confirmEmail);
     request.getSession().removeAttribute("confirmEmail");
     return new ResponseEntity<>(returnedUser, CREATED);
+  }
+
+  @Operation(summary = "Send restore password email")
+  @PostMapping("/restore-password")
+  public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email,
+      HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
+    authService.checkThrottleRequest(request, "restore-password");
+    emailSenderService.sendRestorePasswordCode(email.getEmail(), request);
+    return new ResponseEntity<>(
+        TextResponseModel.toTextResponseModel("Restore password email was successfully sent", true),
+        OK);
+  }
+
+  @Operation(summary = "Confirm password restore")
+  @PatchMapping("/restore-password")
+  public ResponseEntity<UserModel> confirmPasswordRestore(
+      @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request)
+      throws ActivationCodeExpireException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, TooLongPasswordException, TooShortPasswordException, IncorrectConfirmCodeException {
+    String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
+    UserModel returnedUser = authService.restoreUserPassword(confirmEmail, passwordModel);
+    emailSenderService.deleteActivationCode(passwordModel.getCode());
+    request.getSession().removeAttribute("confirmEmail");
+    return new ResponseEntity<>(returnedUser, OK);
+  }
+
+  @Operation(summary = "Send edit user email confirmation")
+  @PostMapping("/email")
+  public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmation(
+      @RequestBody EmailModel email, HttpServletRequest request, Authentication authentication)
+      throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, PermissionsException {
+    authService.checkThrottleRequest(request, "edit-email");
+    emailSenderService.sendEditUserEmailCode(email, authentication, request);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel(
+        "Confirmation for email change was sent to: " + email.getEmail(), true), OK);
   }
 
   @Operation(summary = "Confirm edit user email")
@@ -142,18 +165,6 @@ public class AuthController {
         OK);
   }
 
-  @Operation(summary = "Confirm password restore")
-  @PatchMapping("/restore-password")
-  public ResponseEntity<UserModel> confirmPasswordRestore(
-      @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request)
-      throws ActivationCodeExpireException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, TooLongPasswordException, TooShortPasswordException, IncorrectConfirmCodeException {
-    String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
-    UserModel returnedUser = authService.restoreUserPassword(confirmEmail, passwordModel);
-    emailSenderService.deleteActivationCode(passwordModel.getCode());
-    request.getSession().removeAttribute("confirmEmail");
-    return new ResponseEntity<>(returnedUser, OK);
-  }
-
   @Operation(summary = "Edit user password")
   @PatchMapping("/password")
   public ResponseEntity<UserModel> sendEditUserPasswordConfirmation(
@@ -169,16 +180,5 @@ public class AuthController {
     authService.deactivateSession(request);
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Successful logout", true), OK);
-  }
-
-  @Operation(summary = "Delete user")
-  @DeleteMapping("/user")
-  public ResponseEntity<TextResponseModel> deleteUser(@RequestParam("userId") int userId,
-      Authentication authentication, HttpServletRequest request)
-      throws UserNotFoundException, PermissionsException {
-    authService.deleteUser(request, authentication, userId);
-    rabbitMQService.deleteUserProfile(authentication.getName());
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Successful deletion", true), OK);
   }
 }
