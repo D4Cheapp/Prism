@@ -7,7 +7,9 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.DialogFilesPaginationListModel;
 import com.prism.messenger.model.DialogIdModel;
+import com.prism.messenger.model.FileListModel;
 import com.prism.messenger.model.PaginationListModel;
 import com.prism.messenger.model.TextResponseModel;
 import com.prism.messenger.model.chat.ChatListReceiveModel;
@@ -74,5 +76,19 @@ public class ChatController {
     Integer size = paginationListModel.getSize();
     ChatListReceiveModel chatList = chatService.getChatList(email, page, size);
     return new ResponseEntity<>(chatList, OK);
+  }
+
+  @Operation(summary = "Get all files of the group with pagination")
+  @GetMapping("/files")
+  public ResponseEntity<FileListModel> getGroupFiles(
+      @RequestBody DialogFilesPaginationListModel paginationListModel,
+      Authentication authentication)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    String dialogId = paginationListModel.getDialogId();
+    Integer page = paginationListModel.getPage();
+    Integer size = paginationListModel.getSize();
+    FileListModel files = chatService.getChatFiles(email, dialogId, page, size);
+    return new ResponseEntity<>(files, OK);
   }
 }

@@ -4,6 +4,7 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.FileListModel;
 import com.prism.messenger.model.chat.ChatListReceiveModel;
 import com.prism.messenger.model.chat.ChatModel;
 import io.minio.errors.ErrorResponseException;
@@ -26,4 +27,7 @@ public interface ChatService {
 
   ChatListReceiveModel getChatList(String email, Integer page, Integer size)
       throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
+  FileListModel getChatFiles(String email, String dialogId, Integer page, Integer size)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, PermissionsException;
 }

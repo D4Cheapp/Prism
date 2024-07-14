@@ -5,6 +5,7 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.FileListModel;
 import com.prism.messenger.model.chat.ChatListReceiveModel;
 import com.prism.messenger.model.chat.ChatModel;
 import com.prism.messenger.model.chat.QueryChatListReceiveModel;
@@ -62,11 +63,7 @@ public class ChatServiceImpl implements ChatService {
 
   public void deleteChat(String email, String dialogId)
       throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-    Optional<Boolean> isUserInChat = chatRepository.isUserInChat(email, dialogId);
-    boolean isUserHavePermissions = isUserInChat.isPresent() && isUserInChat.get();
-    if (!isUserHavePermissions) {
-      throw new PermissionsException("only user in chat can delete chat");
-    }
+    checkIsUserInChat(email, dialogId);
     minioService.deleteFolder("chats/" + dialogId);
     chatRepository.deleteChat(dialogId);
   }
@@ -94,5 +91,19 @@ public class ChatServiceImpl implements ChatService {
           ProfileModel.toModel(profileService.getProfileByTag(interlocutorProfile.get(), email))));
     }
     return new ChatListReceiveModel(totalCount, chatModels);
+  }
+
+  public FileListModel getChatFiles(String email, String dialogId, Integer page, Integer size)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException, PermissionsException {
+    checkIsUserInChat(email, dialogId);
+    return minioService.getDialogFiles("chats/" + dialogId, page, size);
+  }
+
+  private void checkIsUserInChat(String email, String dialogId) throws PermissionsException {
+    Optional<Boolean> isUserInChat = chatRepository.isUserInChat(email, dialogId);
+    boolean isUserHavePermissions = isUserInChat.isPresent() && isUserInChat.get();
+    if (!isUserHavePermissions) {
+      throw new PermissionsException("only user in chat can delete chat");
+    }
   }
 }

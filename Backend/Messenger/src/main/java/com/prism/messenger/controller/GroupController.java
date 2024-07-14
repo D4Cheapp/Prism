@@ -9,7 +9,9 @@ import com.prism.messenger.exception.group.DeleteLastAdminException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.DialogFilesPaginationListModel;
 import com.prism.messenger.model.DialogIdModel;
+import com.prism.messenger.model.FileListModel;
 import com.prism.messenger.model.PaginationListModel;
 import com.prism.messenger.model.TextResponseModel;
 import com.prism.messenger.model.group.ChangeGroupDescriptionModel;
@@ -108,9 +110,8 @@ public class GroupController {
 
   @Operation(summary = "Add group admin")
   @PostMapping("/admin")
-  public ResponseEntity<ProfileModel> addGroupAdmin(
-      @RequestBody GroupProfileModel dialogIdModel, Authentication authentication)
-      throws PermissionsException, ProfileNotExistException {
+  public ResponseEntity<ProfileModel> addGroupAdmin(@RequestBody GroupProfileModel dialogIdModel,
+      Authentication authentication) throws PermissionsException, ProfileNotExistException {
     String email = authentication.getName();
     Profile admin = groupService.addGroupAdmin(email, dialogIdModel.getProfileTag(),
         dialogIdModel.getGroupId());
@@ -123,8 +124,7 @@ public class GroupController {
       @RequestBody GroupProfileModel dialogIdModel, Authentication authentication)
       throws PermissionsException, ProfileNotExistException, DeleteLastAdminException {
     String email = authentication.getName();
-    groupService.deleteGroupAdmin(email, dialogIdModel.getProfileTag(),
-        dialogIdModel.getGroupId());
+    groupService.deleteGroupAdmin(email, dialogIdModel.getProfileTag(), dialogIdModel.getGroupId());
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Group admin deleted successfully", true), OK);
   }
@@ -160,5 +160,19 @@ public class GroupController {
     GroupModel group = groupService.changeGroupDescription(email, groupModel.getGroupId(),
         groupModel.getGroupDescription());
     return new ResponseEntity<>(group, OK);
+  }
+
+  @Operation(summary = "Get all files of the group with pagination")
+  @GetMapping("/files")
+  public ResponseEntity<FileListModel> getGroupFiles(
+      @RequestBody DialogFilesPaginationListModel paginationListModel,
+      Authentication authentication)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    String dialogId = paginationListModel.getDialogId();
+    Integer page = paginationListModel.getPage();
+    Integer size = paginationListModel.getSize();
+    FileListModel files = groupService.getGroupFiles(email, dialogId, page, size);
+    return new ResponseEntity<>(files, OK);
   }
 }

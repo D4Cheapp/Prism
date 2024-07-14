@@ -6,6 +6,7 @@ import com.prism.messenger.exception.group.DeleteLastAdminException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.FileListModel;
 import com.prism.messenger.model.group.CreateGroupModel;
 import com.prism.messenger.model.group.GroupListReceiveModel;
 import com.prism.messenger.model.group.GroupModel;
@@ -50,4 +51,7 @@ public interface GroupService {
 
   GroupListReceiveModel getGroupList(String email, Integer page, Integer size)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
+  FileListModel getGroupFiles(String email, String groupId, Integer page, Integer size)
+      throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }
