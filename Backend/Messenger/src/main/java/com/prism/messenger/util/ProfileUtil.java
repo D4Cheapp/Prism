@@ -2,14 +2,13 @@ package com.prism.messenger.util;
 
 import com.prism.messenger.entity.Profile;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.repository.ProfileRepository;
 import java.util.Optional;
 
 public class ProfileUtil {
 
-  public static Profile getProfileByEmail(String email, ProfileRepository profileRepository)
+  public static Profile getProfileBy(String arg, CheckIsProfileExistFunction method)
       throws ProfileNotExistException {
-    Optional<Profile> profile = profileRepository.findByEmail(email);
+    Optional<Profile> profile = method.method(arg);
     boolean isProfileNotFound = profile.isEmpty();
     if (isProfileNotFound) {
       throw new ProfileNotExistException();
@@ -17,23 +16,9 @@ public class ProfileUtil {
     return profile.get();
   }
 
-  public static Profile getProfileByTag(String tag, ProfileRepository profileRepository)
-      throws ProfileNotExistException {
-    Optional<Profile> profile = profileRepository.findByTag(tag);
-    boolean isProfileNotFound = profile.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
-    return profile.get();
-  }
+  @FunctionalInterface
+  public interface CheckIsProfileExistFunction {
 
-  public static Profile getProfileByPhone(String phone, ProfileRepository profileRepository)
-      throws ProfileNotExistException {
-    Optional<Profile> profile = profileRepository.findByPhoneNumber(phone);
-    boolean isProfileNotFound = profile.isEmpty();
-    if (isProfileNotFound) {
-      throw new ProfileNotExistException();
-    }
-    return profile.get();
+    Optional<Profile> method(String arg);
   }
 }

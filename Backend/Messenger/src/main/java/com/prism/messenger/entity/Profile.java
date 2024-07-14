@@ -30,10 +30,10 @@ public class Profile {
   private long lastOnlineTime;
   @Property("profilePicturePath")
   private String profilePicturePath;
-  @Relationship(type = "MEMBER", direction = Relationship.Direction.OUTGOING)
-  private List<Chat> chatList = new ArrayList<>();
-  @Relationship(type = "FRIEND", direction = Relationship.Direction.OUTGOING)
+  @Relationship(type = "MEMBER")
+  private List<MemberRelation> chatList = new ArrayList<>();
+  @Relationship(type = "FRIEND")
   private List<Profile> friendList = new ArrayList<>();
-  @Relationship(type = "BLOCK", direction = Relationship.Direction.OUTGOING)
+  @Relationship(type = "BLOCK")
   private List<Profile> blockedList = new ArrayList<>();
 }

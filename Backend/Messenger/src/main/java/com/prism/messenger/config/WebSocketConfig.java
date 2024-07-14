@@ -4,7 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prism.messenger.component.WebSocketInspector;
-import com.prism.messenger.service.Profile.impl.ProfileServiceImpl;
+import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

@@ -20,7 +20,7 @@ public class RabbitMQConfig {
   private String exchangeName;
   @Value("${spring.rabbitmq.queue}")
   private String queueName;
-  @Value("${spring.rabbitmq.routingkey}")
+  @Value("${spring.rabbitmq.routing-key}")
   private String routingKey;
 
   @Bean

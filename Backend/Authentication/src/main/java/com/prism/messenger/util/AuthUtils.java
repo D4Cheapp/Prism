@@ -56,19 +56,19 @@ public class AuthUtils {
 
   public static void isPasswordTooWeak(String password) throws PasswordIsTooWeakException {
     boolean isPasswordIncludesCapitalLetters = password.matches(".*[A-ZА-Я].*");
-    boolean isPasswordIncluidesLowerLetters = password.matches(".*[a-zа-я].*");
-    boolean isPasswordIncluidesNumbers = password.matches(".*[0-9].*");
-    boolean isPasswordIncluidesSpecialCharacters = password.matches(".*[!@#$%^&*()].*");
+    boolean isPasswordIncludesLowerLetters = password.matches(".*[a-zа-я].*");
+    boolean isPasswordIncludesNumbers = password.matches(".*[0-9].*");
+    boolean isPasswordIncludesSpecialCharacters = password.matches(".*[!@#$%^&*()].*");
     if (!isPasswordIncludesCapitalLetters) {
       throw new PasswordIsTooWeakException("capital letter");
     }
-    if (!isPasswordIncluidesLowerLetters) {
+    if (!isPasswordIncludesLowerLetters) {
       throw new PasswordIsTooWeakException("lower letter");
     }
-    if (!isPasswordIncluidesNumbers) {
+    if (!isPasswordIncludesNumbers) {
       throw new PasswordIsTooWeakException("number");
     }
-    if (!isPasswordIncluidesSpecialCharacters) {
+    if (!isPasswordIncludesSpecialCharacters) {
       throw new PasswordIsTooWeakException("special character");
     }
   }

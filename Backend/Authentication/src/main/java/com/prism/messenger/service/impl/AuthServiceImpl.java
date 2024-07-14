@@ -21,7 +21,7 @@ import com.prism.messenger.model.RestorePasswordModel;
 import com.prism.messenger.model.UserLoginModel;
 import com.prism.messenger.model.UserModel;
 import com.prism.messenger.repository.AuthRepo;
-import com.prism.messenger.service.auth.impl.auth.AuthService;
+import com.prism.messenger.service.AuthService;
 import com.prism.messenger.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -142,14 +142,14 @@ public class AuthServiceImpl implements AuthService {
     return UserModel.toModel(userEntity);
   }
 
-  public void checkTrottleRequest(HttpServletRequest request, String type)
+  public void checkThrottleRequest(HttpServletRequest request, String type)
       throws TooManyAttemptsException {
-    Object storredAttempts = request.getSession().getAttribute(type + "-attempts");
-    boolean isFirstAttempt = storredAttempts == null;
+    Object storedAttempts = request.getSession().getAttribute(type + "-attempts");
+    boolean isFirstAttempt = storedAttempts == null;
     if (isFirstAttempt) {
       setFirstAttempt(request, type);
     } else {
-      checkTrottleRequests(storredAttempts, request, type);
+      checkThrottleRequests(storedAttempts, request, type);
     }
   }
 
@@ -159,17 +159,17 @@ public class AuthServiceImpl implements AuthService {
     request.getSession().setAttribute(type + "-attempts", newAttempt);
   }
 
-  private void checkTrottleRequests(Object storredAttempts, HttpServletRequest request,
+  private void checkThrottleRequests(Object storedAttempts, HttpServletRequest request,
       String type) throws TooManyAttemptsException {
-    RequestAttemptModel attemptModel = (RequestAttemptModel) storredAttempts;
+    RequestAttemptModel attemptModel = (RequestAttemptModel) storedAttempts;
     Date time = new Date();
     int limitAttempts = type.equals("login") || type.equals("registration") ? 5 : 1;
-    boolean isLimitAttemt = attemptModel.getAttemptCount() >= limitAttempts;
+    boolean isLimitAttempt = attemptModel.getAttemptCount() >= limitAttempts;
     boolean isAttemptExpired = attemptModel.getLastAttemptTime() + 60000 < time.getTime();
     if (isAttemptExpired) {
       setFirstAttempt(request, type);
     }
-    if (isLimitAttemt && !isAttemptExpired) {
+    if (isLimitAttempt && !isAttemptExpired) {
       long remainingMillisecondsTime =
           attemptModel.getLastAttemptTime() + 120000 - time.getTime();
       long seconds = (remainingMillisecondsTime / 1000) % 60;
@@ -177,7 +177,7 @@ public class AuthServiceImpl implements AuthService {
       String remainingStringTime = String.format("%02d:%02d", minutes, seconds);
       throw new TooManyAttemptsException(remainingStringTime);
     }
-    if (!isLimitAttemt) {
+    if (!isLimitAttempt) {
       attemptModel.setAttemptCount(attemptModel.getAttemptCount() + 1);
       attemptModel.setLastAttemptTime(time.getTime());
       request.getSession().setAttribute(type + "-attempts", attemptModel);

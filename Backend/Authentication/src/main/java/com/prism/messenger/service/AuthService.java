@@ -1,4 +1,4 @@
-package com.prism.messenger.service.auth.impl.auth;
+package com.prism.messenger.service;
 
 import com.prism.messenger.exception.ActivationCodeExpireException;
 import com.prism.messenger.exception.IncorrectConfirmCodeException;
@@ -42,5 +42,6 @@ public interface AuthService {
   UserModel saveUserAfterConfirm(ActivationCodeModel user, String code)
       throws IncorrectConfirmCodeException;
 
-  void checkTrottleRequest(HttpServletRequest request, String type) throws TooManyAttemptsException;
+  void checkThrottleRequest(HttpServletRequest request, String type)
+      throws TooManyAttemptsException;
 }

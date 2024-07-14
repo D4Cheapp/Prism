@@ -68,11 +68,11 @@ public class EmailSenderServiceImplTest {
     this.authUtilsMock.when(() -> AuthUtils.checkEmailValidity(ArgumentMatchers.anyString()))
         .thenAnswer(i -> null);
     Assertions.assertThrows(UserAlreadyExistException.class,
-        () -> emailSenderService.sendRegitrationCode(user, null));
+        () -> emailSenderService.sendRegistrationCode(user, null));
     user.setConfirmPassword("123456123");
     Mockito.when(authRepo.findByEmail(ArgumentMatchers.anyString())).thenReturn(null);
     Assertions.assertThrows(IncorrectConfirmPasswordException.class,
-        () -> emailSenderService.sendRegitrationCode(user, null));
+        () -> emailSenderService.sendRegistrationCode(user, null));
   }
 
   @Test

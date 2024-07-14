@@ -15,7 +15,7 @@ public class RabbitMQServiceImpl implements RabbitMQService {
 
   @Autowired
   private RabbitTemplate rabbitTemplate;
-  @Value("${spring.rabbitmq.routingkey}")
+  @Value("${spring.rabbitmq.routing-key}")
   private String routingKey;
 
   public void createUserProfile(String email) {
