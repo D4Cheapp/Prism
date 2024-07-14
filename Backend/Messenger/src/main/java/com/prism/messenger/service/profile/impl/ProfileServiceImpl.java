@@ -138,7 +138,7 @@ public class ProfileServiceImpl implements ProfileService {
 
   public ReceiveProfileListModel searchProfileByTag(String tag, Integer page, Integer size) {
     Optional<QueryReceiveProfileListModel> searchList = profileRepository.searchProfileByTag(tag,
-        page, size);
+        page * size, size);
     return convertToListModel(searchList);
   }
 
@@ -182,7 +182,7 @@ public class ProfileServiceImpl implements ProfileService {
 
   private ReceiveProfileListModel convertToListModel(
       Optional<QueryReceiveProfileListModel> profileList) {
-    boolean isTotalCountEmpty = (profileList.isPresent() && profileList.get().getTotalCount() == 0);
+    boolean isTotalCountEmpty = profileList.isPresent() && profileList.get().getTotalCount() == 0;
     boolean isProfileListNotEmpty = profileList.isPresent() && !isTotalCountEmpty;
     if (isProfileListNotEmpty) {
       List<ProfileModel> ProfileModelList = new ArrayList<>();

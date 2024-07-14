@@ -9,11 +9,14 @@ import com.prism.messenger.exception.group.DeleteLastAdminException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.DialogIdModel;
+import com.prism.messenger.model.PaginationListModel;
 import com.prism.messenger.model.TextResponseModel;
 import com.prism.messenger.model.group.ChangeGroupDescriptionModel;
 import com.prism.messenger.model.group.ChangeGroupNameModel;
 import com.prism.messenger.model.group.ChangeGroupPhotoModel;
 import com.prism.messenger.model.group.CreateGroupModel;
+import com.prism.messenger.model.group.GroupListReceiveModel;
 import com.prism.messenger.model.group.GroupModel;
 import com.prism.messenger.model.group.GroupProfileModel;
 import com.prism.messenger.model.profile.ProfileModel;
@@ -33,11 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Group")
@@ -60,13 +63,25 @@ public class GroupController {
 
   @Operation(summary = "Delete group")
   @DeleteMapping
-  public ResponseEntity<TextResponseModel> deleteGroup(@RequestParam("groupId") String groupId,
+  public ResponseEntity<TextResponseModel> deleteGroup(@RequestBody DialogIdModel groupId,
       Authentication authentication)
       throws PermissionsException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     String email = authentication.getName();
-    groupService.deleteGroup(email, groupId);
+    groupService.deleteGroup(email, groupId.getDialogId());
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Group deleted successfully", true), OK);
+  }
+
+  @Operation(summary = "Get group list with pagination")
+  @GetMapping("/list")
+  public ResponseEntity<GroupListReceiveModel> getGroupList(
+      @RequestBody PaginationListModel groupListModel, Authentication authentication)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    String email = authentication.getName();
+    Integer page = groupListModel.getPage();
+    Integer size = groupListModel.getSize();
+    GroupListReceiveModel group = groupService.getGroupList(email, page, size);
+    return new ResponseEntity<>(group, OK);
   }
 
   @Operation(summary = "Add group member")

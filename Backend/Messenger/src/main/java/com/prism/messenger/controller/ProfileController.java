@@ -9,11 +9,13 @@ import com.prism.messenger.exception.profile.ProfileNameIsTooLongException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.exception.profile.StatusIsTooLongException;
 import com.prism.messenger.exception.profile.TagAlreadyExistException;
+import com.prism.messenger.model.PaginationListModel;
 import com.prism.messenger.model.TextResponseModel;
+import com.prism.messenger.model.profile.ChangeProfilePropertyModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ProfileModel;
+import com.prism.messenger.model.profile.ProfileTagModel;
 import com.prism.messenger.model.profile.ReceiveProfileListModel;
-import com.prism.messenger.model.profile.RequestProfileListModel;
 import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
 import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
 import io.minio.errors.ErrorResponseException;
@@ -84,30 +86,30 @@ public class ProfileController {
   @Operation(summary = "Search profile by tag")
   @GetMapping("/search/{tag}")
   public ResponseEntity<ReceiveProfileListModel> searchProfileByTag(@PathVariable String tag,
-      @RequestBody RequestProfileListModel requestProfileListModel) {
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
+      @RequestBody PaginationListModel requestPaginationListModel) {
+    Integer page = requestPaginationListModel.getPage();
+    Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel foundedProfiles = profileService.searchProfileByTag(tag, page, size);
     return new ResponseEntity<>(foundedProfiles, HttpStatus.OK);
   }
 
   @Operation(summary = "Add friend")
   @PostMapping("/friend")
-  public ResponseEntity<TextResponseModel> addFriend(@RequestParam("friendTag") String friendTag,
+  public ResponseEntity<TextResponseModel> addFriend(@RequestBody ProfileTagModel friendTag,
       Authentication authentication)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    profileService.addFriend(email, friendTag);
+    profileService.addFriend(email, friendTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
         HttpStatus.OK);
   }
 
   @Operation(summary = "Delete friend")
   @DeleteMapping("/friend")
-  public ResponseEntity<TextResponseModel> deleteFriend(@RequestParam("friendTag") String friendTag,
+  public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody ProfileTagModel friendTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.deleteFriend(email, friendTag);
+    profileService.deleteFriend(email, friendTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
         HttpStatus.OK);
   }
@@ -115,10 +117,11 @@ public class ProfileController {
   @Operation(summary = "Get friend profile list ")
   @GetMapping("/friend-list")
   public ResponseEntity<ReceiveProfileListModel> getFriendList(
-      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+      @RequestBody PaginationListModel requestPaginationListModel,
+      Authentication authentication) {
     String email = authentication.getName();
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
+    Integer page = requestPaginationListModel.getPage();
+    Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel currentProfile = profileService.getFriendList(email, page, size);
     return new ResponseEntity<>(currentProfile, HttpStatus.OK);
   }
@@ -126,10 +129,11 @@ public class ProfileController {
   @Operation(summary = "Get sent friend request list ")
   @GetMapping("/sent-friend-requests")
   public ResponseEntity<ReceiveProfileListModel> getSentFriendRequestList(
-      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+      @RequestBody PaginationListModel requestPaginationListModel,
+      Authentication authentication) {
     String email = authentication.getName();
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
+    Integer page = requestPaginationListModel.getPage();
+    Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel sentRequests = profileService.getSentFriendRequestList(email, page,
         size);
     return new ResponseEntity<>(sentRequests, HttpStatus.OK);
@@ -138,10 +142,10 @@ public class ProfileController {
   @Operation(summary = "Decline friend request")
   @PostMapping("/friend-decline")
   public ResponseEntity<TextResponseModel> friendRequestDecline(
-      @RequestParam("friendTag") String friendTag,
+      @RequestBody ProfileTagModel friendTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.declineFriendRequest(email, friendTag);
+    profileService.declineFriendRequest(email, friendTag.getTag());
     return new ResponseEntity<>(
         TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
   }
@@ -149,10 +153,11 @@ public class ProfileController {
   @Operation(summary = "Get friend request list ")
   @GetMapping("/friend-requests")
   public ResponseEntity<ReceiveProfileListModel> getFriendRequestList(
-      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+      @RequestBody PaginationListModel requestPaginationListModel,
+      Authentication authentication) {
     String email = authentication.getName();
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
+    Integer page = requestPaginationListModel.getPage();
+    Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel friendRequests = profileService.getFriendRequestsList(email, page,
         size);
     return new ResponseEntity<>(friendRequests, HttpStatus.OK);
@@ -160,11 +165,11 @@ public class ProfileController {
 
   @Operation(summary = "Block user")
   @PostMapping("/block")
-  public ResponseEntity<TextResponseModel> blockUser(@RequestParam("userTag") String userTag,
+  public ResponseEntity<TextResponseModel> blockUser(@RequestBody ProfileTagModel userTag,
       Authentication authentication)
       throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
     String email = authentication.getName();
-    profileService.blockUser(email, userTag);
+    profileService.blockUser(email, userTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User blocked", true),
         HttpStatus.OK);
   }
@@ -172,20 +177,21 @@ public class ProfileController {
   @Operation(summary = "Get blocked profile list ")
   @GetMapping("/block-list")
   public ResponseEntity<ReceiveProfileListModel> getBlockList(
-      @RequestBody RequestProfileListModel requestProfileListModel, Authentication authentication) {
+      @RequestBody PaginationListModel requestPaginationListModel,
+      Authentication authentication) {
     String email = authentication.getName();
-    Integer page = requestProfileListModel.getPage();
-    Integer size = requestProfileListModel.getSize();
+    Integer page = requestPaginationListModel.getPage();
+    Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel profileBockList = profileService.getBlockList(email, page, size);
     return new ResponseEntity<>(profileBockList, HttpStatus.OK);
   }
 
   @Operation(summary = "Unblock user")
   @PostMapping("/unblock")
-  public ResponseEntity<TextResponseModel> unBlockUser(@RequestParam("userTag") String userTag,
+  public ResponseEntity<TextResponseModel> unBlockUser(@RequestBody ProfileTagModel userTag,
       Authentication authentication) {
     String email = authentication.getName();
-    profileService.unBlockUser(email, userTag);
+    profileService.unBlockUser(email, userTag.getTag());
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User unblocked", true),
         HttpStatus.OK);
   }
@@ -193,42 +199,42 @@ public class ProfileController {
   @Operation(summary = "Change profile name")
   @PatchMapping("/name")
   public ResponseEntity<ProfileModel> changeProfileEmail(
-      @RequestParam("name") String profileName, Authentication authentication)
+      @RequestBody ChangeProfilePropertyModel profileName, Authentication authentication)
       throws ProfileNotExistException, ProfileNameIsTooLongException {
     String email = authentication.getName();
-    Profile profile = changeProfileInfoService.changeProfileName(email, profileName);
+    Profile profile = changeProfileInfoService.changeProfileName(email, profileName.getProperty());
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile phone")
   @PatchMapping("/phone")
   public ResponseEntity<ProfileModel> changeProfilePhone(
-      @RequestParam("phoneNumber") String profilePhone, Authentication authentication)
+      @RequestBody ChangeProfilePropertyModel profilePhone, Authentication authentication)
       throws ProfileNotExistException, PhoneNumberAlreadyExistException, IncorrectPhoneNumberException {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfilePhoneNumber(email,
-        profilePhone);
+        profilePhone.getProperty());
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile tag")
   @PatchMapping("/tag")
-  public ResponseEntity<ProfileModel> changeProfileTag(@RequestParam("tag") String profileTag,
+  public ResponseEntity<ProfileModel> changeProfileTag(@RequestBody ProfileTagModel profileTag,
       Authentication authentication)
       throws ProfileNotExistException, TagAlreadyExistException {
     String email = authentication.getName();
-    Profile profile = changeProfileInfoService.changeProfileTag(email, profileTag);
+    Profile profile = changeProfileInfoService.changeProfileTag(email, profileTag.getTag());
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile status")
   @PatchMapping("/status")
   public ResponseEntity<ProfileModel> changeProfileStatus(
-      @RequestParam("status") String profileStatus, Authentication authentication)
+      @RequestBody ChangeProfilePropertyModel profileStatus, Authentication authentication)
       throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException {
     String email = authentication.getName();
     Profile profile = changeProfileInfoService.changeProfileStatus(email,
-        profileStatus);
+        profileStatus.getProperty());
     return new ResponseEntity<>(ProfileModel.toModel(profile), HttpStatus.OK);
   }
 

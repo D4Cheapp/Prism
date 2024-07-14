@@ -8,7 +8,9 @@ import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.group.CreateGroupModel;
+import com.prism.messenger.model.group.GroupListReceiveModel;
 import com.prism.messenger.model.group.GroupModel;
+import com.prism.messenger.model.group.QueryGroupListReceiveModel;
 import com.prism.messenger.repository.GroupRepository;
 import com.prism.messenger.service.group.GroupService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
@@ -22,6 +24,8 @@ import io.minio.errors.XmlParserException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +47,7 @@ public class GroupServiceImpl implements GroupService {
     for (String memberTag : createGroupModel.getGroupMemberTags()) {
       groupRepository.addUserToGroup(memberTag, uniqueGroupId);
     }
+    groupRepository.addGroupAdminByEmail(email, uniqueGroupId);
     return GroupModel.toModel(createGroupModel, uniqueGroupId);
   }
 
@@ -56,7 +61,7 @@ public class GroupServiceImpl implements GroupService {
   public Profile addGroupAdmin(String email, String profileTag, String dialogId)
       throws PermissionsException, ProfileNotExistException {
     checkAdminPermissions(email, dialogId);
-    Optional<Profile> groupAdmin = groupRepository.addGroupAdmin(profileTag, dialogId);
+    Optional<Profile> groupAdmin = groupRepository.addGroupAdminByTag(profileTag, dialogId);
     boolean isAdminNotExists = groupAdmin.isEmpty();
     if (isAdminNotExists) {
       throw new ProfileNotExistException();
@@ -83,30 +88,31 @@ public class GroupServiceImpl implements GroupService {
   public GroupModel changeGroupName(String email, String groupId, String groupName)
       throws PermissionsException, GroupNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     checkAdminPermissions(email, groupId);
-    Optional<Group> group = groupRepository.changeGroupName(groupId, groupName);
-    checkIsGroupExist(group);
-    byte[] photo = getGroupPhoto(group.get());
-    return GroupModel.toModel(group.get(), photo);
+    Optional<Group> optionalGroup = groupRepository.changeGroupName(groupId, groupName);
+    Group group = checkIsGroupExist(optionalGroup);
+    byte[] photo = getGroupPhoto(group);
+    return GroupModel.toModel(group, photo);
   }
 
   public GroupModel changeGroupDescription(String email, String groupId, String groupDescription)
       throws PermissionsException, GroupNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     checkAdminPermissions(email, groupId);
-    Optional<Group> group = groupRepository.changeGroupDescription(groupId, groupDescription);
-    checkIsGroupExist(group);
-    byte[] photo = getGroupPhoto(group.get());
-    return GroupModel.toModel(group.get(), photo);
+    Optional<Group> optionalGroup = groupRepository.changeGroupDescription(groupId,
+        groupDescription);
+    Group group = checkIsGroupExist(optionalGroup);
+    byte[] photo = getGroupPhoto(group);
+    return GroupModel.toModel(group, photo);
   }
 
   public GroupModel changeGroupPhoto(String email, String groupId, MultipartFile groupPhoto)
       throws PermissionsException, GroupNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
     checkAdminPermissions(email, groupId);
-    Optional<Group> group = groupRepository.findGroupById(groupId);
-    checkIsGroupExist(group);
+    Optional<Group> optionalGroup = groupRepository.findGroupById(groupId);
+    Group group = checkIsGroupExist(optionalGroup);
     String photoPath = "groups/" + groupId + "/groupPhoto.jpg";
     minioService.addFile(photoPath, groupPhoto);
     byte[] photo = groupPhoto.getBytes();
-    return GroupModel.toModel(group.get(), photo);
+    return GroupModel.toModel(group, photo);
   }
 
   public void addUserToGroup(String email, String memberTag, String groupId)
@@ -119,6 +125,26 @@ public class GroupServiceImpl implements GroupService {
       throws PermissionsException {
     checkAdminPermissions(email, groupId);
     groupRepository.deleteGroupMember(groupId, profileTag);
+  }
+
+  public GroupListReceiveModel getGroupList(String email, Integer page, Integer size)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    Optional<QueryGroupListReceiveModel> groupList = groupRepository.getGroupList(email,
+        page * size, size);
+    boolean isTotalCountEmpty =
+        groupList.isPresent() && groupList.get().getTotalCount() == 0 || groupList.isEmpty();
+    boolean isGroupListEmpty = groupList.isPresent() && isTotalCountEmpty || groupList.isEmpty();
+    if (isGroupListEmpty) {
+      return new GroupListReceiveModel(0, null);
+    }
+    Integer totalCount = groupList.get().getTotalCount();
+    List<GroupModel> groupModels = new ArrayList<>();
+    for (Group group : groupList.get().getGroups()) {
+      byte[] photo = getGroupPhoto(group);
+      groupModels.add(GroupModel.toModel(group, photo));
+    }
+    return new GroupListReceiveModel(totalCount, groupModels);
+
   }
 
   private void checkAdminPermissions(String email, String dialogId) throws PermissionsException {
@@ -138,11 +164,12 @@ public class GroupServiceImpl implements GroupService {
     return null;
   }
 
-  private void checkIsGroupExist(Optional<Group> group) throws GroupNotExistException {
+  private Group checkIsGroupExist(Optional<Group> group) throws GroupNotExistException {
     boolean isGroupEmpty = group.isEmpty();
     if (isGroupEmpty) {
       throw new GroupNotExistException();
     }
+    return group.get();
   }
 
   private void checkIsUserInGroup(String email, String groupId) throws PermissionsException {

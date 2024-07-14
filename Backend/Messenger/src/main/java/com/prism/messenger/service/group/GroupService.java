@@ -7,6 +7,7 @@ import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.group.CreateGroupModel;
+import com.prism.messenger.model.group.GroupListReceiveModel;
 import com.prism.messenger.model.group.GroupModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -46,4 +47,7 @@ public interface GroupService {
 
   void deleteUserFromGroup(String email, String profileTag, String groupId)
       throws PermissionsException;
+
+  GroupListReceiveModel getGroupList(String email, Integer page, Integer size)
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
 }

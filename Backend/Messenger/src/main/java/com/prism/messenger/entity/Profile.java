@@ -8,7 +8,6 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
-import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 @Data
 @Node("Profile")
@@ -31,12 +30,10 @@ public class Profile {
   private long lastOnlineTime;
   @Property("profilePicturePath")
   private String profilePicturePath;
-  @Relationship(type = "ADMIN", direction = Direction.INCOMING)
-  private List<Profile> adminList = new ArrayList<>();
-  @Relationship(type = "MEMBER", direction = Relationship.Direction.OUTGOING)
-  private List<Chat> chatList = new ArrayList<>();
-  @Relationship(type = "FRIEND", direction = Relationship.Direction.OUTGOING)
+  @Relationship(type = "MEMBER")
+  private List<MemberRelation> chatList = new ArrayList<>();
+  @Relationship(type = "FRIEND")
   private List<Profile> friendList = new ArrayList<>();
-  @Relationship(type = "BLOCK", direction = Relationship.Direction.OUTGOING)
+  @Relationship(type = "BLOCK")
   private List<Profile> blockedList = new ArrayList<>();
 }

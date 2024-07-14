@@ -5,8 +5,11 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.chat.ChatAlreadyExistException;
 import com.prism.messenger.exception.chat.ChatCreatingException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
+import com.prism.messenger.model.chat.ChatListReceiveModel;
 import com.prism.messenger.model.chat.ChatModel;
+import com.prism.messenger.model.chat.QueryChatListReceiveModel;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
+import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.repository.ChatRepository;
 import com.prism.messenger.service.chat.ChatService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
@@ -21,6 +24,8 @@ import io.minio.errors.XmlParserException;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,7 +57,7 @@ public class ChatServiceImpl implements ChatService {
       throw new ChatCreatingException();
     }
     minioService.createFolder("chats/" + uniqueChatId);
-    return new ChatModel(savedChat.get(), interlocutorProfile);
+    return ChatModel.toModel(savedChat.get(), interlocutorProfile);
   }
 
   public void deleteChat(String email, String dialogId)
@@ -64,5 +69,30 @@ public class ChatServiceImpl implements ChatService {
     }
     minioService.deleteFolder("chats/" + dialogId);
     chatRepository.deleteChat(dialogId);
+  }
+
+  public ChatListReceiveModel getChatList(String email, Integer page, Integer size)
+      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    Optional<QueryChatListReceiveModel> chats = chatRepository.getChatList(email, page * size,
+        size);
+    boolean isTotalCountEmpty =
+        chats.isPresent() && chats.get().getTotalCount() == 0 || chats.isEmpty();
+    boolean isChatsEmpty = chats.isPresent() && isTotalCountEmpty || chats.isEmpty();
+    if (isChatsEmpty) {
+      return new ChatListReceiveModel(0, null);
+    }
+    Integer totalCount = chats.get().getTotalCount();
+    List<ChatModel> chatModels = new ArrayList<>();
+    for (Chat chat : chats.get().getChats()) {
+      Optional<String> interlocutorProfile = chatRepository.getInterlocutorProfile(email,
+          chat.getId());
+      boolean isInterlocutorProfileEmpty = interlocutorProfile.isEmpty();
+      if (isInterlocutorProfileEmpty) {
+        throw new ProfileNotExistException();
+      }
+      chatModels.add(ChatModel.toModel(chat,
+          ProfileModel.toModel(profileService.getProfileByTag(interlocutorProfile.get(), email))));
+    }
+    return new ChatListReceiveModel(totalCount, chatModels);
   }
 }

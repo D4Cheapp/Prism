@@ -11,8 +11,17 @@ public class ChatModel {
   private String chatId;
   private ProfileModel conversationProfile;
 
-  public ChatModel(Chat savedChat, FullProfileInfoModel interlocutorProfile) {
-    this.chatId = savedChat.getId();
-    this.conversationProfile = ProfileModel.toModel(interlocutorProfile);
+  public static ChatModel toModel(Chat savedChat, FullProfileInfoModel interlocutorProfile) {
+    ChatModel chatModel = new ChatModel();
+    chatModel.chatId = savedChat.getId();
+    chatModel.conversationProfile = ProfileModel.toModel(interlocutorProfile);
+    return chatModel;
+  }
+
+  public static ChatModel toModel(Chat savedChat, ProfileModel interlocutorProfile) {
+    ChatModel chatModel = new ChatModel();
+    chatModel.chatId = savedChat.getId();
+    chatModel.conversationProfile = interlocutorProfile;
+    return chatModel;
   }
 }
