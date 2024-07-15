@@ -177,6 +177,7 @@ sftp-config.json
 /build
 
 # misc
+*.env
 .env
 .env.local
 .env.development.local

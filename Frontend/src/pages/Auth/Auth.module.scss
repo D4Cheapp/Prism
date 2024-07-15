@@ -1,0 +1,101 @@
+.root {
+  display: grid;
+  height: 100vh;
+  place-items: center;
+}
+
+.form {
+  display: flex;
+  width: 25%;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  background-color: var(--secondBackground);
+  box-shadow: -1px 10px 200px -50px var(--background);
+  gap: 2em;
+  padding-block: 2em;
+  padding-inline: 2.5vw;
+
+  .formTitle {
+    @include fontType(1.8rem, var(--text));
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+
+  .submitButton {
+    width: 70%;
+    border: 2px var(--text) solid;
+    border-radius: 7px;
+    background-color: var(--secondBackground);
+    cursor: pointer;
+    padding-block: 0.3em;
+    transition: 0.2s;
+    @include fontType(1.2rem, var(--text));
+
+    @include hover {
+      border: 2px var(--primary) solid;
+      background-color: var(--primary);
+      color: var(--text);
+    }
+  }
+}
+
+.additionalData {
+  width: 100%;
+}
+
+.checkboxContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.7em;
+  cursor: pointer;
+
+  @include hover {
+    .checkboxLabel {
+      color: var(--primary);
+    }
+
+    .customCheckbox {
+      border-color: var(--primary);
+    }
+  }
+
+  .checkboxLabel {
+    margin: 0;
+    transition: 0.2s;
+    @include fontType(1.2rem, var(--text));
+  }
+
+  .customCheckbox {
+    width: 1vw;
+    height: 1vw;
+    transition: 0.2s;
+  }
+}
+
+.redirect {
+  border-bottom: 1px transparent solid;
+  margin-top: 1em;
+  text-decoration: none;
+  transition: 0.2s;
+  @include fontType(1rem, var(--text));
+
+  @include hover {
+    border-bottom: 1px var(--primary) solid;
+    color: var(--primary);
+  }
+}
+
+.changeThemeContainer {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+}
