@@ -1,0 +1,23 @@
+.container {
+  position: absolute;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  display: grid;
+  overflow: hidden;
+  width: 60%;
+  flex-direction: column;
+  margin-top: 1em;
+  gap: 0.5em;
+  margin-inline: 20%;
+
+  @include bigTablet {
+    width: 80%;
+    margin-inline: 10%;
+  }
+
+  @include tablet {
+    width: 90%;
+    margin-inline: 5%;
+  }
+}

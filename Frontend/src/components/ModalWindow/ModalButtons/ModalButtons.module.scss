@@ -1,0 +1,34 @@
+.formButtons {
+  display: inline-flex;
+  width: 100%;
+  justify-content: space-around;
+
+  @include tablet {
+    flex-direction: column;
+    align-items: center;
+    gap: 1em;
+  }
+
+  .formButton {
+    width: 40%;
+    border: 2px var(--text) solid;
+    border-radius: 5px;
+    background: transparent;
+    cursor: pointer;
+    padding-block: 0.3em;
+    @include fontType(1.4em, var(--text));
+
+    @include tablet {
+      width: 100%;
+    }
+  }
+
+  .confirmButton,
+  .saveButton {
+    @include colorButton(var(--primary));
+  }
+
+  .cancelButton {
+    @include colorButton(var(--red));
+  }
+}

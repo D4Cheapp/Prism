@@ -1,0 +1,56 @@
+.errorMessage {
+  position: relative;
+  display: inline-flex;
+  width: 100%;
+  height: fit-content;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 5px;
+  background-color: var(--red);
+  padding-block: 1em;
+  padding-inline: 3%;
+
+  .error {
+    margin: 0;
+    text-align: left;
+    white-space: pre-wrap;
+    @include fontType(1.5rem, var(--text));
+  }
+
+  .close {
+    height: 2em;
+    padding: 0;
+    border: none;
+    border-radius: 5px;
+    aspect-ratio: 1/1;
+    background-color: transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.3s,
+      scale 0.2s;
+    @include cross(1.5rem, 3px);
+
+    @include hover {
+      background-color: var(--text);
+    }
+
+    &:active {
+      scale: 0.9;
+    }
+  }
+}
+
+.fadeAnimation {
+  animation: fade 0.5s;
+}
+
+@keyframes fade {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}

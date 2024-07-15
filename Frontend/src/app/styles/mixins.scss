@@ -1,0 +1,108 @@
+@mixin hover() {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin fontType($fontSize: null, $fontColor: null, $fontWeight: null) {
+  color: $fontColor;
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+}
+
+@mixin colorButton($color) {
+  transition:
+    border-color 0.2s,
+    background-image 0.2s,
+    color 0.2s;
+
+  @include hover {
+    border-color: $color;
+    color: $color;
+  }
+}
+
+@mixin loadingCircle($width, $thick) {
+  width: $width;
+  height: $width;
+  border: $thick solid transparent;
+  border-radius: 50%;
+  border-top-color: var(--text);
+  border-left-color: var(--text);
+  animation: loading 1s linear infinite;
+
+  @keyframes loading {
+    0% {
+      transform: rotate(0);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@mixin cross($width, $thick) {
+  position: relative;
+  display: grid;
+  place-items: center;
+
+  @include hover {
+    &::after,
+    &::before {
+      background-color: var(--red);
+    }
+  }
+
+  &::after {
+    position: absolute;
+    width: $width;
+    height: $thick;
+    background-color: var(--text);
+    content: '';
+    rotate: -45deg;
+    transition: 0.2s;
+  }
+
+  &::before {
+    position: absolute;
+    width: $width;
+    height: $thick;
+    background-color: var(--text);
+    content: '';
+    rotate: 45deg;
+    transition: 0.2s;
+  }
+}
+
+@mixin bigDesktop() {
+  @media only screen and (width <= 1440px) {
+    @content;
+  }
+}
+
+@mixin mediumDesktop() {
+  @media only screen and (width <= 1256px) {
+    @content;
+  }
+}
+
+@mixin desktop() {
+  @media only screen and (width <= 1080px) {
+    @content;
+  }
+}
+
+@mixin bigTablet() {
+  @media only screen and (width <= 834px) {
+    @content;
+  }
+}
+
+@mixin tablet() {
+  @media only screen and (width <= 600px) {
+    @content;
+  }
+}
