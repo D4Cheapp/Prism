@@ -10,6 +10,7 @@
   background-color: var(--secondBackground);
   opacity: 0;
   padding-inline: 0.5em;
+  transition: 0.2s;
   @include fontType(1.2rem, var(--text), 500);
 }
 
@@ -17,7 +18,7 @@
   width: 100%;
   box-sizing: border-box;
   padding-top: 0.8em;
-  padding-bottom: 0.7em;
+  padding-bottom: 0.8em;
   border: 2px var(--text) solid;
   border-radius: 5px;
   background: var(--secondBackground);

@@ -1,0 +1,27 @@
+.submitButton {
+  display: grid;
+  width: 70%;
+  border: 2px var(--text) solid;
+  border-radius: 7px;
+  background-color: var(--secondBackground);
+  cursor: pointer;
+  padding-block: 0.3em;
+  place-items: center;
+  transition: 0.2s;
+  @include fontType(1.2rem, var(--text));
+
+  @include hover {
+    border: 2px var(--primary) solid;
+    background-color: var(--primary);
+    color: var(--text);
+  }
+
+  &:disabled:hover {
+    border: 2px var(--primary) solid;
+    background-color: transparent;
+  }
+}
+
+.loader {
+  @include loadingCircle(1.2rem, 2px);
+}

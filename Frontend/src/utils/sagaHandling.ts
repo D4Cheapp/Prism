@@ -1,6 +1,6 @@
 import { call, put } from 'redux-saga/effects';
 import { createFetch } from '@/src/utils/createFetch';
-import { setErrorsState, setLoadingState } from '@/src/reduxjs/base';
+import { setMessagesState, setLoadingState, setRequestStatus } from '@/src/reduxjs/base';
 
 type SagaHandlingPropsType<T> = {
   href: string;
@@ -24,7 +24,7 @@ function* sagaHandling<T>({
     server === 'auth' ? process.env.AUTH_SERVER_URL : process.env.MESSENGER_SERVER_URL
   ) as string;
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const response: [T | { error: string }, Response] | Error = yield call(() =>
+  const response: [T | { info?: string; error?: string }, Response] | Error = yield call(() =>
     createFetch<T>({
       method,
       href: serverUrl + href,
@@ -37,16 +37,22 @@ function* sagaHandling<T>({
   const isResponseContainsErrorMessage =
     // @ts-ignore
     isResponseOkCrashed && !!response[0]?.error;
+  // @ts-ignore
+  const isInfoInResponse = !isResponseCrashed && !isResponseOkCrashed && !!response[0]?.info;
   if (isResponseCrashed) {
-    yield put(setErrorsState(response.message));
+    yield put(setMessagesState({ error: response.message }));
   }
   if (isResponseOkCrashed) {
     if (isResponseContainsErrorMessage) {
       //@ts-ignore
-      yield put(setErrorsState(response[0]?.error as string));
+      yield put(setMessagesState({ error: response[0]?.error as string }));
     } else {
-      yield put(setErrorsState(`Error: ${response[1].statusText}`));
+      yield put(setMessagesState({ error: `Error: ${response[1].statusText}` }));
     }
+  }
+  if (isInfoInResponse) {
+    //@ts-ignore
+    yield put(setMessagesState({ info: response[0].info as string }));
   }
   if (isActionExist) {
     if (isDataInAction) {
@@ -57,6 +63,9 @@ function* sagaHandling<T>({
       yield action();
     }
   }
+  yield put(
+    setRequestStatus({ method, request: href, isOk: !isResponseCrashed && !isResponseOkCrashed }),
+  );
   yield put(setLoadingState(false));
   return !isResponseCrashed && !isResponseContainsErrorMessage ? response[0] : { error: true };
 }

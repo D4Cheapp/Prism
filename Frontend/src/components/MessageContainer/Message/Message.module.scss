@@ -1,4 +1,4 @@
-.errorMessage {
+.messageContainer {
   position: relative;
   display: inline-flex;
   width: 100%;
@@ -7,11 +7,10 @@
   align-items: center;
   justify-content: space-between;
   border-radius: 5px;
-  background-color: var(--red);
   padding-block: 1em;
   padding-inline: 3%;
 
-  .error {
+  .message {
     margin: 0;
     text-align: left;
     white-space: pre-wrap;
@@ -39,6 +38,14 @@
       scale: 0.9;
     }
   }
+}
+
+.errorMessage {
+  background-color: var(--red);
+}
+
+.infoMessage {
+  background-color: var(--green);
 }
 
 .fadeAnimation {

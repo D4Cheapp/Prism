@@ -5,3 +5,4 @@ import { LoginRequestType, RegistrationRequestType } from '@/src/types/authReque
 export type SetCurrentUserActionType = PayloadAction<UserReceiveType | null>;
 export type LoginActionType = PayloadAction<LoginRequestType>;
 export type RegistrationActionType = PayloadAction<RegistrationRequestType>;
+export type ConfirmCodeActionType = PayloadAction<{ code: string }>;

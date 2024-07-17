@@ -1,7 +1,12 @@
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 import { createSlice } from '@reduxjs/toolkit';
 import { UserReceiveType } from '@/src/types/authRecieveTypes';
-import { LoginActionType, SetCurrentUserActionType } from './types';
+import {
+  ConfirmCodeActionType,
+  LoginActionType,
+  RegistrationActionType,
+  SetCurrentUserActionType,
+} from './types';
 
 interface AuthSliceInterface {
   currentUser?: UserReceiveType;
@@ -24,10 +29,15 @@ const authSlice = createSlice({
 
     login: (state, user: LoginActionType) => state,
 
+    registration: (state, user: RegistrationActionType) => state,
+
+    confirmRegistration: (state, confirmCode: ConfirmCodeActionType) => state,
+
     logout: (state) => state,
   },
 });
 
 export const authActions = authSlice.actions;
-export const { getCurrentUser, setCurrentUser, login, logout } = authSlice.actions;
+export const { getCurrentUser, setCurrentUser, login, registration, confirmRegistration, logout } =
+  authSlice.actions;
 export default authSlice.reducer;

@@ -1,0 +1,24 @@
+.root {
+  position: relative;
+  cursor: pointer;
+
+  .eye {
+    transition: 0.2s;
+  }
+
+  .eyeLine {
+    position: absolute;
+    top: -0;
+    right: 1em;
+    width: 0.16em;
+    height: 2em;
+    background-color: var(--text);
+    opacity: 0;
+    rotate: -50deg;
+    transition: 0.2s;
+  }
+
+  .isHide {
+    opacity: 1;
+  }
+}

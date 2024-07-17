@@ -2,7 +2,7 @@ import React from 'react';
 import { Metadata } from 'next';
 import './styles/_variables.scss';
 import './styles/globals.scss';
-import ErrorContainer from '../components/ErrorContainer';
+import MessageContainer from '../components/MessageContainer';
 import Providers from '../components/Providers';
 
 export const metadata: Metadata = {
@@ -17,7 +17,8 @@ const RootLayout = ({ children }: Props): React.ReactNode => {
   return (
     <html lang="en">
       <Providers>
-        <ErrorContainer />
+        <div className="noise" />
+        <MessageContainer />
         {children}
       </Providers>
     </html>

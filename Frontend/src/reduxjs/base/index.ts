@@ -1,42 +1,71 @@
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 import { createSlice } from '@reduxjs/toolkit';
+import { SetRequestStatusActionType } from './types';
 import {
-  DeleteErrorStateActionType,
-  SetErrorStateActionType,
+  DeleteMessageStateActionType,
+  SetMessageStateActionType,
   SetLoadingStateActionType,
+  RequestStatusType,
+  MessageType,
 } from './types';
 
 interface BaseSliceInterface {
   loadingState: boolean;
-  errors: { error: string; id: number }[];
+  messages: MessageType[];
+  requestStatus: RequestStatusType;
 }
 
 const baseSlice = createSlice({
   name: 'baseSlice',
   initialState: {
     loadingState: false,
-    errors: [],
+    requestStatus: {
+      method: 'GET',
+      request: '',
+      isOk: true,
+    },
+    messages: [],
   } as BaseSliceInterface,
   reducers: {
     setLoadingState: (state, isLoading: SetLoadingStateActionType) => {
       state.loadingState = isLoading.payload;
+      return state;
     },
 
-    setErrorsState: (state, errors: SetErrorStateActionType) => {
-      const isPayloadEmpty = errors.payload !== undefined;
-      if (isPayloadEmpty) {
-        state.errors = [...state.errors, { error: 'Error: ' + errors.payload, id: Date.now() }];
+    setRequestStatus: (state, status: SetRequestStatusActionType) => {
+      state.requestStatus = status.payload;
+      return state;
+    },
+
+    setMessagesState: (state, messages: SetMessageStateActionType) => {
+      const isPayloadExist =
+        messages.payload !== undefined && (!!messages.payload?.error || !!messages.payload?.info);
+      if (isPayloadExist) {
+        const error = !!messages.payload?.error ? 'Error: ' + messages.payload.error : undefined;
+        const info = messages.payload?.info ?? undefined;
+        state.messages = [
+          ...state.messages,
+          {
+            id: Date.now(),
+            error,
+            info,
+          },
+        ];
       } else {
-        state.errors = [];
+        state.messages = [];
       }
+      return state;
     },
 
-    deleteErrorState: (state, errorIndex: DeleteErrorStateActionType) => {
-      state.errors = state.errors.filter((error) => error.id !== errorIndex.payload);
+    deleteMessageState: (state, messageIndex: DeleteMessageStateActionType) => {
+      state.messages = state.messages.filter(
+        (message) => message && message.id !== messageIndex.payload,
+      );
     },
   },
 });
 
 export const baseActions = baseSlice.actions;
-export const { setErrorsState, deleteErrorState, setLoadingState } = baseSlice.actions;
+export const { setMessagesState, deleteMessageState, setLoadingState, setRequestStatus } =
+  baseSlice.actions;
 export default baseSlice.reducer;

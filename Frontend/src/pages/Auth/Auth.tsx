@@ -1,13 +1,12 @@
 'use client';
 import { Form, Formik } from 'formik';
 import Link from 'next/link';
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAppSelector } from '@/src/hooks/reduxHooks';
-import { currentUserSelector } from '@/src/reduxjs/auth/selectors';
+import React, { useState } from 'react';
 import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
 import CustomInput from '@/src/ui/CustomInput';
 import CustomInputButton from '@/src/ui/CustomInputButton';
+import { HideButton } from '@/src/ui/HideButton';
+import CustomButton from '@/src/ui/CustomButton';
 import { AuthFormType } from '@/src/types/formTypes';
 import s from './Auth.module.scss';
 
@@ -16,7 +15,7 @@ interface Props {
   redirectText: string;
   title: string;
   onFormSubmitClick: (values: AuthFormType) => Promise<void>;
-  withAdditionalData?: boolean;
+  withConfirmPassword?: boolean;
 }
 
 const Auth = ({
@@ -24,16 +23,10 @@ const Auth = ({
   redirectText,
   title,
   onFormSubmitClick,
-  withAdditionalData,
+  withConfirmPassword,
 }: Props): React.ReactNode => {
-  const currentUser = useAppSelector(currentUserSelector);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (currentUser?.id) {
-      router.push('/');
-    }
-  }, [currentUser, router]);
+  const [isPasswordHidden, setIsPasswordHidden] = useState(true);
+  const [isConfirmPasswordHidden, setIsConfirmPasswordHidden] = useState(true);
 
   return (
     <section className={s.root}>
@@ -54,22 +47,34 @@ const Auth = ({
         <Form className={s.form}>
           <h1 className={s.formTitle}>{title}</h1>
           <CustomInput name="email" isFormInput label="Email" placeholder="Enter your email" />
-          <CustomInput
-            name="password"
-            type="password"
-            isFormInput
-            label="Password"
-            placeholder="Enter your password"
-          />
-          {withAdditionalData && (
+          <div className={s.inputContainer}>
+            <CustomInput
+              name="password"
+              type={isPasswordHidden ? 'password' : 'text'}
+              isFormInput
+              label="Password"
+              placeholder="Enter your password"
+              classNames={{ input: s.input }}
+            />
+            <HideButton styles={s.eye} isHide={isPasswordHidden} toggleHide={setIsPasswordHidden} />
+          </div>
+          {withConfirmPassword && (
             <div className={s.additionalData}>
-              <CustomInput
-                name="confirmPassword"
-                type="password"
-                isFormInput
-                label="Confirm password"
-                placeholder="Confirm your password"
-              />
+              <div className={s.inputContainer}>
+                <CustomInput
+                  name="confirmPassword"
+                  type={isConfirmPasswordHidden ? 'password' : 'text'}
+                  isFormInput
+                  label="Confirm password"
+                  placeholder="Confirm your password"
+                  classNames={{ input: s.input }}
+                />
+                <HideButton
+                  styles={s.eye}
+                  isHide={isConfirmPasswordHidden}
+                  toggleHide={setIsConfirmPasswordHidden}
+                />
+              </div>
               <label className={s.checkboxContainer}>
                 <p className={s.checkboxLabel}>Is developer</p>
                 <CustomInputButton
@@ -82,9 +87,7 @@ const Auth = ({
             </div>
           )}
           <div className={s.buttonsContainer}>
-            <button className={s.submitButton} type="submit">
-              Submit
-            </button>
+            <CustomButton text="Submit" type="submit" withLoader />
             <Link className={s.redirect} href={redirectTo}>
               {redirectText}
             </Link>

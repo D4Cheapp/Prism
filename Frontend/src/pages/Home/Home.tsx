@@ -1,14 +1,22 @@
 'use client';
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useActions } from '@/src/hooks/reduxHooks';
 import styles from './Home.module.scss';
 
 const Home = (): React.ReactNode => {
   const { logout } = useActions();
+  const router = useRouter();
+
+  const handleLogoutClick = () => {
+    logout();
+    router.push('/login');
+  };
+
   return (
     <div className={styles.root}>
       Home
-      <button onClick={() => logout()}>Logout</button>
+      <button onClick={handleLogoutClick}>Logout</button>
     </div>
   );
 };

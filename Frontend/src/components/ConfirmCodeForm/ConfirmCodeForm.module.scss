@@ -5,6 +5,7 @@
 }
 
 .form {
+  position: relative;
   display: flex;
   width: 25%;
   box-sizing: border-box;
@@ -18,12 +19,9 @@
   padding-inline: 2.5vw;
 
   .formTitle {
+    text-align: center;
     @include fontType(1.8rem, var(--text));
   }
-}
-
-.additionalData {
-  width: 100%;
 }
 
 .inputContainer {
@@ -39,36 +37,23 @@
     top: 0.8em;
     right: 1em;
   }
-}
 
-.checkboxContainer {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1em;
-  cursor: pointer;
-
-  @include hover {
-    .checkboxLabel {
-      color: var(--primary);
-    }
-
-    .customCheckbox {
-      border-color: var(--primary);
-    }
-  }
-
-  .checkboxLabel {
-    margin: 0;
-    transition: 0.2s;
+  .resendText {
+    text-align: center;
     @include fontType(1.2rem, var(--text));
   }
 
-  .customCheckbox {
-    width: 1vw;
-    height: 1vw;
-    transition: 0.2s;
+  .resendButton {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    @include fontType(1.2rem, var(--text));
+  }
+
+  .resendButtonText {
+    cursor: pointer;
+    text-decoration: underline;
   }
 }
 
@@ -79,21 +64,20 @@
 }
 
 .buttonsContainer {
-  display: flex;
+  display: inline-flex;
   width: 100%;
-  flex-direction: column;
-  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1em;
 
-  .redirect {
-    border-bottom: 1px transparent solid;
-    margin-top: 1em;
-    text-decoration: none;
-    transition: 0.2s;
-    @include fontType(1rem, var(--text));
+  .button {
+    width: 45%;
+  }
 
+  .goBackButton {
     @include hover {
-      border-bottom: 1px var(--primary) solid;
-      color: var(--primary);
+      border: 2px var(--secondary) solid;
+      background-color: var(--secondary);
+      color: var(--text);
     }
   }
 }
