@@ -1,6 +1,6 @@
 import { call, put } from 'redux-saga/effects';
 import { createFetch } from '@/src/utils/createFetch';
-import { setMessagesState, setLoadingState, setRequestStatus } from '@/src/reduxjs/base';
+import { baseActions } from '@/src/reduxjs/base';
 
 type SagaHandlingPropsType<T> = {
   href: string;
@@ -19,7 +19,7 @@ function* sagaHandling<T>({
   action,
   isDataInAction,
 }: SagaHandlingPropsType<T>) {
-  yield put(setLoadingState(true));
+  yield put(baseActions.setLoadingState(true));
   const serverUrl: string = (
     server === 'auth' ? process.env.AUTH_SERVER_URL : process.env.MESSENGER_SERVER_URL
   ) as string;
@@ -40,21 +40,21 @@ function* sagaHandling<T>({
   // @ts-ignore
   const isInfoInResponse = !isResponseCrashed && !isResponseOkCrashed && !!response[0]?.info;
   if (isResponseCrashed) {
-    yield put(setMessagesState({ error: response.message }));
+    console.error(response.message);
   }
   if (isResponseOkCrashed) {
     if (isResponseContainsErrorMessage) {
       //@ts-ignore
-      yield put(setMessagesState({ error: response[0]?.error as string }));
+      yield put(baseActions.setMessagesState({ error: response[0]?.error as string }));
     } else {
-      yield put(setMessagesState({ error: `Error: ${response[1].statusText}` }));
+      yield put(baseActions.setMessagesState({ error: `Error: ${response[1].statusText}` }));
     }
   }
   if (isInfoInResponse) {
     //@ts-ignore
-    yield put(setMessagesState({ info: response[0].info as string }));
+    yield put(baseActions.setMessagesState({ info: response[0].info as string }));
   }
-  if (isActionExist) {
+  if (isActionExist && !isResponseCrashed && !isResponseOkCrashed) {
     if (isDataInAction) {
       // @ts-ignore
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -64,9 +64,13 @@ function* sagaHandling<T>({
     }
   }
   yield put(
-    setRequestStatus({ method, request: href, isOk: !isResponseCrashed && !isResponseOkCrashed }),
+    baseActions.setRequestStatus({
+      method,
+      request: href,
+      isOk: !isResponseCrashed && !isResponseOkCrashed,
+    }),
   );
-  yield put(setLoadingState(false));
+  yield put(baseActions.setLoadingState(false));
   return !isResponseCrashed && !isResponseContainsErrorMessage ? response[0] : { error: true };
 }
 

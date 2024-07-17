@@ -2,6 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
+import {
+  confirmCodeValidation,
+  confirmPasswordValidationSchema,
+  passwordValidationSchema,
+} from '@/src/utils/formValidationSchemas';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
 import ConfirmCodeForm from '@/src/components/ConfirmCodeForm';
 import Auth from '@/src/pages/Auth';
@@ -30,10 +35,12 @@ const RegistrationPage = (): React.ReactNode => {
 
   const handleConfirmCodeClick = async (values: ConfirmCodeFormType) => {
     let isError = false;
-    await confirmCodeValidation.validate(values).catch((error: Yup.ValidationError) => {
-      isError = true;
-      setMessagesState({ error: error.errors[0] });
-    });
+    await Yup.object({ code: confirmCodeValidation })
+      .validate(values)
+      .catch((error: Yup.ValidationError) => {
+        isError = true;
+        setMessagesState({ error: error.errors[0] });
+      });
     if (!isError) {
       confirmRegistration(values);
     }
@@ -57,7 +64,7 @@ const RegistrationPage = (): React.ReactNode => {
       setIsConfirmCodeSent(true);
     }
     if (isRegistrationSuccess) {
-      router.push('/login');
+      router.push('/auth/login');
     }
   }, [requestStatus, router]);
 
@@ -73,38 +80,22 @@ const RegistrationPage = (): React.ReactNode => {
       ) : (
         <Auth
           title="Registration"
-          redirectTo="/login"
+          redirectTo="/auth/login"
           redirectText="Already have an account?"
           onFormSubmitClick={handleRegistrationClick}
-          withConfirmPassword={true}
+          withPassword
+          withConfirmPassword
         />
       )}
     </>
   );
 };
 
-export const passwordSchema = Yup.string()
-  .min(6, 'Password must be at least 6 characters')
-  .max(25, 'Password must be less than 25 characters')
-  .matches(/.*[A-ZА-Я].*/, 'Password must contain at least one uppercase letter')
-  .matches(/.*[a-zа-я].*/, 'Password must contain at least one lowercase letter')
-  .matches(/.*[0-9].*/, 'Password must contain at least one number')
-  .matches(
-    /.*[!\";#$%&'()*+,-./:<=>?@^_`{|}~].*/,
-    'Password must contain at least one special character',
-  );
-
 const registrationValidation = {
   email: Yup.string().email("Email isn't valid").required('Email is required'),
-  password: passwordSchema.required('Password is required'),
-  confirmPassword: Yup.string()
-    .required()
-    .oneOf([Yup.ref('password')], 'Passwords must match'),
+  password: passwordValidationSchema.required('Password is required'),
+  confirmPassword: confirmPasswordValidationSchema,
 };
-
-const confirmCodeValidation = Yup.object({
-  code: Yup.string().min(4, 'Invalid code').max(4, 'Invalid code').required('Code is required'),
-});
 
 const handleRegistrationValidate = Yup.object({
   ...registrationValidation,

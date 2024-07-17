@@ -1,9 +1,14 @@
 import { all, put, takeEvery } from 'redux-saga/effects';
 import { sagaHandling } from '@/src/utils/sagaHandling';
-import { UserReceiveType } from '@/src/types/authRecieveTypes';
+import { UserReceiveType } from '@/src/types/authReceiveTypes';
 import { TextReceiveType } from '@/src/types/receiveTypes';
-import { authActions, setCurrentUser } from '.';
-import { ConfirmCodeActionType, LoginActionType, RegistrationActionType } from './types';
+import { authActions } from '.';
+import {
+  ConfirmCodeActionType,
+  LoginActionType,
+  RegistrationActionType,
+  RestorePasswordActionType,
+} from './types';
 
 function* getCurrentUserSaga() {
   yield sagaHandling<UserReceiveType>({
@@ -11,7 +16,7 @@ function* getCurrentUserSaga() {
     href: '/user',
     server: 'auth',
     isDataInAction: true,
-    action: (data?: UserReceiveType) => put(setCurrentUser(data ?? null)),
+    action: (data?: UserReceiveType) => put(authActions.setCurrentUser(data ?? null)),
   });
 }
 
@@ -22,7 +27,16 @@ function* loginSaga(action: LoginActionType) {
     server: 'auth',
     body: action.payload,
     isDataInAction: true,
-    action: (data?: UserReceiveType) => put(setCurrentUser(data ?? null)),
+    action: (data?: UserReceiveType) => put(authActions.setCurrentUser(data ?? null)),
+  });
+}
+
+function* logoutSaga() {
+  yield sagaHandling<TextReceiveType>({
+    method: 'DELETE',
+    href: '/logout',
+    server: 'auth',
+    action: () => put(authActions.setCurrentUser(null)),
   });
 }
 
@@ -44,12 +58,21 @@ function* confirmRegistrationSaga(action: ConfirmCodeActionType) {
   });
 }
 
-function* logoutSaga() {
+function* restorePasswordSaga(action: RestorePasswordActionType) {
   yield sagaHandling<TextReceiveType>({
-    method: 'DELETE',
-    href: '/logout',
+    method: 'POST',
+    href: '/restore-password',
     server: 'auth',
-    action: () => put(setCurrentUser(null)),
+    body: action.payload,
+  });
+}
+
+function* confirmRestorePasswordSaga(action: ConfirmCodeActionType) {
+  yield sagaHandling<TextReceiveType>({
+    method: 'PATCH',
+    href: '/restore-password',
+    server: 'auth',
+    body: action.payload,
   });
 }
 
@@ -57,8 +80,10 @@ export default function* authSaga() {
   yield all([
     takeEvery(authActions.getCurrentUser, getCurrentUserSaga),
     takeEvery(authActions.login, loginSaga),
+    takeEvery(authActions.logout, logoutSaga),
     takeEvery(authActions.registration, registrationSaga),
     takeEvery(authActions.confirmRegistration, confirmRegistrationSaga),
-    takeEvery(authActions.logout, logoutSaga),
+    takeEvery(authActions.restorePassword, restorePasswordSaga),
+    takeEvery(authActions.confirmRestorePassword, confirmRestorePasswordSaga),
   ]);
 }

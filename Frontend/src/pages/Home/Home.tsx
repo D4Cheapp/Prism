@@ -10,7 +10,7 @@ const Home = (): React.ReactNode => {
 
   const handleLogoutClick = () => {
     logout();
-    router.push('/login');
+    router.push('/auth/login');
   };
 
   return (

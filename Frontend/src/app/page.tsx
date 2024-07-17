@@ -1,8 +1,12 @@
-import React from 'react';
 import Home from '../pages/Home';
+import UserVerification from '../components/UserVerification';
 
 const HomePage = () => {
-  return <Home />;
+  return (
+    <UserVerification>
+      <Home />
+    </UserVerification>
+  );
 };
 
 export default HomePage;

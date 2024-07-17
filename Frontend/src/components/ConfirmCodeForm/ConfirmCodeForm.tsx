@@ -58,7 +58,7 @@ const ConfirmCodeForm = ({
         <Form className={s.form}>
           <h1 className={s.formTitle}>{title}</h1>
           <div className={s.inputContainer}>
-            <CustomInput name="code" isFormInput placeholder="Enter code" />
+            <CustomInput name="code" isFormInput placeholder="Enter code" label="Confirm code" />
             {sendAgainBlockTimer > 0 ? (
               <p className={s.resendText}>
                 Please, wait {timerMinutes}:{timerSeconds < 10 ? `0${timerSeconds}` : timerSeconds}{' '}

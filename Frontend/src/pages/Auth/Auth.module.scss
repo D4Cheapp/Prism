@@ -39,15 +39,32 @@
     top: 0.8em;
     right: 1em;
   }
+
+  .forgotPassword {
+    border: none;
+    border-bottom: 1px transparent solid;
+    margin-top: 0.5em;
+    background: none;
+    cursor: pointer;
+    padding-inline: 0;
+    transition: 0.2s;
+    @include fontType(1.1rem, var(--text));
+
+    @include hover {
+      border-bottom: 1px var(--primary) solid;
+      color: var(--primary);
+    }
+  }
 }
 
 .checkboxContainer {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-top: 1em;
   cursor: pointer;
+  gap: 1em;
 
   @include hover {
     .checkboxLabel {
@@ -62,12 +79,12 @@
   .checkboxLabel {
     margin: 0;
     transition: 0.2s;
-    @include fontType(1.2rem, var(--text));
+    @include fontType(1.1rem, var(--text));
   }
 
   .customCheckbox {
-    width: 1vw;
-    height: 1vw;
+    width: 1em;
+    height: 1em;
     transition: 0.2s;
   }
 }
@@ -78,18 +95,34 @@
   right: 5%;
 }
 
+.multiButtonsContainer {
+  flex-direction: row !important;
+  justify-content: space-between;
+}
+
 .buttonsContainer {
   display: flex;
   width: 100%;
   flex-direction: column;
   align-items: center;
 
+  .goBackButton {
+    @include hover {
+      border-color: var(--secondary) !important;
+      background-color: var(--secondary) !important;
+    }
+  }
+
+  .smallButton {
+    width: 45%;
+  }
+
   .redirect {
     border-bottom: 1px transparent solid;
-    margin-top: 1em;
+    margin-top: 0.5em;
     text-decoration: none;
     transition: 0.2s;
-    @include fontType(1rem, var(--text));
+    @include fontType(1.1rem, var(--text));
 
     @include hover {
       border-bottom: 1px var(--primary) solid;

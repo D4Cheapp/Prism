@@ -37,9 +37,11 @@ const LoginPage = () => {
   return (
     <Auth
       title="Login"
-      redirectTo="/registration"
+      redirectTo="/auth/registration"
       redirectText="Don't have an account?"
       onFormSubmitClick={handleLoginClick}
+      withPassword
+      withRestorePassword
     />
   );
 };

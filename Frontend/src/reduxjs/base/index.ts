@@ -1,9 +1,8 @@
 /* eslint @typescript-eslint/no-unused-vars: 0 */
 import { createSlice } from '@reduxjs/toolkit';
-import { SetRequestStatusActionType } from './types';
+import { SetMessageStateActionType, SetRequestStatusActionType } from './types';
 import {
   DeleteMessageStateActionType,
-  SetMessageStateActionType,
   SetLoadingStateActionType,
   RequestStatusType,
   MessageType,
@@ -66,6 +65,4 @@ const baseSlice = createSlice({
 });
 
 export const baseActions = baseSlice.actions;
-export const { setMessagesState, deleteMessageState, setLoadingState, setRequestStatus } =
-  baseSlice.actions;
 export default baseSlice.reducer;
