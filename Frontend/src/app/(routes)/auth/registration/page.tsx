@@ -8,10 +8,9 @@ import {
   passwordValidationSchema,
 } from '@/src/utils/formValidationSchemas';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
-import ConfirmCodeForm from '@/src/components/ConfirmCodeForm';
-import Auth from '@/src/pages/Auth';
+import AuthForm from '@/src/pages/AuthForm';
 import { requestStatusSelector } from '@/src/reduxjs/base/selectors';
-import { AuthFormType, ConfirmCodeFormType } from '@/src/types/formTypes';
+import { AuthFormType } from '@/src/types/formTypes';
 import { RegistrationRequestType } from '@/src/types/authRequestTypes';
 
 const RegistrationPage = (): React.ReactNode => {
@@ -33,7 +32,7 @@ const RegistrationPage = (): React.ReactNode => {
     }
   };
 
-  const handleConfirmCodeClick = async (values: ConfirmCodeFormType) => {
+  const handleConfirmCodeClick = async (values: AuthFormType) => {
     let isError = false;
     await Yup.object({ code: confirmCodeValidation })
       .validate(values)
@@ -71,20 +70,24 @@ const RegistrationPage = (): React.ReactNode => {
   return (
     <>
       {isConfirmCodeSent ? (
-        <ConfirmCodeForm
+        <AuthForm
           title="Confirm your email"
-          onBackClick={handleBackToRegistrationClick}
-          onFormSubmit={handleConfirmCodeClick}
+          onGoBackClick={handleBackToRegistrationClick}
           onResendButtonClick={handleResendCodeClick}
+          onFormSubmitClick={handleConfirmCodeClick}
+          withConfirmCode
+          withGoBackButton
         />
       ) : (
-        <Auth
+        <AuthForm
           title="Registration"
           redirectTo="/auth/login"
           redirectText="Already have an account?"
           onFormSubmitClick={handleRegistrationClick}
+          withEmail
           withPassword
           withConfirmPassword
+          withDeveloperCheckbox
         />
       )}
     </>

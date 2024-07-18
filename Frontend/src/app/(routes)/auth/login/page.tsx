@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
 import { requestStatusSelector } from '@/src/reduxjs/base/selectors';
 import { currentUserSelector } from '@/src/reduxjs/auth/selectors';
-import Auth from '@/src/pages/Auth';
+import Auth from '@/src/pages/AuthForm';
 import { AuthFormType } from '@/src/types/formTypes';
 
 const LoginPage = () => {
@@ -40,6 +40,7 @@ const LoginPage = () => {
       redirectTo="/auth/registration"
       redirectText="Don't have an account?"
       onFormSubmitClick={handleLoginClick}
+      withEmail
       withPassword
       withRestorePassword
     />

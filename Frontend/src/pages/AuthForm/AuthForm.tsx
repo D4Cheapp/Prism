@@ -2,7 +2,7 @@
 import { Form, Formik } from 'formik';
 import cn from 'classnames';
 import Link from 'next/link';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
 import CustomInput from '@/src/ui/CustomInput';
@@ -10,39 +10,76 @@ import CustomInputButton from '@/src/ui/CustomInputButton';
 import { HideButton } from '@/src/ui/HideButton';
 import CustomButton from '@/src/ui/CustomButton';
 import { AuthFormType } from '@/src/types/formTypes';
-import s from './Auth.module.scss';
+import s from './AuthForm.module.scss';
 
 interface Props {
   title: string;
   onFormSubmitClick: (values: AuthFormType) => Promise<void>;
-  withPassword?: boolean;
+  onResendButtonClick?: () => void;
+  onGoBackClick?: () => void;
   redirectTo?: string;
   redirectText?: string;
+  withEmail?: boolean;
+  withPassword?: boolean;
   withConfirmPassword?: boolean;
   withRestorePassword?: boolean;
   withGoBackButton?: boolean;
+  withConfirmCode?: boolean;
+  withDeveloperCheckbox?: boolean;
 }
 
-const Auth = ({
+const AuthForm = ({
   redirectTo,
   redirectText,
   title,
   onFormSubmitClick,
+  onResendButtonClick,
+  onGoBackClick,
+  withEmail,
   withPassword,
   withConfirmPassword,
   withRestorePassword,
   withGoBackButton,
+  withConfirmCode,
+  withDeveloperCheckbox,
 }: Props): React.ReactNode => {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [isConfirmPasswordHidden, setIsConfirmPasswordHidden] = useState(true);
+  const [sendAgainBlockTimer, setSendAgainBlockTimer] = useState<number>(60);
   const router = useRouter();
+  const timerSeconds = sendAgainBlockTimer % 60;
+  const timerMinutes = Math.floor(sendAgainBlockTimer / 60);
+
+  const handleSendEmailAgainClick = () => {
+    if (withConfirmCode && onResendButtonClick) {
+      setSendAgainBlockTimer(60);
+      onResendButtonClick();
+    }
+  };
+
+  useEffect(() => {
+    if (withConfirmCode) {
+      const timer = setInterval(() => {
+        if (sendAgainBlockTimer > 0) {
+          setSendAgainBlockTimer((time) => time - 1);
+        } else {
+          () => clearInterval(timer);
+        }
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [sendAgainBlockTimer, withConfirmCode]);
 
   const handleForgotPasswordClick = () => {
     router.push('/auth/restore-password');
   };
 
   const handleGoBackClick = () => {
-    router.back();
+    if (onGoBackClick) {
+      onGoBackClick();
+    } else {
+      router.back();
+    }
   };
 
   return (
@@ -63,7 +100,30 @@ const Auth = ({
       >
         <Form className={s.form}>
           <h1 className={s.formTitle}>{title}</h1>
-          <CustomInput name="email" isFormInput label="Email" placeholder="Enter your email" />
+          {withConfirmCode && (
+            <div className={s.inputContainer}>
+              <CustomInput name="code" isFormInput placeholder="Enter code" label="Confirm code" />
+              <>
+                {sendAgainBlockTimer > 0 ? (
+                  <p className={s.resendText}>
+                    Please, wait {timerMinutes}:
+                    {timerSeconds < 10 ? `0${timerSeconds}` : timerSeconds} to resend confirm code
+                  </p>
+                ) : (
+                  <button
+                    className={s.resendButton}
+                    type="button"
+                    onClick={handleSendEmailAgainClick}
+                  >
+                    <p className={s.resendButtonText}>Send confirm code again</p>
+                  </button>
+                )}
+              </>
+            </div>
+          )}
+          {withEmail && (
+            <CustomInput name="email" isFormInput label="Email" placeholder="Enter your email" />
+          )}
           {withPassword && (
             <div className={s.inputContainer}>
               <CustomInput
@@ -107,15 +167,17 @@ const Auth = ({
                   toggleHide={setIsConfirmPasswordHidden}
                 />
               </div>
-              <label className={s.checkboxContainer}>
-                <p className={s.checkboxLabel}>Is developer</p>
-                <CustomInputButton
-                  name="isDeveloper"
-                  type="checkbox"
-                  isFormInput
-                  className={s.customCheckbox}
-                />
-              </label>
+              {withDeveloperCheckbox && (
+                <label className={s.checkboxContainer}>
+                  <p className={s.checkboxLabel}>Is developer</p>
+                  <CustomInputButton
+                    name="isDeveloper"
+                    type="checkbox"
+                    isFormInput
+                    className={s.customCheckbox}
+                  />
+                </label>
+              )}
             </div>
           )}
           <div className={cn(s.buttonsContainer, { [s.multiButtonsContainer]: withGoBackButton })}>
@@ -144,4 +206,4 @@ const Auth = ({
   );
 };
 
-export default Auth;
+export default AuthForm;

@@ -8,10 +8,9 @@ import {
   passwordValidationSchema,
 } from '@/src/utils/formValidationSchemas';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
-import ConfirmCodeForm from '@/src/components/ConfirmCodeForm';
-import Auth from '@/src/pages/Auth';
+import AuthForm from '@/src/pages/AuthForm';
 import { requestStatusSelector } from '@/src/reduxjs/base/selectors';
-import { AuthFormType, ConfirmCodeFormType } from '@/src/types/formTypes';
+import { AuthFormType } from '@/src/types/formTypes';
 
 const RestorePassword = () => {
   const [isEmailSent, setIsEmailSent] = useState<boolean>(false);
@@ -24,7 +23,7 @@ const RestorePassword = () => {
     router.push('/auth/login');
   };
 
-  const handleConfirmRestorePasswordClick = async (values: ConfirmCodeFormType) => {
+  const handleConfirmRestorePasswordClick = async (values: AuthFormType) => {
     let isError = false;
     await Yup.object({
       code: confirmCodeValidation,
@@ -76,17 +75,21 @@ const RestorePassword = () => {
   return (
     <>
       {isEmailSent ? (
-        <ConfirmCodeForm
-          onBackClick={handleGoBackClick}
-          onFormSubmit={handleConfirmRestorePasswordClick}
+        <AuthForm
+          onGoBackClick={handleGoBackClick}
+          onFormSubmitClick={handleConfirmRestorePasswordClick}
           onResendButtonClick={handleResendCodeClick}
           title="Enter your new password"
-          isConfirmPassword
+          withConfirmCode
+          withPassword
+          withConfirmPassword
+          withGoBackButton
         />
       ) : (
-        <Auth
+        <AuthForm
           onFormSubmitClick={handleSendRestorePasswordClick}
           title="Enter your email"
+          withEmail
           withGoBackButton
         />
       )}

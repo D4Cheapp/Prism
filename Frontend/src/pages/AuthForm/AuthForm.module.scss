@@ -6,7 +6,7 @@
 
 .form {
   display: flex;
-  width: 25%;
+  min-width: 25%;
   box-sizing: border-box;
   flex-direction: column;
   align-items: center;
@@ -19,6 +19,19 @@
 
   .formTitle {
     @include fontType(1.8rem, var(--text));
+  }
+
+  @include bigDesktop {
+    min-width: 40%;
+  }
+
+  @include desktop {
+    min-width: 70%;
+  }
+
+  @include tablet {
+    min-width: 90%;
+    padding-inline: 5vw;
   }
 }
 
@@ -44,6 +57,7 @@
     border: none;
     border-bottom: 1px transparent solid;
     margin-top: 0.5em;
+    margin-left: 0.5em;
     background: none;
     cursor: pointer;
     padding-inline: 0;
@@ -55,13 +69,33 @@
       color: var(--primary);
     }
   }
+
+  .resendText {
+    margin-bottom: 0;
+    text-align: center;
+    @include fontType(1.1rem, var(--text));
+  }
+
+  .resendButton {
+    width: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    @include fontType(1.1rem, var(--text));
+  }
+
+  .resendButtonText {
+    margin-bottom: 0;
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
 
 .checkboxContainer {
   display: flex;
   width: 100%;
   align-items: center;
-  justify-content: space-around;
+  padding-left: 0.5em;
   margin-top: 1em;
   cursor: pointer;
   gap: 1em;

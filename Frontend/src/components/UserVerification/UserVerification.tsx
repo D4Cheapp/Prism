@@ -38,7 +38,7 @@ const UserVerification = ({ children, permission = 'user' }: Props) => {
       setIsVerified(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser]);
+  }, [currentUser, requestStatus]);
 
   return <>{isVerified ? children : <LoadingScreen />}</>;
 };

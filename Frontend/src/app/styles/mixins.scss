@@ -84,25 +84,25 @@
 }
 
 @mixin mediumDesktop() {
-  @media only screen and (width <= 1256px) {
+  @media only screen and (width <= 1280px) {
     @content;
   }
 }
 
 @mixin desktop() {
-  @media only screen and (width <= 1080px) {
+  @media only screen and (width <= 1024px) {
     @content;
   }
 }
 
 @mixin bigTablet() {
-  @media only screen and (width <= 834px) {
+  @media only screen and (width <= 854px) {
     @content;
   }
 }
 
 @mixin tablet() {
-  @media only screen and (width <= 600px) {
+  @media only screen and (width <= 640px) {
     @content;
   }
 }
