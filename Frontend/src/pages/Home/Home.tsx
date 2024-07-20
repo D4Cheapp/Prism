@@ -1,22 +1,23 @@
 'use client';
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { useActions } from '@/src/hooks/reduxHooks';
-import styles from './Home.module.scss';
+import React, { useEffect, useState } from 'react';
+import Menu from './components/Menu';
+import MessengerLists from './components/MessengerLists';
+import Dialog from './components/Dialog';
+import s from './Home.module.scss';
 
 const Home = (): React.ReactNode => {
-  const { logout } = useActions();
-  const router = useRouter();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleLogoutClick = () => {
-    logout();
-    router.push('/auth/login');
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => setIsDialogOpen(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <div className={styles.root}>
-      Home
-      <button onClick={handleLogoutClick}>Logout</button>
+    <div className={s.root}>
+      <Menu />
+      {isDialogOpen && <Dialog />}
+      <MessengerLists isDialogOpen={isDialogOpen} />
     </div>
   );
 };

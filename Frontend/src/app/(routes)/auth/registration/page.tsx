@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import {
@@ -20,40 +20,46 @@ const RegistrationPage = (): React.ReactNode => {
   const requestStatus = useAppSelector(requestStatusSelector);
   const router = useRouter();
 
-  const handleRegistrationClick = async (values: AuthFormType) => {
-    let isError = false;
-    await handleRegistrationValidate.validate(values).catch((error: Yup.ValidationError) => {
-      isError = true;
-      setMessagesState({ error: error.errors[0] });
-    });
-    if (!isError) {
-      registration(values);
-      setRegistrationData(values);
-    }
-  };
-
-  const handleConfirmCodeClick = async (values: AuthFormType) => {
-    let isError = false;
-    await Yup.object({ code: confirmCodeValidation })
-      .validate(values)
-      .catch((error: Yup.ValidationError) => {
+  const handleRegistrationClick = useCallback(
+    async (values: AuthFormType) => {
+      let isError = false;
+      await handleRegistrationValidate.validate(values).catch((error: Yup.ValidationError) => {
         isError = true;
         setMessagesState({ error: error.errors[0] });
       });
-    if (!isError) {
-      confirmRegistration(values);
-    }
-  };
+      if (!isError) {
+        registration(values);
+        setRegistrationData(values);
+      }
+    },
+    [registration, setMessagesState],
+  );
 
-  const handleBackToRegistrationClick = () => {
+  const handleConfirmCodeClick = useCallback(
+    async (values: AuthFormType) => {
+      let isError = false;
+      await Yup.object({ code: confirmCodeValidation })
+        .validate(values)
+        .catch((error: Yup.ValidationError) => {
+          isError = true;
+          setMessagesState({ error: error.errors[0] });
+        });
+      if (!isError) {
+        confirmRegistration(values);
+      }
+    },
+    [confirmRegistration, setMessagesState],
+  );
+
+  const handleBackToRegistrationClick = useCallback(() => {
     setIsConfirmCodeSent(false);
-  };
+  }, []);
 
-  const handleResendCodeClick = () => {
+  const handleResendCodeClick = useCallback(() => {
     if (registrationData) {
       registration(registrationData);
     }
-  };
+  }, [registration, registrationData]);
 
   useEffect(() => {
     const { method, request, isOk } = requestStatus;

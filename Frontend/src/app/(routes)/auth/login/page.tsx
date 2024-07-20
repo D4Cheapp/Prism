@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
@@ -14,16 +14,19 @@ const LoginPage = () => {
   const currentUser = useAppSelector(currentUserSelector);
   const router = useRouter();
 
-  const handleLoginClick = async (values: AuthFormType) => {
-    let isError = false;
-    await handleLoginValidate.validate(values).catch((error: Yup.ValidationError) => {
-      isError = true;
-      setMessagesState({ error: error.errors[0] });
-    });
-    if (!isError) {
-      login(values);
-    }
-  };
+  const handleLoginClick = useCallback(
+    async (values: AuthFormType) => {
+      let isError = false;
+      await handleLoginValidate.validate(values).catch((error: Yup.ValidationError) => {
+        isError = true;
+        setMessagesState({ error: error.errors[0] });
+      });
+      if (!isError) {
+        login(values);
+      }
+    },
+    [login, setMessagesState],
+  );
 
   useEffect(() => {
     const { method, request, isOk } = requestStatus;

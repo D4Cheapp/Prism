@@ -7,7 +7,7 @@
   position: absolute;
   top: -0.5em;
   left: 1em;
-  background-color: var(--secondBackground);
+  background-color: var(--background);
   opacity: 0;
   padding-inline: 0.5em;
   transition: 0.2s;
@@ -21,7 +21,7 @@
   padding-bottom: 0.8em;
   border: 2px var(--text) solid;
   border-radius: 5px;
-  background: var(--secondBackground);
+  background: var(--background);
   outline: none;
   padding-inline: 1em;
   transition: border 0.1s;

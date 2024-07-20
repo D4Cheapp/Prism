@@ -1,0 +1,22 @@
+.menu {
+  display: flex;
+  width: 6%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 20px 5px 5px 20px;
+  background-color: var(--background);
+  padding-block: 25px;
+
+  .mainButtons {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+  }
+
+  .imageButton {
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+}

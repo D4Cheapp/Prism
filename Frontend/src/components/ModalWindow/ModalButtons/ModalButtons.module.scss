@@ -2,6 +2,8 @@
   display: inline-flex;
   width: 100%;
   justify-content: space-around;
+  background-color: var(--background);
+  padding-block: 1em;
 
   @include tablet {
     flex-direction: column;
@@ -10,7 +12,10 @@
   }
 
   .formButton {
+    display: flex;
     width: 40%;
+    align-items: center;
+    justify-content: center;
     border: 2px var(--text) solid;
     border-radius: 5px;
     background: transparent;
@@ -20,6 +25,10 @@
 
     @include tablet {
       width: 100%;
+    }
+
+    .loader {
+      @include loadingCircle(1.4em, 3px);
     }
   }
 

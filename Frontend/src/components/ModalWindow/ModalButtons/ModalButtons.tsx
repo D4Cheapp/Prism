@@ -1,5 +1,7 @@
 import React from 'react';
 import cn from 'classnames';
+import { useAppSelector } from '@/src/hooks/reduxHooks';
+import { loadingSelector } from '@/src/reduxjs/base/selectors';
 import s from './ModalButtons.module.scss';
 
 interface Props {
@@ -17,6 +19,8 @@ const ModalButtons = ({
   onCloseWindowClick,
   buttonInfo,
 }: Props): React.ReactNode => {
+  const isLoading = useAppSelector(loadingSelector);
+
   return (
     <div className={s.formButtons}>
       {buttonInfo.withConfirmButton && (
@@ -24,8 +28,9 @@ const ModalButtons = ({
           type="button"
           className={cn(s.formButton, s.confirmButton)}
           onClick={onConfirmClick}
+          disabled={isLoading}
         >
-          {buttonInfo?.confirmTitle ?? 'Confirm'}
+          {isLoading ? <div className={s.loader} /> : (buttonInfo?.confirmTitle ?? 'Confirm')}
         </button>
       )}
       <button
@@ -33,7 +38,7 @@ const ModalButtons = ({
         className={cn(s.formButton, s.cancelButton)}
         onClick={onCloseWindowClick}
       >
-        Отмена
+        Cancel
       </button>
     </div>
   );

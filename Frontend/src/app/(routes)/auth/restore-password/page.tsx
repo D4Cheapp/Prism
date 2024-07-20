@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,45 +19,51 @@ const RestorePassword = () => {
   const requestStatus = useAppSelector(requestStatusSelector);
   const router = useRouter();
 
-  const handleGoBackClick = () => {
+  const handleGoBackClick = useCallback(() => {
     router.push('/auth/login');
-  };
+  }, [router]);
 
-  const handleConfirmRestorePasswordClick = async (values: AuthFormType) => {
-    let isError = false;
-    await Yup.object({
-      code: confirmCodeValidation,
-      password: passwordValidationSchema.required('Password is required'),
-      confirmPassword: confirmPasswordValidationSchema,
-    })
-      .validate(values)
-      .catch((error: Yup.ValidationError) => {
-        isError = true;
-        setMessagesState({ error: error.errors[0] });
-      });
-    if (!isError) {
-      confirmRestorePassword(values);
-    }
-  };
+  const handleConfirmRestorePasswordClick = useCallback(
+    async (values: AuthFormType) => {
+      let isError = false;
+      await Yup.object({
+        code: confirmCodeValidation,
+        password: passwordValidationSchema.required('Password is required'),
+        confirmPassword: confirmPasswordValidationSchema,
+      })
+        .validate(values)
+        .catch((error: Yup.ValidationError) => {
+          isError = true;
+          setMessagesState({ error: error.errors[0] });
+        });
+      if (!isError) {
+        confirmRestorePassword(values);
+      }
+    },
+    [confirmRestorePassword, setMessagesState],
+  );
 
-  const handleResendCodeClick = () => {
+  const handleResendCodeClick = useCallback(() => {
     const isRestorePasswordExist = !!restoreEmail;
     if (isRestorePasswordExist) {
       restorePassword({ email: restoreEmail });
     }
-  };
+  }, [restoreEmail, restorePassword]);
 
-  const handleSendRestorePasswordClick = async (values: AuthFormType) => {
-    let isError = false;
-    await emailValidationSchema.validate(values).catch((error: Yup.ValidationError) => {
-      isError = true;
-      setMessagesState({ error: error.errors[0] });
-    });
-    if (!isError) {
-      restorePassword({ email: values.email });
-      setRestoreEmail(values.email);
-    }
-  };
+  const handleSendRestorePasswordClick = useCallback(
+    async (values: AuthFormType) => {
+      let isError = false;
+      await emailValidationSchema.validate(values).catch((error: Yup.ValidationError) => {
+        isError = true;
+        setMessagesState({ error: error.errors[0] });
+      });
+      if (!isError) {
+        restorePassword({ email: values.email });
+        setRestoreEmail(values.email);
+      }
+    },
+    [restorePassword, setMessagesState],
+  );
 
   useEffect(() => {
     const { method, request, isOk } = requestStatus;

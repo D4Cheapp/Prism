@@ -3,8 +3,11 @@ import { sagaHandling } from '@/src/utils/sagaHandling';
 import { UserReceiveType } from '@/src/types/authReceiveTypes';
 import { TextReceiveType } from '@/src/types/receiveTypes';
 import { authActions } from '.';
+import { baseActions } from '../base';
 import {
+  ChangePasswordActionType,
   ConfirmCodeActionType,
+  DeleteAccountActionType,
   LoginActionType,
   RegistrationActionType,
   RestorePasswordActionType,
@@ -76,6 +79,25 @@ function* confirmRestorePasswordSaga(action: ConfirmCodeActionType) {
   });
 }
 
+function* changePasswordSaga(action: ChangePasswordActionType) {
+  yield sagaHandling<UserReceiveType>({
+    method: 'PATCH',
+    href: '/password',
+    server: 'auth',
+    body: action.payload,
+    action: () => put(baseActions.setMessagesState({ info: 'Password changed' })),
+  });
+}
+
+function* deleteAccountSaga(action: DeleteAccountActionType) {
+  yield sagaHandling<TextReceiveType>({
+    method: 'DELETE',
+    href: '/user',
+    server: 'auth',
+    body: action.payload,
+  });
+}
+
 export default function* authSaga() {
   yield all([
     takeEvery(authActions.getCurrentUser, getCurrentUserSaga),
@@ -85,5 +107,7 @@ export default function* authSaga() {
     takeEvery(authActions.confirmRegistration, confirmRegistrationSaga),
     takeEvery(authActions.restorePassword, restorePasswordSaga),
     takeEvery(authActions.confirmRestorePassword, confirmRestorePasswordSaga),
+    takeEvery(authActions.changePassword, changePasswordSaga),
+    takeEvery(authActions.deleteAccount, deleteAccountSaga),
   ]);
 }

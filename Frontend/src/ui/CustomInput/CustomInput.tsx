@@ -5,6 +5,7 @@ import s from './CustomInput.module.scss';
 
 interface Props {
   name: string;
+  reference?: React.RefObject<HTMLInputElement>;
   placeholder?: string;
   isFormInput?: boolean;
   label?: string;
@@ -31,6 +32,7 @@ function CustomInput({
   type = 'text',
   onChange,
   onBlur,
+  reference,
   defaultValue,
   id,
   classNames,
@@ -50,7 +52,7 @@ function CustomInput({
       {isFormInput ? (
         <Field {...inputInfo} />
       ) : (
-        <input {...inputInfo} onChange={onChange} defaultValue={defaultValue} />
+        <input ref={reference} {...inputInfo} onChange={onChange} defaultValue={defaultValue} />
       )}
       {label && (
         <label className={cn(s.label, classNames ? classNames.title : '')} htmlFor={id ? id : name}>
