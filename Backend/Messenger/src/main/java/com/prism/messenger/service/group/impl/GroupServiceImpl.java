@@ -7,7 +7,7 @@ import com.prism.messenger.exception.group.DeleteLastAdminException;
 import com.prism.messenger.exception.group.EmptyGroupNameException;
 import com.prism.messenger.exception.group.GroupNotExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
-import com.prism.messenger.model.FileListModel;
+import com.prism.messenger.model.common.FileListModel;
 import com.prism.messenger.model.group.CreateGroupModel;
 import com.prism.messenger.model.group.GroupListReceiveModel;
 import com.prism.messenger.model.group.GroupModel;

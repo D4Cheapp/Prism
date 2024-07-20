@@ -31,7 +31,7 @@ public class Profile {
   @Property("profilePicturePath")
   private String profilePicturePath;
   @Relationship(type = "MEMBER")
-  private List<MemberRelation> chatList = new ArrayList<>();
+  private List<Chat> chatList = new ArrayList<>();
   @Relationship(type = "FRIEND")
   private List<Profile> friendList = new ArrayList<>();
   @Relationship(type = "BLOCK")

@@ -9,6 +9,7 @@ services:
     depends_on:
       - neo4j
       - minio
+      - mongodb
     networks:
       - prism-network
       - prism-messenger-network
@@ -32,6 +33,16 @@ services:
       - "7687:7687"
       - "7474:7474"
       - "7473:7473"
+    env_file:
+      - ../../backend.env
+  mongodb:
+    container_name: mongodb
+    image: mongo
+    restart: always
+    networks:
+      - prism-messenger-network
+    ports:
+      - "27017:27017"
     env_file:
       - ../../backend.env
   minio:

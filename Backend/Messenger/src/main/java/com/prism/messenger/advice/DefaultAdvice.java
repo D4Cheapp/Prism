@@ -2,7 +2,7 @@ package com.prism.messenger.advice;
 
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.rabbitMQ.IncorrectMessageActionException;
-import com.prism.messenger.model.TextResponseModel;
+import com.prism.messenger.model.common.TextResponseModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

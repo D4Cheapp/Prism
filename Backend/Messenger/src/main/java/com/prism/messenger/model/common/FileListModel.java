@@ -1,4 +1,4 @@
-package com.prism.messenger.model;
+package com.prism.messenger.model.common;
 
 import java.util.List;
 import lombok.AllArgsConstructor;

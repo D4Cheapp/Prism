@@ -163,7 +163,7 @@ public class AuthServiceImpl implements AuthService {
       String type) throws TooManyAttemptsException {
     RequestAttemptModel attemptModel = (RequestAttemptModel) storedAttempts;
     Date time = new Date();
-    int limitAttempts = type.equals("login") || type.equals("registration") ? 5 : 1;
+    int limitAttempts = type.equals("login") ? 5 : 1;
     boolean isLimitAttempt = attemptModel.getAttemptCount() >= limitAttempts;
     boolean isAttemptExpired = attemptModel.getLastAttemptTime() + 60000 < time.getTime();
     if (isAttemptExpired) {
@@ -171,7 +171,7 @@ public class AuthServiceImpl implements AuthService {
     }
     if (isLimitAttempt && !isAttemptExpired) {
       long remainingMillisecondsTime =
-          attemptModel.getLastAttemptTime() + 120000 - time.getTime();
+          attemptModel.getLastAttemptTime() + 60000 - time.getTime();
       long seconds = (remainingMillisecondsTime / 1000) % 60;
       long minutes = (remainingMillisecondsTime / 1000) / 60;
       String remainingStringTime = String.format("%02d:%02d", minutes, seconds);

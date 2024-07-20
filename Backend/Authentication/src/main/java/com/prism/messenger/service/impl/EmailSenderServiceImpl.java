@@ -13,7 +13,7 @@ import com.prism.messenger.exception.password.PasswordIsTooWeakException;
 import com.prism.messenger.exception.password.TooLongPasswordException;
 import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.model.ActivationCodeModel;
-import com.prism.messenger.model.EmailModel;
+import com.prism.messenger.model.ChangeEmailModel;
 import com.prism.messenger.model.UserRegistrationModel;
 import com.prism.messenger.repository.ActivationCodeRepo;
 import com.prism.messenger.repository.AuthRepo;
@@ -22,11 +22,14 @@ import com.prism.messenger.util.AuthUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 @Service
 public class EmailSenderServiceImpl implements EmailSenderService {
@@ -38,17 +41,25 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   @Autowired
   private JavaMailSender javaMailSender;
   @Autowired
+  private TemplateEngine templateEngine;
+  @Autowired
   private PasswordEncoder encoder;
   @Value("${spring.mail.username}")
   private String fromEmail;
 
-  public void saveActivationCode(Auth account, String message) {
+  public void saveActivationCode(Auth account, String title) {
     String code = String.valueOf((int) ((Math.random() * (9999 - 1000)) + 1000));
-    SimpleMailMessage mail = new SimpleMailMessage();
-    mail.setFrom(fromEmail);
-    mail.setTo(account.getEmail());
-    mail.setSubject("Prism activation code");
-    mail.setText(message + "\nCode: " + code);
+    MimeMessagePreparator mail = mimeMessage -> {
+      MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
+      message.setTo(account.getEmail());
+      message.setFrom(fromEmail);
+      message.setSubject("Prism confirm code");
+      Context context = new Context();
+      context.setVariable("code", code);
+      context.setVariable("title", title);
+      String html = templateEngine.process("confirmCodeEmail.html", context);
+      message.setText(html, true);
+    };
     activationCodeRepo.saveActivationCode(new ActivationCodeModel(account, code));
     javaMailSender.send(mail);
   }
@@ -61,7 +72,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
     activationCodeRepo.deleteActivationCode(email);
   }
 
-  public void sendEditUserEmailCode(EmailModel editData, Authentication authentication,
+  public void sendEditUserEmailCode(ChangeEmailModel editData, Authentication authentication,
       HttpServletRequest request)
       throws UserNotFoundException, PermissionsException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException {
     Auth storedUser = AuthUtils.getUser(editData.getId(), storeUserRepo);
