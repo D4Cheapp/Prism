@@ -4,7 +4,7 @@ import com.prism.messenger.entity.Auth;
 import com.prism.messenger.exception.UserAlreadyExistException;
 import com.prism.messenger.exception.UserNotFoundException;
 import com.prism.messenger.exception.password.IncorrectConfirmPasswordException;
-import com.prism.messenger.model.EmailModel;
+import com.prism.messenger.model.ChangeEmailModel;
 import com.prism.messenger.model.UserRegistrationModel;
 import com.prism.messenger.repository.AuthRepo;
 import com.prism.messenger.util.AuthUtils;
@@ -43,7 +43,7 @@ public class EmailSenderServiceImplTest {
   @Test
   void testSendEditUserEmailCode() throws UserNotFoundException {
     Auth storedUser = new Auth();
-    EmailModel currentUser = new EmailModel();
+    ChangeEmailModel currentUser = new ChangeEmailModel();
     currentUser.setId(1);
     currentUser.setEmail("test@gmail.com");
     Mockito.when(AuthUtils.getUser(ArgumentMatchers.anyInt(), ArgumentMatchers.any()))

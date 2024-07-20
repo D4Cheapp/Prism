@@ -1,4 +1,4 @@
-version: "3.7"
+version: '3.7'
 name: prism-core
 services:
   swagger:
@@ -8,7 +8,7 @@ services:
     networks:
       - prism-network
     ports:
-      - "2222:2222"
+      - '2222:2222'
     environment:
       PORT: 2222
       CONFIG_URL: /swagger-config.yaml
@@ -21,8 +21,8 @@ services:
     networks:
       - prism-network
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - '5672:5672'
+      - '15672:15672'
     restart: always
     env_file:
       - ../backend.env
@@ -33,7 +33,7 @@ services:
     networks:
       - prism-network
     ports:
-      - "3030:3000"
+      - '3030:3000'
     depends_on:
       - prometheus
     volumes:
@@ -43,12 +43,13 @@ services:
   prometheus:
     container_name: prometheus
     image: prom/prometheus
+    restart: always
     hostname: prometheus
     networks:
       - prism-network
     ports:
-      - "9090:9090"
-      - "9091:9091"
+      - '9090:9090'
+      - '9091:9091'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
 networks:

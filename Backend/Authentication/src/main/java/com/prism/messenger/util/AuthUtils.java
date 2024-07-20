@@ -58,7 +58,8 @@ public class AuthUtils {
     boolean isPasswordIncludesCapitalLetters = password.matches(".*[A-ZА-Я].*");
     boolean isPasswordIncludesLowerLetters = password.matches(".*[a-zа-я].*");
     boolean isPasswordIncludesNumbers = password.matches(".*[0-9].*");
-    boolean isPasswordIncludesSpecialCharacters = password.matches(".*[!@#$%^&*()].*");
+    boolean isPasswordIncludesSpecialCharacters = password.matches(
+        ".*[!\";#$%&'()*+,-./:<=>?@^_`{|}~].*");
     if (!isPasswordIncludesCapitalLetters) {
       throw new PasswordIsTooWeakException("capital letter");
     }

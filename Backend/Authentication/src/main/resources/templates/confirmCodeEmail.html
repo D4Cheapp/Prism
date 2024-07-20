@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title></title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+      rel="stylesheet">
+</head>
+<body>
+<header class="header">
+  <p class="headerTitle">Prism messenger</p>
+</header>
+<section class="root">
+  <div class="codeForm">
+    <p class="title" th:text="${title}"/>
+    <p class="code" th:text="${code}"/>
+  </div>
+</section>
+</body>
+<style>
+  .root {
+    margin: 0;
+    height: 70vh;
+    background: linear-gradient(90deg, #8172e6 0%, #2086d9 100%);
+    display: grid;
+    place-items: center;
+  }
+
+  .header {
+    display: flex;
+    justify-content: flex-start;
+    width: calc(100% - 2em);
+    background-color: #4a4d4f;
+    padding-inline: 1em;
+    padding-block: 1em;
+  }
+
+  .headerTitle {
+    color: #dbe3eb;
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 900;
+  }
+
+  .codeForm {
+    display: flex;
+    min-width: 25%;
+    max-width: 70%;
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 10px;
+    background-color: #4a4d4f;
+    box-shadow: -1px 10px 200px -50px #383d3e;
+    margin-block: 10vh;
+    padding-block: 2em;
+    padding-inline: 1em;
+  }
+
+  .title {
+    color: #dbe3eb;
+    font-size: 2.5rem;
+    font-weight: 900;
+    text-align: center;
+    padding-inline: 1em;
+    word-break: keep-all;
+  }
+
+  .code {
+    color: #dbe3eb;
+    margin-top: 0.8em;
+    font-size: 2.5rem;
+    padding-left: 0.25em;
+    letter-spacing: 0.5em;
+    font-weight: 900;
+  }
+
+  @media screen and (max-width: 600px) {
+    .codeForm {
+      max-width: calc(90% - 2em);
+    }
+
+    .headerTitle {
+      font-size: 1.5rem;
+    }
+
+    .code {
+      font-size: 1.5rem;
+    }
+
+    .title {
+      font-size: 1.5rem;
+    }
+  }
+</style>
+</html>

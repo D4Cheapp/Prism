@@ -13,7 +13,7 @@ import com.prism.messenger.exception.password.PasswordIsTooWeakException;
 import com.prism.messenger.exception.password.TooLongPasswordException;
 import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.model.ActivationCodeModel;
-import com.prism.messenger.model.EmailModel;
+import com.prism.messenger.model.ChangeEmailModel;
 import com.prism.messenger.model.UserRegistrationModel;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -28,7 +28,7 @@ public interface EmailSenderService {
       throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException;
 
 
-  void sendEditUserEmailCode(EmailModel email, Authentication authentication,
+  void sendEditUserEmailCode(ChangeEmailModel email, Authentication authentication,
       HttpServletRequest request)
       throws UserNotFoundException, PermissionsException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException;
 

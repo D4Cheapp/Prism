@@ -1,6 +1,6 @@
 package com.prism.messenger.service.minio;
 
-import com.prism.messenger.model.FileListModel;
+import com.prism.messenger.model.common.FileListModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;

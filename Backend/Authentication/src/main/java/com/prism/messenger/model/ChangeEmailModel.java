@@ -3,7 +3,8 @@ package com.prism.messenger.model;
 import lombok.Data;
 
 @Data
-public class EmailModel {
+public class ChangeEmailModel {
 
+  private Integer id;
   private String email;
 }

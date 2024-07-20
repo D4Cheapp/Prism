@@ -18,10 +18,13 @@ import com.prism.messenger.exception.password.PasswordIsTooWeakException;
 import com.prism.messenger.exception.password.TooLongPasswordException;
 import com.prism.messenger.exception.password.TooShortPasswordException;
 import com.prism.messenger.model.ActivationCodeModel;
+import com.prism.messenger.model.ChangeEmailModel;
+import com.prism.messenger.model.ConfirmCodeModel;
 import com.prism.messenger.model.EditPasswordModel;
 import com.prism.messenger.model.EmailModel;
 import com.prism.messenger.model.RestorePasswordModel;
 import com.prism.messenger.model.TextResponseModel;
+import com.prism.messenger.model.UserIdModel;
 import com.prism.messenger.model.UserLoginModel;
 import com.prism.messenger.model.UserModel;
 import com.prism.messenger.model.UserRegistrationModel;
@@ -41,7 +44,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Authentication")
@@ -66,13 +68,13 @@ public class AuthController {
 
   @Operation(summary = "Delete user")
   @DeleteMapping("/user")
-  public ResponseEntity<TextResponseModel> deleteUser(@RequestParam("userId") int userId,
+  public ResponseEntity<TextResponseModel> deleteUser(@RequestBody UserIdModel userIdModel,
       Authentication authentication, HttpServletRequest request)
       throws UserNotFoundException, PermissionsException {
-    authService.deleteUser(request, authentication, userId);
+    authService.deleteUser(request, authentication, userIdModel.getUserId());
     rabbitMQService.deleteUserProfile(authentication.getName());
     return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Successful deletion", true), OK);
+        TextResponseModel.toTextResponseModel("User was deleted successfully", true), OK);
   }
 
   @Operation(summary = "Login")
@@ -101,46 +103,52 @@ public class AuthController {
   @Transactional
   @Operation(summary = "Confirm registration")
   @PatchMapping("/registration")
-  public ResponseEntity<UserModel> confirmRegistration(
-      @RequestParam("code") String code, HttpServletRequest request)
+  public ResponseEntity<TextResponseModel> confirmRegistration(
+      @RequestBody ConfirmCodeModel codeModel, HttpServletRequest request)
       throws ActivationCodeExpireException, IncorrectConfirmCodeException {
     String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
     ActivationCodeModel activationCodeModel = emailSenderService.getUserByEmail(confirmEmail);
-    UserModel returnedUser = authService.saveUserAfterConfirm(activationCodeModel,
-        code);
+    authService.saveUserAfterConfirm(activationCodeModel,
+        codeModel.getCode());
     rabbitMQService.createUserProfile(confirmEmail);
     emailSenderService.deleteActivationCode(confirmEmail);
     request.getSession().removeAttribute("confirmEmail");
-    return new ResponseEntity<>(returnedUser, CREATED);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("You have successfully "
+        + "registered", true), CREATED);
   }
 
   @Operation(summary = "Send restore password email")
   @PostMapping("/restore-password")
-  public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(@RequestBody EmailModel email,
+  public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(
+      @RequestBody EmailModel email,
       HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
     authService.checkThrottleRequest(request, "restore-password");
     emailSenderService.sendRestorePasswordCode(email.getEmail(), request);
     return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Restore password email was successfully sent", true),
+        TextResponseModel.toTextResponseModel(
+            "Restore password email was sent to: " + email.getEmail(),
+            true),
         OK);
   }
 
   @Operation(summary = "Confirm password restore")
   @PatchMapping("/restore-password")
-  public ResponseEntity<UserModel> confirmPasswordRestore(
+  public ResponseEntity<TextResponseModel> confirmPasswordRestore(
       @RequestBody RestorePasswordModel passwordModel, HttpServletRequest request)
       throws ActivationCodeExpireException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, TooLongPasswordException, TooShortPasswordException, IncorrectConfirmCodeException {
     String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
-    UserModel returnedUser = authService.restoreUserPassword(confirmEmail, passwordModel);
+    authService.restoreUserPassword(confirmEmail, passwordModel);
     emailSenderService.deleteActivationCode(passwordModel.getCode());
     request.getSession().removeAttribute("confirmEmail");
-    return new ResponseEntity<>(returnedUser, OK);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Your password was changed "
+        + "successfully", true), OK);
   }
 
   @Operation(summary = "Send edit user email confirmation")
   @PostMapping("/email")
   public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmation(
-      @RequestBody EmailModel email, HttpServletRequest request, Authentication authentication)
+      @RequestBody ChangeEmailModel email, HttpServletRequest request,
+      Authentication authentication)
       throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, PermissionsException {
     authService.checkThrottleRequest(request, "edit-email");
     emailSenderService.sendEditUserEmailCode(email, authentication, request);
@@ -150,18 +158,18 @@ public class AuthController {
 
   @Operation(summary = "Confirm edit user email")
   @PatchMapping("/email")
-  public ResponseEntity<TextResponseModel> confirmEmail(@RequestParam("code") String code,
+  public ResponseEntity<TextResponseModel> confirmEmail(@RequestBody ConfirmCodeModel codeModel,
       HttpServletRequest request)
       throws ActivationCodeExpireException, IncorrectConfirmCodeException {
     String confirmEmail = (String) request.getSession().getAttribute("confirmEmail");
     ActivationCodeModel activationCodeModel = emailSenderService.getUserByEmail(confirmEmail);
-    authService.saveUserAfterConfirm(activationCodeModel, code);
+    authService.saveUserAfterConfirm(activationCodeModel, codeModel.getCode());
     emailSenderService.deleteActivationCode(confirmEmail);
     rabbitMQService.changeProfileEmail(activationCodeModel.getEmail(), confirmEmail);
     request.getSession().removeAttribute("confirmEmail");
     authService.deactivateSession(request);
     return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Email was changed successfully", true),
+        TextResponseModel.toTextResponseModel("Email was changed to: " + confirmEmail, true),
         OK);
   }
 

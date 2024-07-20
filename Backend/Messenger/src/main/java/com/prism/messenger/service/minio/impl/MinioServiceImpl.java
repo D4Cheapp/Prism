@@ -1,7 +1,7 @@
 package com.prism.messenger.service.minio.impl;
 
 import com.google.common.collect.Iterables;
-import com.prism.messenger.model.FileListModel;
+import com.prism.messenger.model.common.FileListModel;
 import com.prism.messenger.service.minio.MinioService;
 import io.minio.GetObjectArgs;
 import io.minio.ListObjectsArgs;

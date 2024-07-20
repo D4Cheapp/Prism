@@ -3,7 +3,7 @@ package com.prism.messenger.model;
 import lombok.Data;
 
 @Data
-public class DialogIdModel {
+public class ConfirmCodeModel {
 
-  private String dialogId;
+  private String code;
 }

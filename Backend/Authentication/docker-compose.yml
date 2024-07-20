@@ -1,15 +1,16 @@
-version: "3.7"
+version: '3.7'
 name: prism-authentication
 services:
   app:
     container_name: prism-authentication
     image: d4c/prism-authentication:latest
     build: ./
+    restart: always
     networks:
       - prism-network
       - prism-auth-network
     ports:
-      - "8090:8090"
+      - '8090:8090'
     depends_on:
       - redis
       - postgres
@@ -26,7 +27,7 @@ services:
     networks:
       - prism-network
     ports:
-      - "6379:6379"
+      - '6379:6379'
     restart: always
     env_file:
       - ../../backend.env
@@ -35,7 +36,7 @@ services:
     image: postgres
     restart: always
     ports:
-      - "5432:5432"
+      - '5432:5432'
     networks:
       - prism-auth-network
     env_file:
