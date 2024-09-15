@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { passwordValidationSchema } from '@/src/utils/formValidationSchemas';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
 import ModalWindow from '@/src/components/ModalWindow';
+import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
 import { currentUserSelector } from '@/src/reduxjs/auth/selectors';
 import { requestStatusSelector } from '@/src/reduxjs/base/selectors';
 import ChangePasswordMenu from './ChangePasswordMenu';
@@ -12,10 +13,9 @@ import s from './MenuSettings.module.scss';
 
 interface Props {
   setIsSettingsOpen: Dispatch<SetStateAction<boolean>>;
-  setTheme: () => void;
 }
 
-const MenuSettings = ({ setIsSettingsOpen, setTheme }: Props): React.ReactElement => {
+const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isDeleteAccountConfirmOpen, setIsDeleteAccountConfirmOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -57,9 +57,7 @@ const MenuSettings = ({ setIsSettingsOpen, setTheme }: Props): React.ReactElemen
     }
   }, [changePassword, currentUser?.id, setMessagesState]);
 
-  const handleThemeChangeClick = () => {
-    setTheme();
-  };
+  const handleThemeChangeClick = () => {};
 
   const handleDeleteAccount = () => {
     setIsDeleteAccountConfirmOpen(true);
@@ -110,6 +108,7 @@ const MenuSettings = ({ setIsSettingsOpen, setTheme }: Props): React.ReactElemen
           )}
           <button className={s.settingsButton} onClick={handleThemeChangeClick}>
             Change Theme
+            <ChangeThemeIcon />
           </button>
         </div>
         <div className={s.settingsSection}>

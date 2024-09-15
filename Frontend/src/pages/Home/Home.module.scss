@@ -4,7 +4,10 @@
   height: 100vh;
   box-sizing: border-box;
   justify-content: space-between;
+  padding: 0;
   gap: 1%;
-  padding-block: 30px;
-  padding-inline: 40px;
+
+  @include bigTablet {
+    flex-direction: column-reverse;
+  }
 }

@@ -3,22 +3,21 @@
   cursor: pointer;
 
   .eye {
+    fill: var(--text);
     transition: 0.2s;
   }
 
-  .eyeLine {
-    position: absolute;
-    top: -0;
-    right: 1em;
-    width: 0.16em;
-    height: 2em;
-    background-color: var(--text);
+  .isHide {
+    animation: fade 0.2s;
+  }
+}
+
+@keyframes fade {
+  0% {
     opacity: 0;
-    rotate: -50deg;
-    transition: opacity 0.2s;
   }
 
-  .isHide {
+  100% {
     opacity: 1;
   }
 }

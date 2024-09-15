@@ -1,7 +1,7 @@
-import React from 'react';
-import Image from 'next/image';
+import React, { useState } from 'react';
 import cn from 'classnames';
-import { useTheme } from '@/src/hooks/useTheme';
+import Eye from 'public/icons/menu/eye.svg';
+import HideEye from 'public/icons/menu/hideEye.svg';
 import s from './HideButton.module.scss';
 
 interface Props {
@@ -11,22 +11,20 @@ interface Props {
 }
 
 const HideButton = ({ isHide, styles, toggleHide }: Props): React.ReactElement => {
-  const theme = useTheme();
+  const [isHidePressed, setIsHidePressed] = useState(false);
 
   const handleClick = () => {
-    toggleHide(!isHide);
+    setIsHidePressed(true);
+    setTimeout(() => toggleHide(!isHide), 200);
   };
 
   return (
     <div onClick={handleClick} className={cn(s.root, styles)}>
-      <Image
-        className={s.eye}
-        src={`/icons/menu/${theme[0]}/eye.svg`}
-        alt="Hide button"
-        width={35}
-        height={35}
-      />
-      <div className={cn(s.eyeLine, { [s.isHide]: isHide })} />
+      {isHide ? (
+        <HideEye className={cn(s.eye, { [s.isHide]: isHidePressed })} width={35} height={35} />
+      ) : (
+        <Eye className={cn(s.eye, { [s.isHide]: isHidePressed })} width={35} height={35} />
+      )}
     </div>
   );
 };

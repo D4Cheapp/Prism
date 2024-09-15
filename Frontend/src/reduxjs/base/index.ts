@@ -40,7 +40,7 @@ const baseSlice = createSlice({
       const isPayloadExist =
         messages.payload !== undefined && (!!messages.payload?.error || !!messages.payload?.info);
       if (isPayloadExist) {
-        const error = !!messages.payload?.error ? 'Error: ' + messages.payload.error : undefined;
+        const error = !!messages.payload?.error ? messages.payload.error : undefined;
         const info = messages.payload?.info ?? undefined;
         state.messages = [
           ...state.messages,

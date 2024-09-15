@@ -1,9 +1,8 @@
 .dialog {
-  width: 62%;
+  width: 74%;
   height: 100%;
-  border-radius: 5px;
   animation: appearing 0.5s;
-  background-color: var(--background);
+  background-color: var(--secondBackground);
 }
 
 @keyframes appearing {
@@ -13,7 +12,7 @@
   }
 
   100% {
-    width: 62%;
+    width: 74%;
     opacity: 1;
   }
 }

@@ -1,23 +1,19 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import Menu from './components/Menu';
-import MessengerLists from './components/MessengerLists';
+import React, { useState } from 'react';
 import Dialog from './components/Dialog';
+import MessengerLists from './components/MessengerLists';
+import Menu from './components/Menu';
 import s from './Home.module.scss';
 
 const Home = (): React.ReactNode => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsDialogOpen(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const [isDialogOpen, setIsOpenDialog] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<'friends' | 'chats' | 'groups'>('chats');
 
   return (
     <div className={s.root}>
-      <Menu />
+      <Menu selectedCategory={selectedCategory} setSelectedCategory={setSelectedCategory} />
+      <MessengerLists setIsOpenDialog={setIsOpenDialog} isDialogOpen={isDialogOpen} />
       {isDialogOpen && <Dialog />}
-      <MessengerLists isDialogOpen={isDialogOpen} />
     </div>
   );
 };

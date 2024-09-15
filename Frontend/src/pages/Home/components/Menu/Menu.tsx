@@ -1,40 +1,71 @@
 'use client';
-import Image from 'next/image';
-import { useCallback, useState } from 'react';
-import { useTheme } from '@/src/hooks/useTheme';
+import cn from 'classnames';
+import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import Profile from 'public/icons/menu/profile.svg';
+import Friends from 'public/icons/menu/friends.svg';
+import Groups from 'public/icons/menu/groups.svg';
+import Chats from 'public/icons/menu/chats.svg';
+import Settings from 'public/icons/menu/settings.svg';
 import MenuSettings from './MenuSettings';
 import s from './Menu.module.scss';
 
-interface Props {}
+interface Props {
+  selectedCategory: 'friends' | 'chats' | 'groups';
+  setSelectedCategory: Dispatch<SetStateAction<'friends' | 'chats' | 'groups'>>;
+}
 
-const Menu = ({}: Props): React.ReactElement => {
+const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElement => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [theme, setTheme] = useTheme();
 
   const handleSettingsClick = useCallback(() => {
     setIsSettingsOpen(true);
   }, []);
 
+  const handleProfileClick = useCallback(() => {}, []);
+
+  const handleFriendsClick = useCallback(() => {
+    setSelectedCategory('friends');
+  }, [setSelectedCategory]);
+
+  const handleGroupsClick = useCallback(() => {
+    setSelectedCategory('groups');
+  }, [setSelectedCategory]);
+
+  const handleChatsClick = useCallback(() => {
+    setSelectedCategory('chats');
+  }, [setSelectedCategory]);
+
   return (
     <aside className={s.menu}>
-      <div className={s.mainButtons}>
-        <button className={s.imageButton}>
-          <Image src={`/icons/menu/${theme}/profile.svg`} alt="profile" width={50} height={50} />
+      <div className={s.buttonsContainer}>
+        <button className={s.imageButton} onClick={handleProfileClick}>
+          <Profile className={s.icon} width={25} height={25} />
         </button>
-        <button className={s.imageButton}>
-          <Image src={`/icons/menu/${theme}/friends.svg`} alt="friends" width={50} height={50} />
+        <button
+          className={cn(s.imageButton, { [s.active]: selectedCategory === 'friends' })}
+          onClick={handleFriendsClick}
+        >
+          <Friends className={s.icon} width={25} height={25} />
         </button>
-        <button className={s.imageButton}>
-          <Image src={`/icons/menu/${theme}/groups.svg`} alt="groups" width={50} height={50} />
+        <button
+          className={cn(s.imageButton, { [s.active]: selectedCategory === 'groups' })}
+          onClick={handleGroupsClick}
+        >
+          <Groups className={s.icon} width={25} height={25} />
         </button>
-        <button className={s.imageButton}>
-          <Image src={`/icons/menu/${theme}/chats.svg`} alt="chats" width={50} height={50} />
+        <button
+          className={cn(s.imageButton, { [s.active]: selectedCategory === 'chats' })}
+          onClick={handleChatsClick}
+        >
+          <Chats className={s.icon} width={25} height={25} />
         </button>
       </div>
-      <button className={s.imageButton} onClick={handleSettingsClick}>
-        <Image src={`/icons/menu/${theme}/gear.svg`} alt="gear" width={50} height={50} />
-      </button>
-      {isSettingsOpen && <MenuSettings setTheme={setTheme} setIsSettingsOpen={setIsSettingsOpen} />}
+      <div className={cn(s.buttonsContainer, s.settings)}>
+        <button className={cn(s.imageButton, s.settings)} onClick={handleSettingsClick}>
+          <Settings className={s.icon} width={35} height={35} />
+        </button>
+      </div>
+      {isSettingsOpen && <MenuSettings setIsSettingsOpen={setIsSettingsOpen} />}
     </aside>
   );
 };

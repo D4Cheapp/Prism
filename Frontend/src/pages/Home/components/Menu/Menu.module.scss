@@ -1,22 +1,60 @@
 .menu {
   display: flex;
-  width: 6%;
+  min-width: 4.5em;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  border-radius: 20px 5px 5px 20px;
   background-color: var(--background);
   padding-block: 25px;
+  transition: 0.2s background-color;
 
-  .mainButtons {
+  @include bigTablet {
+    flex-direction: row-reverse;
+    justify-content: center;
+    padding: 1em;
+  }
+
+  .icon {
+    width: 2.7em;
+    height: 2.7em;
+    fill: var(--text);
+    transition: fill 0.2s;
+  }
+
+  .active svg {
+    fill: var(--primary);
+  }
+
+  .buttonsContainer {
     display: flex;
     flex-direction: column;
     gap: 50px;
+
+    @include bigTablet {
+      width: 100%;
+      flex-direction: row-reverse;
+      gap: unset;
+    }
+  }
+
+  .settings {
+    @include bigTablet {
+      width: 20%;
+    }
   }
 
   .imageButton {
+    width: 100%;
     border: 0;
+    border-radius: 10px;
     background: none;
     cursor: pointer;
+    padding-block: 0.5em;
+    padding-inline: 0.5em;
+    transition: 0.13s;
+
+    @include hover {
+      background-color: var(--secondBackground);
+    }
   }
 }
