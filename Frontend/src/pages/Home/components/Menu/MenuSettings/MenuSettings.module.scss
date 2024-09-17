@@ -13,16 +13,36 @@
     flex-direction: column;
     align-items: flex-start;
     background-color: var(--background);
+    padding-block: 0.5em;
   }
 
   .settingsButton {
-    padding-left: 1em;
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: space-between;
     border: none;
     background: none;
     cursor: pointer;
+    outline: none;
     padding-block: 0.5em;
-    @include fontType(1.3rem, var(--text));
+    padding-inline: 1rem;
+    text-align: start;
+    transition: background-color 0.2s;
+    @include fontType(1.4rem, var(--text));
     @include colorButton(var(--primary));
+
+    @include hover {
+      background-color: rgb(from var(--secondBackground) r g b / 50%);
+
+      svg {
+        fill: var(--primary);
+      }
+    }
+
+    .email {
+      margin: 0;
+    }
   }
 
   .dangerButton {

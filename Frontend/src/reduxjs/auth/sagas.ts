@@ -5,6 +5,7 @@ import { TextReceiveType } from '@/src/types/receiveTypes';
 import { authActions } from '.';
 import { baseActions } from '../base';
 import {
+  ChangeEmailActionType,
   ChangePasswordActionType,
   ConfirmCodeActionType,
   DeleteAccountActionType,
@@ -89,6 +90,24 @@ function* changePasswordSaga(action: ChangePasswordActionType) {
   });
 }
 
+function* changeEmailSaga(action: ConfirmCodeActionType) {
+  yield sagaHandling<TextReceiveType>({
+    method: 'PATCH',
+    href: '/email',
+    server: 'auth',
+    body: action.payload,
+  });
+}
+
+function* sendConfirmToChangeEmailSaga(action: ChangeEmailActionType) {
+  yield sagaHandling<TextReceiveType>({
+    method: 'POST',
+    href: '/email',
+    server: 'auth',
+    body: action.payload,
+  });
+}
+
 function* deleteAccountSaga(action: DeleteAccountActionType) {
   yield sagaHandling<TextReceiveType>({
     method: 'DELETE',
@@ -108,6 +127,8 @@ export default function* authSaga() {
     takeEvery(authActions.restorePassword, restorePasswordSaga),
     takeEvery(authActions.confirmRestorePassword, confirmRestorePasswordSaga),
     takeEvery(authActions.changePassword, changePasswordSaga),
+    takeEvery(authActions.changeEmail, changeEmailSaga),
+    takeEvery(authActions.sendConfirmToChangeEmail, sendConfirmToChangeEmailSaga),
     takeEvery(authActions.deleteAccount, deleteAccountSaga),
   ]);
 }

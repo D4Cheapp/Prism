@@ -1,6 +1,7 @@
 import { PayloadAction } from '@reduxjs/toolkit';
 import { UserReceiveType } from '@/src/types/authReceiveTypes';
 import {
+  ChangeEmailType,
   ChangePasswordType,
   LoginRequestType,
   RegistrationRequestType,
@@ -15,3 +16,4 @@ export type RestorePasswordActionType = PayloadAction<{ email: string }>;
 export type ConfirmRestorePasswordActionType = PayloadAction<AuthFormType>;
 export type DeleteAccountActionType = PayloadAction<{ userId: number }>;
 export type ChangePasswordActionType = PayloadAction<ChangePasswordType>;
+export type ChangeEmailActionType = PayloadAction<ChangeEmailType>;

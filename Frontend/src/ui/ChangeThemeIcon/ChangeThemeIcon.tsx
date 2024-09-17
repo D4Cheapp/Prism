@@ -1,7 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
+import { useState } from 'react';
 import cn from 'classnames';
+import Moon from 'public/icons/themeSwitch/moon.svg';
+import Sun from 'public/icons/themeSwitch/sun.svg';
 import { useTheme } from '../../hooks/useTheme';
 import s from './ChangeThemeIcon.module.scss';
 
@@ -10,34 +11,35 @@ interface Props {
 }
 
 const ChangeThemeIcon = ({ size }: Props) => {
-  const [theme, setTheme] = useTheme();
+  const [theme, toggleTheme] = useTheme();
   const [isFade, setIsFade] = useState(false);
-  const checkImageSource =
-    theme === 'light' ? '/icons/themeSwitch/moon.svg' : '/icons/themeSwitch/sun.svg';
-  const [imageSource, setImageSource] = useState(checkImageSource);
 
-  useEffect(() => {
+  const handleThemeToggle = () => {
     setIsFade(true);
-    setImageSource(checkImageSource);
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       setIsFade(false);
-    }, 200);
-    return () => clearTimeout(timer);
-  }, [checkImageSource, theme]);
+      toggleTheme();
+    }, 100);
+  };
 
   return (
-    <Image
-      className={cn(s.icon, {
-        [s.rightFade]: isFade && theme === 'dark',
-        [s.leftFade]: isFade && theme === 'light',
-      })}
-      onClick={setTheme}
-      priority={false}
-      src={imageSource}
-      alt="Theme switch"
-      width={size ?? 40}
-      height={size ?? 40}
-    />
+    <>
+      {theme === 'light' ? (
+        <Moon
+          className={cn(s.icon, { [s.rightFade]: isFade })}
+          onClick={handleThemeToggle}
+          width={size ?? 24}
+          height={size ?? 24}
+        />
+      ) : (
+        <Sun
+          className={cn(s.icon, { [s.leftFade]: isFade })}
+          onClick={handleThemeToggle}
+          width={size ?? 24}
+          height={size ?? 24}
+        />
+      )}
+    </>
   );
 };
 

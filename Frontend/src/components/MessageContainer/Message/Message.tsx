@@ -28,7 +28,7 @@ const Message = ({ message, index, onCloseClick }: Props): null | React.ReactNod
   return (
     <div className={cn(s.messageContainer, { [s.fadeAnimation]: isFaded, [s.infoMessage]: !isError, [s.errorMessage]: isError })}>
       <p className={s.message}>{ isError ? message.error : message.info}</p>
-      <button className={s.close} onClick={handleMessageCloseClick} />
+      <button title='Close' className={s.close} onClick={handleMessageCloseClick} />
     </div>
   );
 };

@@ -3,15 +3,16 @@ import cn from 'classnames';
 import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import Profile from 'public/icons/menu/profile.svg';
 import Friends from 'public/icons/menu/friends.svg';
-import Groups from 'public/icons/menu/groups.svg';
 import Chats from 'public/icons/menu/chats.svg';
 import Settings from 'public/icons/menu/settings.svg';
+import Groups from 'public/icons/menu/groups.svg';
+import { SelectedCategoryType } from '@/src/types/messengerTypes';
 import MenuSettings from './MenuSettings';
 import s from './Menu.module.scss';
 
 interface Props {
-  selectedCategory: 'friends' | 'chats' | 'groups';
-  setSelectedCategory: Dispatch<SetStateAction<'friends' | 'chats' | 'groups'>>;
+  selectedCategory: SelectedCategoryType;
+  setSelectedCategory: Dispatch<SetStateAction<SelectedCategoryType>>;
 }
 
 const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElement => {
@@ -38,22 +39,25 @@ const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElem
   return (
     <aside className={s.menu}>
       <div className={s.buttonsContainer}>
-        <button className={s.imageButton} onClick={handleProfileClick}>
+        <button title="Profile" className={s.imageButton} onClick={handleProfileClick}>
           <Profile className={s.icon} width={25} height={25} />
         </button>
         <button
+          title="Friends"
           className={cn(s.imageButton, { [s.active]: selectedCategory === 'friends' })}
           onClick={handleFriendsClick}
         >
           <Friends className={s.icon} width={25} height={25} />
         </button>
         <button
+          title="Groups"
           className={cn(s.imageButton, { [s.active]: selectedCategory === 'groups' })}
           onClick={handleGroupsClick}
         >
           <Groups className={s.icon} width={25} height={25} />
         </button>
         <button
+          title="Chats"
           className={cn(s.imageButton, { [s.active]: selectedCategory === 'chats' })}
           onClick={handleChatsClick}
         >

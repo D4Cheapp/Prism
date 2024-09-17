@@ -13,3 +13,7 @@ export type ChangePasswordType = {
   oldPassword: string;
   newPassword: string;
 };
+export type ChangeEmailType = {
+  id: number;
+  email: string;
+};

@@ -11,7 +11,7 @@ interface Props {
   label?: string;
   readOnly?: boolean;
   autoFocus?: boolean;
-  type?: 'text' | 'password' | 'number';
+  type?: 'text' | 'password' | 'number' | 'email';
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   onBlur?: FocusEventHandler;
   id?: string;

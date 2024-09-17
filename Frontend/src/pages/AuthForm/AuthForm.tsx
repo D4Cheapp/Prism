@@ -2,7 +2,7 @@
 import { Form, Formik } from 'formik';
 import cn from 'classnames';
 import Link from 'next/link';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
 import CustomInput from '@/src/ui/CustomInput';
@@ -10,6 +10,7 @@ import CustomInputButton from '@/src/ui/CustomInputButton';
 import { HideButton } from '@/src/ui/HideButton';
 import CustomButton from '@/src/ui/CustomButton';
 import { AuthFormType } from '@/src/types/formTypes';
+import EmailConfirmCodeTimer from '../../components/EmailConfirmCodeTimer';
 import s from './AuthForm.module.scss';
 
 interface Props {
@@ -45,30 +46,7 @@ const AuthForm = ({
 }: Props): React.ReactNode => {
   const [isPasswordHidden, setIsPasswordHidden] = useState(true);
   const [isConfirmPasswordHidden, setIsConfirmPasswordHidden] = useState(true);
-  const [sendAgainBlockTimer, setSendAgainBlockTimer] = useState<number>(60);
   const router = useRouter();
-  const timerSeconds = sendAgainBlockTimer % 60;
-  const timerMinutes = Math.floor(sendAgainBlockTimer / 60);
-
-  const handleSendEmailAgainClick = () => {
-    if (withConfirmCode && onResendButtonClick) {
-      setSendAgainBlockTimer(60);
-      onResendButtonClick();
-    }
-  };
-
-  useEffect(() => {
-    if (withConfirmCode) {
-      const timer = setInterval(() => {
-        if (sendAgainBlockTimer > 0) {
-          setSendAgainBlockTimer((time) => time - 1);
-        } else {
-          () => clearInterval(timer);
-        }
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [sendAgainBlockTimer, withConfirmCode]);
 
   const handleForgotPasswordClick = () => {
     router.push('/auth/restore-password');
@@ -85,7 +63,7 @@ const AuthForm = ({
   return (
     <section className={s.root}>
       <div className={s.changeThemeContainer}>
-        <ChangeThemeIcon />
+        <ChangeThemeIcon size={40} />
       </div>
       <Formik
         initialValues={
@@ -93,6 +71,7 @@ const AuthForm = ({
             email: '',
             password: '',
             confirmPassword: '',
+            code: '',
             isDeveloper: false,
           } as AuthFormType
         }
@@ -102,23 +81,8 @@ const AuthForm = ({
           <h1 className={s.formTitle}>{title}</h1>
           {withConfirmCode && (
             <div className={s.inputContainer}>
-              <CustomInput name="code" isFormInput placeholder="Enter code" label="Confirm code" />
-              <>
-                {sendAgainBlockTimer > 0 ? (
-                  <p className={s.resendText}>
-                    Please, wait {timerMinutes}:
-                    {timerSeconds < 10 ? `0${timerSeconds}` : timerSeconds} to resend confirm code
-                  </p>
-                ) : (
-                  <button
-                    className={s.resendButton}
-                    type="button"
-                    onClick={handleSendEmailAgainClick}
-                  >
-                    <p className={s.resendButtonText}>Send confirm code again</p>
-                  </button>
-                )}
-              </>
+              <CustomInput name="code" placeholder="Enter code" isFormInput label="Confirm code" />
+              <EmailConfirmCodeTimer onResendButtonClick={onResendButtonClick} />
             </div>
           )}
           {withEmail && (

@@ -1,14 +1,14 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from 'react';
 import cn from 'classnames';
-import * as Yup from 'yup';
 import { useRouter } from 'next/navigation';
-import { passwordValidationSchema } from '@/src/utils/formValidationSchemas';
 import { useActions, useAppSelector } from '@/src/hooks/reduxHooks';
+import { useTheme } from '@/src/hooks/useTheme';
 import ModalWindow from '@/src/components/ModalWindow';
-import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
 import { currentUserSelector } from '@/src/reduxjs/auth/selectors';
 import { requestStatusSelector } from '@/src/reduxjs/base/selectors';
-import ChangePasswordMenu from './ChangePasswordMenu';
+import ChangeThemeIcon from '@/src/ui/ChangeThemeIcon';
+import ChangePasswordMenu from './components/ChangePasswordWindow';
+import ChangeEmailWindow from './components/ChangeEmailWindow';
 import s from './MenuSettings.module.scss';
 
 interface Props {
@@ -19,49 +19,28 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
   const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
   const [isDeleteAccountConfirmOpen, setIsDeleteAccountConfirmOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
-  const oldPasswordRef = useRef<HTMLInputElement>(null);
-  const newPasswordRef = useRef<HTMLInputElement>(null);
+  const [isChangeEmailOpen, setIsChangeEmailOpen] = useState(false);
   const currentUser = useAppSelector(currentUserSelector);
   const requestStatus = useAppSelector(requestStatusSelector);
-  const { logout, deleteAccount, changePassword, setMessagesState } = useActions();
+  const [, toggleTheme] = useTheme();
+  const { logout, deleteAccount } = useActions();
   const router = useRouter();
+  const formattedEmail =
+    currentUser?.email && currentUser?.email.length > 25
+      ? `${currentUser?.email.slice(0, 15)}...`
+      : currentUser?.email;
 
-  const handleLogoutClick = () => {
-    setIsLogoutConfirmOpen(true);
-  };
+  const handleLogoutClick = () => setIsLogoutConfirmOpen(true);
 
-  const handleConfirmLogoutClick = () => {
-    logout();
-  };
+  const handleConfirmLogoutClick = () => logout();
 
-  const handleChangePasswordClick = () => {
-    setIsChangePasswordOpen(true);
-  };
+  const handleChangePasswordClick = () => setIsChangePasswordOpen(true);
 
-  const handleConfirmChangePasswordClick = useCallback(async () => {
-    const oldPassword = oldPasswordRef.current?.value;
-    const newPassword = newPasswordRef.current?.value;
-    let isError = false;
-    await Yup.object({
-      oldPassword: Yup.string().required('Old password is required'),
-      newPassword: passwordValidationSchema.required('New password is required'),
-    })
-      .validate({ oldPassword, newPassword })
-      .catch((error: Yup.ValidationError) => {
-        setMessagesState({ error: error.errors[0] });
-        isError = true;
-      });
-    if (!isError) {
-      //@ts-ignore
-      changePassword({ id: currentUser?.id, oldPassword, newPassword });
-    }
-  }, [changePassword, currentUser?.id, setMessagesState]);
+  const handleChangeEmailClick = () => setIsChangeEmailOpen(true);
 
-  const handleThemeChangeClick = () => {};
+  const handleThemeChangeClick = () => toggleTheme();
 
-  const handleDeleteAccount = () => {
-    setIsDeleteAccountConfirmOpen(true);
-  };
+  const handleDeleteAccount = () => setIsDeleteAccountConfirmOpen(true);
 
   const handleConfirmDeleteAccount = useCallback(() => {
     const isCurrentUserExist = currentUser?.id;
@@ -71,16 +50,10 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
   }, [currentUser?.id, deleteAccount]);
 
   useEffect(() => {
-    const isLogoutStatusCompleted =
-      requestStatus.isOk &&
-      requestStatus.method === 'DELETE' &&
-      requestStatus.request === '/logout';
-    const isDeleteAccountStatusCompleted =
-      requestStatus.isOk && requestStatus.method === 'DELETE' && requestStatus.request === '/user';
-    const isChangePasswordStatusCompleted =
-      requestStatus.isOk &&
-      requestStatus.method === 'PATCH' &&
-      requestStatus.request === '/password';
+    const { isOk, method, request } = requestStatus;
+    const isLogoutStatusCompleted = isOk && method === 'DELETE' && request === '/logout';
+    const isDeleteAccountStatusCompleted = isOk && method === 'DELETE' && request === '/user';
+    const isChangePasswordStatusCompleted = isOk && method === 'PATCH' && request === '/password';
     if (isLogoutStatusCompleted || isDeleteAccountStatusCompleted) {
       router.push('/auth/login');
     }
@@ -93,22 +66,27 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
     <ModalWindow setIsActive={setIsSettingsOpen} title={'Settings'}>
       <div className={s.root}>
         <div className={s.settingsSection}>
+          <button className={s.settingsButton} onClick={handleChangeEmailClick}>
+            Change email <p className={s.email}>{formattedEmail}</p>
+          </button>
+          {isChangeEmailOpen && (
+            <ChangeEmailWindow
+              currentUser={currentUser}
+              setIsChangeEmailOpen={setIsChangeEmailOpen}
+            />
+          )}
           <button className={s.settingsButton} onClick={handleChangePasswordClick}>
             Change password
           </button>
           {isChangePasswordOpen && (
-            <ModalWindow
-              setIsActive={setIsChangePasswordOpen}
-              title="Change password"
-              onConfirmClick={handleConfirmChangePasswordClick}
-              buttonInfo={{ withConfirmButton: true }}
-            >
-              <ChangePasswordMenu oldPasswordRef={oldPasswordRef} newPasswordRef={newPasswordRef} />
-            </ModalWindow>
+            <ChangePasswordMenu
+              setIsChangePasswordOpen={setIsChangePasswordOpen}
+              currentUser={currentUser}
+            />
           )}
           <button className={s.settingsButton} onClick={handleThemeChangeClick}>
             Change Theme
-            <ChangeThemeIcon />
+            <ChangeThemeIcon size={30} />
           </button>
         </div>
         <div className={s.settingsSection}>

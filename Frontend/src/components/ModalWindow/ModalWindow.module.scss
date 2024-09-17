@@ -54,29 +54,28 @@
 .formHeader {
   display: inline-flex;
   width: calc(100% - 2em);
-  align-items: center;
   justify-content: space-between;
   padding-top: 1.5em;
   padding-bottom: 1em;
   background-color: var(--background);
-  padding-inline: 1em;
+  padding-inline: 1rem;
 
   .title {
     max-width: 60%;
     margin-block: 0;
-    @include fontType(2em);
+    @include fontType(1.7em);
   }
 
   .closeButton {
-    width: 34px;
-    height: 34px;
+    width: 30px;
+    height: 30px;
     border: none;
     background: transparent;
     cursor: pointer;
     transition:
       border-color 0.2s,
       scale 0.2s;
-    @include cross(2em, 3px);
+    @include cross(1.7em, 3px);
 
     @include hover {
       &::after,

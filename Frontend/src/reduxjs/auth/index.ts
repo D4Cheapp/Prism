@@ -2,6 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { UserReceiveType } from '@/src/types/authReceiveTypes';
 import {
+  ChangeEmailActionType,
   ChangePasswordActionType,
   ConfirmCodeActionType,
   ConfirmRestorePasswordActionType,
@@ -39,7 +40,11 @@ const authSlice = createSlice({
 
     confirmRestorePassword: (state, restorePassword: ConfirmRestorePasswordActionType) => state,
 
-    changePassword: (state, user: ChangePasswordActionType) => state,
+    changePassword: (state, passwords: ChangePasswordActionType) => state,
+
+    changeEmail: (state, confirmCode: ConfirmCodeActionType) => state,
+
+    sendConfirmToChangeEmail: (state, email: ChangeEmailActionType) => state,
 
     deleteAccount: (state, user: DeleteAccountActionType) => state,
   },

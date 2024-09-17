@@ -1,18 +1,18 @@
 import { Dispatch, SetStateAction } from 'react';
-import cn from 'classnames';
+import { SelectedCategoryType } from '@/src/types/messengerTypes';
 import s from './MessengerLists.module.scss';
 
 interface Props {
-  isDialogOpen: boolean;
+  selectedCategory: SelectedCategoryType;
   setIsOpenDialog: Dispatch<SetStateAction<boolean>>;
 }
 
-const MessengerLists = ({ isDialogOpen, setIsOpenDialog }: Props): React.ReactElement => {
+const MessengerLists = ({ setIsOpenDialog, selectedCategory }: Props): React.ReactElement => {
   const handleDialogToggleClick = () => setIsOpenDialog((state) => !state);
   return (
-    <section className={cn(s.lists, { [s.sideLists]: isDialogOpen })}>
+    <section className={s.lists}>
       <div className={s.header}>Header</div>
-      Messenger lists works!
+      {selectedCategory} lists works!
       <button onClick={handleDialogToggleClick}>open dialog</button>
     </section>
   );

@@ -55,7 +55,7 @@ const ModalWindow = ({
       >
         <div className={s.formHeader}>
           <h1 className={s.title}>{title}</h1>
-          <button className={s.closeButton} onClick={handleCloseWindowClick} />
+          <button title="Close" className={s.closeButton} onClick={handleCloseWindowClick} />
         </div>
         {children}
         {buttonInfo && (
