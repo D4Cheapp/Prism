@@ -28,7 +28,7 @@
   .buttonsContainer {
     display: flex;
     flex-direction: column;
-    gap: 50px;
+    gap: 5vh;
 
     @include bigTablet {
       width: 100%;

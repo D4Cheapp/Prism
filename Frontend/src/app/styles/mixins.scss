@@ -6,6 +6,63 @@
   }
 }
 
+@mixin modalWindowList() {
+  display: flex;
+  overflow: hidden overlay;
+  width: 100%;
+  height: fit-content;
+  max-height: 50vh;
+  flex-direction: column;
+  gap: 0.5em;
+
+  .section {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: var(--background);
+    padding-block: 0.5em;
+  }
+
+  .button {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: space-between;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    padding-block: 0.5em;
+    padding-inline: 1rem;
+    text-align: start;
+    transition: background-color 0.2s;
+    @include fontType(1.4rem, var(--text));
+    @include colorButton(var(--primary));
+
+    @include hover {
+      background-color: rgb(from var(--secondBackground) r g b / 50%);
+
+      svg {
+        fill: var(--primary);
+      }
+    }
+  }
+
+  .parameter {
+    overflow: hidden;
+    max-width: 25ch;
+    padding-left: 1em;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dangerButton {
+    @include colorButton(var(--red));
+  }
+}
+
 @mixin fontType($fontSize: null, $fontColor: null, $fontWeight: null) {
   color: $fontColor;
   font-size: $fontSize;

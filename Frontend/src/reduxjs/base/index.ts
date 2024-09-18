@@ -8,7 +8,7 @@ import {
   MessageType,
 } from './types';
 
-interface BaseSliceInterface {
+interface SliceInterface {
   loadingState: boolean;
   messages: MessageType[];
   requestStatus: RequestStatusType;
@@ -24,7 +24,7 @@ const baseSlice = createSlice({
       isOk: true,
     },
     messages: [],
-  } as BaseSliceInterface,
+  } as SliceInterface,
   reducers: {
     setLoadingState: (state, isLoading: SetLoadingStateActionType) => {
       state.loadingState = isLoading.payload;

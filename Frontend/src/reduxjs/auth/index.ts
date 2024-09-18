@@ -13,13 +13,13 @@ import {
   SetCurrentUserActionType,
 } from './types';
 
-interface AuthSliceInterface {
+interface SliceInterface {
   currentUser?: UserReceiveType;
 }
 
 const authSlice = createSlice({
   name: 'authSlice',
-  initialState: { currentUser: undefined } as AuthSliceInterface,
+  initialState: { currentUser: undefined } as SliceInterface,
   reducers: {
     getCurrentUser: (state) => state,
 

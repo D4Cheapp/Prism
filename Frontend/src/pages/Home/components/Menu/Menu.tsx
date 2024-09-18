@@ -1,13 +1,14 @@
 'use client';
 import cn from 'classnames';
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import Profile from 'public/icons/menu/profile.svg';
 import Friends from 'public/icons/menu/friends.svg';
 import Chats from 'public/icons/menu/chats.svg';
 import Settings from 'public/icons/menu/settings.svg';
 import Groups from 'public/icons/menu/groups.svg';
 import { SelectedCategoryType } from '@/src/types/messengerTypes';
-import MenuSettings from './MenuSettings';
+import MenuSettings from './components/MenuSettings';
+import MenuProfile from './components/MenuProfile';
 import s from './Menu.module.scss';
 
 interface Props {
@@ -17,24 +18,17 @@ interface Props {
 
 const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElement => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const handleSettingsClick = useCallback(() => {
-    setIsSettingsOpen(true);
-  }, []);
+  const handleSettingsClick = () => setIsSettingsOpen(true);
 
-  const handleProfileClick = useCallback(() => {}, []);
+  const handleProfileClick = () => setIsProfileOpen(true);
 
-  const handleFriendsClick = useCallback(() => {
-    setSelectedCategory('friends');
-  }, [setSelectedCategory]);
+  const handleFriendsClick = () => setSelectedCategory('friends');
 
-  const handleGroupsClick = useCallback(() => {
-    setSelectedCategory('groups');
-  }, [setSelectedCategory]);
+  const handleGroupsClick = () => setSelectedCategory('groups');
 
-  const handleChatsClick = useCallback(() => {
-    setSelectedCategory('chats');
-  }, [setSelectedCategory]);
+  const handleChatsClick = () => setSelectedCategory('chats');
 
   return (
     <aside className={s.menu}>
@@ -42,6 +36,7 @@ const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElem
         <button title="Profile" className={s.imageButton} onClick={handleProfileClick}>
           <Profile className={s.icon} width={25} height={25} />
         </button>
+        {isProfileOpen && <MenuProfile setIsProfileOpen={setIsProfileOpen} />}
         <button
           title="Friends"
           className={cn(s.imageButton, { [s.active]: selectedCategory === 'friends' })}
@@ -68,8 +63,8 @@ const Menu = ({ selectedCategory, setSelectedCategory }: Props): React.ReactElem
         <button className={cn(s.imageButton, s.settings)} onClick={handleSettingsClick}>
           <Settings className={s.icon} width={35} height={35} />
         </button>
+        {isSettingsOpen && <MenuSettings setIsSettingsOpen={setIsSettingsOpen} />}
       </div>
-      {isSettingsOpen && <MenuSettings setIsSettingsOpen={setIsSettingsOpen} />}
     </aside>
   );
 };

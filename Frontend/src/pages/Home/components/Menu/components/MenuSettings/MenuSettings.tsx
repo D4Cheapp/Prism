@@ -25,10 +25,6 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
   const [, toggleTheme] = useTheme();
   const { logout, deleteAccount } = useActions();
   const router = useRouter();
-  const formattedEmail =
-    currentUser?.email && currentUser?.email.length > 25
-      ? `${currentUser?.email.slice(0, 15)}...`
-      : currentUser?.email;
 
   const handleLogoutClick = () => setIsLogoutConfirmOpen(true);
 
@@ -65,9 +61,9 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
   return (
     <ModalWindow setIsActive={setIsSettingsOpen} title={'Settings'}>
       <div className={s.root}>
-        <div className={s.settingsSection}>
-          <button className={s.settingsButton} onClick={handleChangeEmailClick}>
-            Change email <p className={s.email}>{formattedEmail}</p>
+        <div className={s.section}>
+          <button className={s.button} onClick={handleChangeEmailClick}>
+            Change email <p className={s.parameter}>{currentUser?.email}</p>
           </button>
           {isChangeEmailOpen && (
             <ChangeEmailWindow
@@ -75,7 +71,7 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
               setIsChangeEmailOpen={setIsChangeEmailOpen}
             />
           )}
-          <button className={s.settingsButton} onClick={handleChangePasswordClick}>
+          <button className={s.button} onClick={handleChangePasswordClick}>
             Change password
           </button>
           {isChangePasswordOpen && (
@@ -84,13 +80,13 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
               currentUser={currentUser}
             />
           )}
-          <button className={s.settingsButton} onClick={handleThemeChangeClick}>
+          <button className={s.button} onClick={handleThemeChangeClick}>
             Change Theme
             <ChangeThemeIcon size={30} />
           </button>
         </div>
-        <div className={s.settingsSection}>
-          <button className={cn(s.settingsButton, s.dangerButton)} onClick={handleLogoutClick}>
+        <div className={s.section}>
+          <button className={cn(s.button, s.dangerButton)} onClick={handleLogoutClick}>
             Logout
           </button>
           {isLogoutConfirmOpen && (
@@ -101,7 +97,7 @@ const MenuSettings = ({ setIsSettingsOpen }: Props): React.ReactElement => {
               buttonInfo={{ withConfirmButton: true }}
             />
           )}
-          <button className={cn(s.settingsButton, s.dangerButton)} onClick={handleDeleteAccount}>
+          <button className={cn(s.button, s.dangerButton)} onClick={handleDeleteAccount}>
             Delete account
           </button>
           {isDeleteAccountConfirmOpen && (
