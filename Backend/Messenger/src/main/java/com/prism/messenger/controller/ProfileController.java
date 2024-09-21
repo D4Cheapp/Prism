@@ -1,10 +1,12 @@
 package com.prism.messenger.controller;
 
-import com.prism.messenger.exception.EmptyParameterException;
 import com.prism.messenger.exception.profile.*;
 import com.prism.messenger.model.common.PaginationListModel;
 import com.prism.messenger.model.common.TextResponseModel;
-import com.prism.messenger.model.profile.*;
+import com.prism.messenger.model.profile.ChangeProfilePropertyModel;
+import com.prism.messenger.model.profile.FullProfileInfoModel;
+import com.prism.messenger.model.profile.ProfileTagModel;
+import com.prism.messenger.model.profile.ReceiveProfileListModel;
 import com.prism.messenger.service.profile.impl.ChangeProfileInfoServiceImpl;
 import com.prism.messenger.service.profile.impl.ProfileServiceImpl;
 import io.minio.errors.*;
@@ -199,69 +201,64 @@ public class ProfileController {
 
     @Operation(summary = "Change profile name")
     @PatchMapping("/name")
-    public ResponseEntity<ProfileModel> changeProfileEmail(
+    public ResponseEntity<TextResponseModel> changeProfileEmail(
             @RequestBody ChangeProfilePropertyModel profileName, Authentication authentication)
-            throws ProfileNotExistException, ProfileNameIsTooLongException, ServerException,
-            InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException,
-            InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+            throws ProfileNotExistException, ProfileNameIsTooLongException {
         String email = authentication.getName();
-        ProfileModel profile = changeProfileInfoService.changeProfileName(email,
+        changeProfileInfoService.changeProfileName(email,
                 profileName.getProperty());
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+        return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Name changed", true),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "Change profile phone")
     @PatchMapping("/phone")
-    public ResponseEntity<ProfileModel> changeProfilePhone(
+    public ResponseEntity<TextResponseModel> changeProfilePhone(
             @RequestBody ChangeProfilePropertyModel profilePhone, Authentication authentication)
             throws ProfileNotExistException, PhoneNumberAlreadyExistException,
-            IncorrectPhoneNumberException, ServerException, InsufficientDataException,
-            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
+            IncorrectPhoneNumberException {
         String email = authentication.getName();
-        ProfileModel profile = changeProfileInfoService.changeProfilePhoneNumber(email,
+        changeProfileInfoService.changeProfilePhoneNumber(email,
                 profilePhone.getProperty());
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+        return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Phone changed", true),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "Change profile tag")
     @PatchMapping("/tag")
-    public ResponseEntity<ProfileModel> changeProfileTag(@RequestBody ProfileTagModel profileTag,
-                                                         Authentication authentication)
-            throws ProfileNotExistException, TagAlreadyExistException, ServerException,
-            InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-            XmlParserException, InternalException {
+    public ResponseEntity<TextResponseModel> changeProfileTag(
+            @RequestBody ProfileTagModel profileTag,
+            Authentication authentication)
+            throws ProfileNotExistException, TagAlreadyExistException {
         String email = authentication.getName();
-        ProfileModel profile = changeProfileInfoService.changeProfileTag(email,
+        changeProfileInfoService.changeProfileTag(email,
                 profileTag.getTag());
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+        return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Tag changed", true),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "Change profile status")
     @PatchMapping("/status")
-    public ResponseEntity<ProfileModel> changeProfileStatus(
+    public ResponseEntity<TextResponseModel> changeProfileStatus(
             @RequestBody ChangeProfilePropertyModel profileStatus, Authentication authentication)
-            throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException,
-            ServerException, InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-            XmlParserException, InternalException {
+            throws ProfileNotExistException, StatusIsTooLongException {
         String email = authentication.getName();
-        ProfileModel profile = changeProfileInfoService.changeProfileStatus(email,
+        changeProfileInfoService.changeProfileStatus(email,
                 profileStatus.getProperty());
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+        return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Status changed", true),
+                HttpStatus.OK);
     }
 
     @Operation(summary = "Change profile picture")
     @PatchMapping("/profile-picture")
-    public ResponseEntity<ProfileModel> changeProfilePicture(
+    public ResponseEntity<TextResponseModel> changeProfilePicture(
             @RequestParam("file") MultipartFile profilePicture, Authentication authentication)
             throws ProfileNotExistException, ServerException, InsufficientDataException,
             ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
         String email = authentication.getName();
-        ProfileModel profile = changeProfileInfoService.changeProfilePicture(email, profilePicture);
-        return new ResponseEntity<>(profile, HttpStatus.OK);
+        changeProfileInfoService.changeProfilePicture(email, profilePicture);
+        return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Profile picture " +
+                "changed", true), HttpStatus.OK);
     }
 }

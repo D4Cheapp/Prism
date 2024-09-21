@@ -1,9 +1,7 @@
 package com.prism.messenger.service.profile.impl;
 
 import com.prism.messenger.entity.Profile;
-import com.prism.messenger.exception.EmptyParameterException;
 import com.prism.messenger.exception.profile.*;
-import com.prism.messenger.model.profile.ProfileModel;
 import com.prism.messenger.model.rabbitMQ.RabbitMQChangeEmailMessageModel;
 import com.prism.messenger.repository.ProfileRepository;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
@@ -42,11 +40,8 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
         }
     }
 
-    public ProfileModel changeProfileName(String email, String name)
-            throws ProfileNotExistException, ProfileNameIsTooLongException, ServerException,
-            InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-            XmlParserException, InternalException {
+    public void changeProfileName(String email, String name)
+            throws ProfileNotExistException, ProfileNameIsTooLongException {
         Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
         boolean isNameTooLong = name.length() > 100;
         if (isNameTooLong) {
@@ -54,15 +49,11 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
         }
         profile.setName(name);
         profileRepository.changeProfileName(email, name);
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(profile);
-        return ProfileModel.toModel(profile, profilePhoto);
     }
 
-    public ProfileModel changeProfilePhoneNumber(String email, String phoneNumber)
+    public void changeProfilePhoneNumber(String email, String phoneNumber)
             throws ProfileNotExistException, PhoneNumberAlreadyExistException,
-            IncorrectPhoneNumberException, ServerException, InsufficientDataException,
-            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
-            InvalidResponseException, XmlParserException, InternalException {
+            IncorrectPhoneNumberException {
         Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
         boolean isPhoneExist = phoneNumber.isEmpty();
         String resultPhoneNumber;
@@ -73,15 +64,10 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
         }
         profile.setPhoneNumber(resultPhoneNumber);
         profileRepository.changeProfilePhoneNumber(email, resultPhoneNumber);
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(profile);
-        return ProfileModel.toModel(profile, profilePhoto);
     }
 
-    public ProfileModel changeProfileTag(String email, String newTag)
-            throws ProfileNotExistException, TagAlreadyExistException, ServerException,
-            InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-            XmlParserException, InternalException {
+    public void changeProfileTag(String email, String newTag)
+            throws ProfileNotExistException, TagAlreadyExistException {
         Profile oldProfile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
         Optional<Profile> newProfile = profileRepository.findByTag(newTag);
         boolean isNewProfileExist = newProfile.isPresent();
@@ -94,31 +80,27 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
         }
         profileRepository.changeTag(oldProfile.getTag(), newTag);
         oldProfile.setTag(newTag);
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(oldProfile);
-        return ProfileModel.toModel(oldProfile, profilePhoto);
     }
 
-    public ProfileModel changeProfileStatus(String email, String status)
-            throws ProfileNotExistException, StatusIsTooLongException, EmptyParameterException,
-            ServerException, InsufficientDataException, ErrorResponseException, IOException,
-            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
-            XmlParserException, InternalException {
+    public void changeProfileStatus(String email, String status)
+            throws ProfileNotExistException, StatusIsTooLongException {
         Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
-        boolean isStatusTooLong = status.length() > 100;
-        boolean isStatusEmpty = status.isEmpty();
+        boolean isStatusEmpty = status == null;
         if (isStatusEmpty) {
-            throw new EmptyParameterException();
+            profile.setStatus(null);
+            profileRepository.changeProfileStatus(email, null);
+        } else {
+            String trimmedStatus = status.replaceAll("\\s+", " ").trim();
+            boolean isStatusTooLong = status.length() > 100;
+            if (isStatusTooLong) {
+                throw new StatusIsTooLongException();
+            }
+            profile.setStatus(trimmedStatus);
+            profileRepository.changeProfileStatus(email, trimmedStatus);
         }
-        if (isStatusTooLong) {
-            throw new StatusIsTooLongException();
-        }
-        profile.setStatus(status);
-        profileRepository.changeProfileStatus(email, status);
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(profile);
-        return ProfileModel.toModel(profile, profilePhoto);
     }
 
-    public ProfileModel changeProfilePicture(String email, MultipartFile picture)
+    public void changeProfilePicture(String email, MultipartFile picture)
             throws ProfileNotExistException, IOException, ServerException,
             InsufficientDataException, ErrorResponseException, NoSuchAlgorithmException,
             InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
@@ -132,8 +114,6 @@ public class ChangeProfileInfoServiceImpl implements ChangeProfileInfoService {
         }
         profile.setProfilePicturePath(profilePicturePath);
         profileRepository.changeProfilePicture(email, profilePicturePath);
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(profile);
-        return ProfileModel.toModel(profile, profilePhoto);
     }
 
     private String phoneNumberValidation(String phoneNumber)

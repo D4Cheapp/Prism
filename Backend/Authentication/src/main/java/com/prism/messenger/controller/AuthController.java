@@ -175,11 +175,12 @@ public class AuthController {
 
   @Operation(summary = "Edit user password")
   @PatchMapping("/password")
-  public ResponseEntity<UserModel> sendEditUserPasswordConfirmation(
+  public ResponseEntity<TextResponseModel> sendEditUserPasswordConfirmation(
       @RequestBody EditPasswordModel passwords, Authentication authentication)
       throws UserNotFoundException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectPasswordException, TooLongPasswordException, PermissionsException, TooShortPasswordException {
-    UserModel returnedUser = authService.editUserPassword(authentication, passwords);
-    return new ResponseEntity<>(returnedUser, OK);
+    authService.editUserPassword(authentication, passwords);
+    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Password was changed", true),
+        OK);
   }
 
   @Operation(summary = "Logout")
