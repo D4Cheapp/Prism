@@ -6,54 +6,71 @@ import com.prism.messenger.exception.profile.DeleteUserProfileException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.model.profile.FullProfileInfoModel;
 import com.prism.messenger.model.profile.ReceiveProfileListModel;
-import io.minio.errors.ErrorResponseException;
-import io.minio.errors.InsufficientDataException;
-import io.minio.errors.InternalException;
-import io.minio.errors.InvalidResponseException;
-import io.minio.errors.ServerException;
-import io.minio.errors.XmlParserException;
+import io.minio.errors.*;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 public interface ProfileService {
 
-  FullProfileInfoModel getCurrentProfile(String email)
-      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    FullProfileInfoModel getCurrentProfile(String email)
+            throws ProfileNotExistException, ServerException, InsufficientDataException,
+            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException;
 
-  FullProfileInfoModel getProfileByTag(String tag, String email)
-      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    FullProfileInfoModel getProfileByTag(String tag, String email)
+            throws ProfileNotExistException, ServerException, InsufficientDataException,
+            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException;
 
-  FullProfileInfoModel getProfileByTelephone(String telephone, String email)
-      throws ProfileNotExistException, ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+    FullProfileInfoModel getProfileByTelephone(String telephone, String email)
+            throws ProfileNotExistException, ServerException, InsufficientDataException,
+            ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
+            InvalidResponseException, XmlParserException, InternalException;
 
-  void createProfile(String email) throws CreateProfileException;
+    void createProfile(String email) throws CreateProfileException;
 
-  void deleteProfile(String email) throws DeleteUserProfileException;
+    void deleteProfile(String email) throws DeleteUserProfileException;
 
-  void addFriend(String email, String friendTag)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
+    void addFriend(String email, String friendTag)
+            throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
 
-  void deleteFriend(String email, String friendTag);
+    void deleteFriend(String email, String friendTag);
 
-  void blockUser(String email, String userTag)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
+    void blockUser(String email, String userTag)
+            throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException;
 
-  void unBlockUser(String email, String userTag);
+    void unBlockUser(String email, String userTag);
 
-  ReceiveProfileListModel getFriendList(String email, Integer page, Integer size);
+    ReceiveProfileListModel getFriendList(String email, Integer page, Integer size)
+            throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException;
 
-  ReceiveProfileListModel getBlockList(String email, Integer page, Integer size);
+    ReceiveProfileListModel getBlockList(String email, Integer page, Integer size)
+            throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException;
 
-  ReceiveProfileListModel getFriendRequestsList(String email, Integer page, Integer size);
+    ReceiveProfileListModel getFriendRequestsList(String email, Integer page, Integer size)
+            throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException;
 
-  ReceiveProfileListModel getSentFriendRequestList(String email, Integer page, Integer size);
+    ReceiveProfileListModel getSentFriendRequestList(String email, Integer page, Integer size)
+            throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException;
 
-  void declineFriendRequest(String email, String tag);
+    void declineFriendRequest(String email, String tag);
 
-  void setOnlineConnectedStatus(String email);
+    void setOnlineConnectedStatus(String email);
 
-  void setOnlineDisconnectedStatus(String email);
+    void setOnlineDisconnectedStatus(String email);
 
-  ReceiveProfileListModel searchProfileByTag(String tag, Integer page, Integer size);
+    ReceiveProfileListModel searchProfileByTag(String tag, Integer page, Integer size)
+            throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+            NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+            XmlParserException, InternalException;
 }
