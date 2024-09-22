@@ -12,7 +12,14 @@
     cursor: text;
   }
 
+  .modalInput {
+    width: calc(100% - 2em);
+    margin-block: 1em;
+    margin-inline: 1em;
+  }
+
   .name {
+    max-width: calc(100% - 2em);
     border: 2px solid transparent;
     background: transparent;
     margin-block: 1em;

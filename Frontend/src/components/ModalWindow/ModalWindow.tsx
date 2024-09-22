@@ -8,16 +8,19 @@ interface Props {
   title: string;
   setIsActive: Dispatch<SetStateAction<boolean>>;
   onConfirmClick?: (() => void) | (() => Promise<void>);
+  onSecondButtonClick?: (() => void) | (() => Promise<void>);
   children?: React.ReactNode;
   buttonInfo?: {
     confirmTitle?: string;
     withConfirmButton?: boolean;
+    secondButtonTitle?: string;
   };
 }
 
 const ModalWindow = ({
   setIsActive,
   onConfirmClick,
+  onSecondButtonClick,
   children,
   title,
   buttonInfo,
@@ -61,6 +64,7 @@ const ModalWindow = ({
         {buttonInfo && (
           <ModalButtons
             onConfirmClick={onConfirmClick}
+            onSecondButtonClick={onSecondButtonClick}
             onCloseWindowClick={handleCloseWindowClick}
             buttonInfo={buttonInfo}
           />

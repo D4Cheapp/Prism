@@ -6,16 +6,18 @@ import s from './ModalButtons.module.scss';
 
 interface Props {
   onConfirmClick?: () => void;
+  onSecondButtonClick?: () => void;
   onCloseWindowClick: () => void;
   buttonInfo: {
     confirmTitle?: string;
-    withGoHomeButton?: boolean;
     withConfirmButton?: boolean;
+    secondButtonTitle?: string;
   };
 }
 
 const ModalButtons = ({
   onConfirmClick,
+  onSecondButtonClick,
   onCloseWindowClick,
   buttonInfo,
 }: Props): React.ReactNode => {
@@ -36,9 +38,9 @@ const ModalButtons = ({
       <button
         type="button"
         className={cn(s.formButton, s.cancelButton)}
-        onClick={onCloseWindowClick}
+        onClick={onSecondButtonClick ?? onCloseWindowClick}
       >
-        Cancel
+        {buttonInfo?.secondButtonTitle ?? 'Cancel'}
       </button>
     </div>
   );

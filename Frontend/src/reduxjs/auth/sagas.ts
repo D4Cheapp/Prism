@@ -3,7 +3,6 @@ import { sagaHandling } from '@/src/utils/sagaHandling';
 import { UserReceiveType } from '@/src/types/authReceiveTypes';
 import { TextReceiveType } from '@/src/types/receiveTypes';
 import { authActions } from '.';
-import { baseActions } from '../base';
 import {
   ChangeEmailActionType,
   ChangePasswordActionType,
@@ -86,7 +85,6 @@ function* changePasswordSaga(action: ChangePasswordActionType) {
     href: '/password',
     server: 'auth',
     body: action.payload,
-    action: () => put(baseActions.setMessagesState({ info: 'Password changed' })),
   });
 }
 

@@ -1,7 +1,7 @@
 import { all } from 'redux-saga/effects';
 import authSaga from './auth/sagas';
-import messengerSaga from './messenger/sagas';
+import profileSaga from './profile/sagas';
 
 export function* rootSaga() {
-  yield all([authSaga(), messengerSaga()]);
+  yield all([authSaga(), profileSaga()]);
 }

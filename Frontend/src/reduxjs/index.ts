@@ -4,15 +4,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import { rootSaga } from './sagas';
 import baseReducer, { baseActions } from './base';
 import authReducer, { authActions } from './auth';
-import messengerReducer, { messengerActions } from './messenger';
+import profileReducer, { profileActions } from './profile';
 
 const sagaMiddleware = createSagaMiddleware();
 const rootReducer = combineReducers({
   base: baseReducer,
   auth: authReducer,
-  messenger: messengerReducer,
+  profile: profileReducer,
 });
-export const reducersActions = { ...baseActions, ...authActions, ...messengerActions };
+export const reducersActions = { ...baseActions, ...authActions, ...profileActions };
 export const store = configureStore({
   reducer: rootReducer,
   //@ts-ignore

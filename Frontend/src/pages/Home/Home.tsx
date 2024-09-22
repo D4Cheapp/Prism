@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { SelectedCategoryType } from '@/src/types/messengerTypes';
+import { SelectedCategoryType } from '@/src/types/profileReceiveTypes';
 import Dialog from './components/Dialog';
 import Menu from './components/Menu';
 import MessengerLists from './components/MessengerLists';

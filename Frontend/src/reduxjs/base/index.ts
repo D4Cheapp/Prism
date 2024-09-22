@@ -60,6 +60,7 @@ const baseSlice = createSlice({
       state.messages = state.messages.filter(
         (message) => message && message.id !== messageIndex.payload,
       );
+      return state;
     },
   },
 });

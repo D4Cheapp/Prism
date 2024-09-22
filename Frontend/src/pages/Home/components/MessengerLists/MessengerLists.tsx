@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react';
-import { SelectedCategoryType } from '@/src/types/messengerTypes';
+import { SelectedCategoryType } from '@/src/types/profileReceiveTypes';
 import s from './MessengerLists.module.scss';
 
 interface Props {

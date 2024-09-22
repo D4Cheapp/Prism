@@ -6,7 +6,7 @@ import Friends from 'public/icons/menu/friends.svg';
 import Chats from 'public/icons/menu/chats.svg';
 import Settings from 'public/icons/menu/settings.svg';
 import Groups from 'public/icons/menu/groups.svg';
-import { SelectedCategoryType } from '@/src/types/messengerTypes';
+import { SelectedCategoryType } from '@/src/types/profileReceiveTypes';
 import MenuSettings from './components/MenuSettings';
 import MenuProfile from './components/MenuProfile';
 import s from './Menu.module.scss';
