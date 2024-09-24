@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.prism.messenger.util.ProfileUtil.loadPictureInProfileModel;
-
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
@@ -37,7 +35,7 @@ public class ProfileServiceImpl implements ProfileService {
             ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
         Profile profile = ProfileUtil.getProfileBy(email, profileRepository::findByEmail);
-        byte[] profilePhoto = loadPictureInProfileModel(profile);
+        byte[] profilePhoto = minioService.loadPictureInProfileModel(profile);
         return new FullProfileInfoModel(profile, profilePhoto, null);
     }
 
@@ -46,7 +44,7 @@ public class ProfileServiceImpl implements ProfileService {
             ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException,
             InvalidResponseException, XmlParserException, InternalException {
         Profile profile = ProfileUtil.getProfileBy(tag, profileRepository::findByTag);
-        byte[] profilePhoto = loadPictureInProfileModel(profile);
+        byte[] profilePhoto = minioService.loadPictureInProfileModel(profile);
         RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(tag,
                 email);
         return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);
@@ -58,7 +56,7 @@ public class ProfileServiceImpl implements ProfileService {
             InvalidResponseException, XmlParserException, InternalException {
         Profile profile = ProfileUtil.getProfileBy(phoneNumber,
                 profileRepository::findByPhoneNumber);
-        byte[] profilePhoto = loadPictureInProfileModel(profile);
+        byte[] profilePhoto = minioService.loadPictureInProfileModel(profile);
         RelationsBetweenUserModel relationWithCurrentProfile = loadRelationsWithCurrentProfile(
                 profile.getTag(), email);
         return new FullProfileInfoModel(profile, profilePhoto, relationWithCurrentProfile);

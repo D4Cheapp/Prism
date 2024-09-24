@@ -250,7 +250,7 @@ public class ProfileController {
     }
 
     @Operation(summary = "Change profile picture")
-    @PatchMapping("/profile-picture")
+    @PatchMapping("/picture")
     public ResponseEntity<TextResponseModel> changeProfilePicture(
             @RequestParam("file") MultipartFile profilePicture, Authentication authentication)
             throws ProfileNotExistException, ServerException, InsufficientDataException,

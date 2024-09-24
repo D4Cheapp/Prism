@@ -1,6 +1,7 @@
 package com.prism.messenger.service.minio.impl;
 
 import com.google.common.collect.Iterables;
+import com.prism.messenger.entity.Profile;
 import com.prism.messenger.model.common.FileListModel;
 import com.prism.messenger.service.minio.MinioService;
 import io.minio.GetObjectArgs;
@@ -114,5 +115,16 @@ public class MinioServiceImpl implements MinioService {
       }
     }
     return new FileListModel(totalCount - 1, fileList.subList(1, fileList.size()));
+  }
+
+  public byte[] loadPictureInProfileModel(Profile profile)
+      throws InsufficientDataException, ErrorResponseException, IOException,
+      NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+      XmlParserException, InternalException, ServerException {
+    boolean isProfilePictureNotFound = profile.getProfilePicturePath() == null;
+    if (isProfilePictureNotFound) {
+      return null;
+    }
+    return this.getFile(profile.getProfilePicturePath());
   }
 }

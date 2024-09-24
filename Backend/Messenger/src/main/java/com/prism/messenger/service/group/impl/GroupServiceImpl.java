@@ -17,7 +17,6 @@ import com.prism.messenger.repository.GroupRepository;
 import com.prism.messenger.service.group.GroupService;
 import com.prism.messenger.service.minio.impl.MinioServiceImpl;
 import com.prism.messenger.util.DialogUtils;
-import com.prism.messenger.util.ProfileUtil;
 import io.minio.errors.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -72,7 +71,7 @@ public class GroupServiceImpl implements GroupService {
         if (isAdminNotExists) {
             throw new ProfileNotExistException();
         }
-        byte[] profilePhoto = ProfileUtil.loadPictureInProfileModel(groupAdmin.get());
+        byte[] profilePhoto = minioService.loadPictureInProfileModel(groupAdmin.get());
         return ProfileModel.toModel(groupAdmin.get(), profilePhoto);
     }
 
