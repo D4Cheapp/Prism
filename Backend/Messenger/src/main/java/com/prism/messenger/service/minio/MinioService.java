@@ -1,5 +1,6 @@
 package com.prism.messenger.service.minio;
 
+import com.prism.messenger.entity.Profile;
 import com.prism.messenger.model.common.FileListModel;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
@@ -34,4 +35,8 @@ public interface MinioService {
 
   FileListModel getDialogFiles(String dialogPath, Integer page, Integer size)
       throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException;
+
+ byte[] loadPictureInProfileModel(Profile profile) throws InsufficientDataException, ErrorResponseException, IOException,
+     NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+     XmlParserException, InternalException, ServerException;
 }
