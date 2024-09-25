@@ -1,0 +1,55 @@
+.root {
+  position: relative;
+  width: 100%;
+}
+
+.label {
+  position: absolute;
+  top: -0.5em;
+  left: 1em;
+  background-color: var(--background);
+  opacity: 0;
+  padding-inline: 0.5em;
+  transition: 0.2s;
+  @include fontType(1.2rem, var(--text), 500);
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  border: 2px var(--text) solid;
+  border-radius: 5px;
+  background: var(--background);
+  outline: none;
+  padding-inline: 1em;
+  transition: border 0.1s;
+  @include fontType(1.2rem, var(--text));
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    display: none;
+  }
+
+  &::placeholder {
+    @include fontType(null, rgba(var(--text), 0.7));
+  }
+
+  &:focus {
+    border-color: var(--primary);
+
+    &::placeholder {
+      opacity: 0;
+    }
+  }
+
+  &:focus + .label {
+    opacity: 1;
+    @include fontType(null, var(--primary));
+  }
+
+  &:not(:placeholder-shown) + .label {
+    opacity: 1;
+  }
+}

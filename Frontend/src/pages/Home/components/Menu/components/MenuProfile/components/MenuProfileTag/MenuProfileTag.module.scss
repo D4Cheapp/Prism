@@ -1,0 +1,14 @@
+.attribute {
+  width: 100%;
+  @include modalWindowList;
+
+  .input {
+    cursor: text;
+  }
+
+  .modalInput {
+    width: calc(100% - 2em);
+    margin-block: 1em;
+    margin-inline: 1em;
+  }
+}

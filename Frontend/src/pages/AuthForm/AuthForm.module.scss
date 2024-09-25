@@ -1,0 +1,146 @@
+.root {
+  display: grid;
+  height: 100vh;
+  place-items: center;
+}
+
+.form {
+  display: flex;
+  min-width: 25%;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10px;
+  background-color: var(--background);
+  box-shadow: -1px 10px 200px -50px var(--background);
+  gap: 2em;
+  padding-block: 2em;
+  padding-inline: 2.5vw;
+
+  .formTitle {
+    @include fontType(1.8rem, var(--text));
+  }
+
+  @include bigDesktop {
+    min-width: 40%;
+  }
+
+  @include desktop {
+    min-width: 70%;
+  }
+
+  @include tablet {
+    min-width: 90%;
+    padding-inline: 5vw;
+  }
+}
+
+.additionalData {
+  width: 100%;
+}
+
+.inputContainer {
+  position: relative;
+  width: 100%;
+
+  .input {
+    padding-right: 3em;
+  }
+
+  .eye {
+    position: absolute;
+    top: 0.8em;
+    right: 1em;
+  }
+
+  .forgotPassword {
+    border: none;
+    border-bottom: 1px transparent solid;
+    margin-top: 0.5em;
+    margin-left: 0.5em;
+    background: none;
+    cursor: pointer;
+    padding-inline: 0;
+    transition: 0.2s;
+    @include fontType(1.1rem, var(--text));
+
+    @include hover {
+      border-bottom: 1px var(--primary) solid;
+      color: var(--primary);
+    }
+  }
+}
+
+.checkboxContainer {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding-left: 0.5em;
+  margin-top: 1em;
+  cursor: pointer;
+  gap: 1em;
+
+  @include hover {
+    .checkboxLabel {
+      color: var(--primary);
+    }
+
+    .customCheckbox {
+      border-color: var(--primary);
+    }
+  }
+
+  .checkboxLabel {
+    margin: 0;
+    transition: 0.2s;
+    @include fontType(1.1rem, var(--text));
+  }
+
+  .customCheckbox {
+    width: 1em;
+    height: 1em;
+    transition: 0.2s;
+  }
+}
+
+.changeThemeContainer {
+  position: absolute;
+  top: 5%;
+  right: 5%;
+}
+
+.multiButtonsContainer {
+  flex-direction: row !important;
+  justify-content: space-between;
+}
+
+.buttonsContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+
+  .goBackButton {
+    @include hover {
+      border-color: var(--secondary) !important;
+      background-color: var(--secondary) !important;
+    }
+  }
+
+  .smallButton {
+    width: 45%;
+  }
+
+  .redirect {
+    border-bottom: 1px transparent solid;
+    margin-top: 0.5em;
+    text-decoration: none;
+    transition: 0.2s;
+    @include fontType(1.1rem, var(--text));
+
+    @include hover {
+      border-bottom: 1px var(--primary) solid;
+      color: var(--primary);
+    }
+  }
+}

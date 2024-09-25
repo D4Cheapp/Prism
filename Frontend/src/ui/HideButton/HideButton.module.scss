@@ -1,0 +1,23 @@
+.root {
+  position: relative;
+  cursor: pointer;
+
+  .eye {
+    fill: var(--text);
+    transition: 0.2s;
+  }
+
+  .isHide {
+    animation: fade 0.2s;
+  }
+}
+
+@keyframes fade {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}

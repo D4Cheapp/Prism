@@ -1,0 +1,16 @@
+.lists {
+  min-width: 25%;
+  height: 100%;
+  background-color: var(--background);
+  transition:
+    width 1s,
+    background-color 0.2s;
+
+  @include mediumDesktop {
+    min-width: 30%;
+  }
+
+  @include desktop {
+    min-width: 35%;
+  }
+}

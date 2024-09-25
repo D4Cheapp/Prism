@@ -1,0 +1,165 @@
+@mixin hover() {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}
+
+@mixin modalWindowList() {
+  display: flex;
+  overflow: hidden overlay;
+  width: 100%;
+  height: fit-content;
+  max-height: 50vh;
+  flex-direction: column;
+  gap: 0.5em;
+
+  .section {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: var(--background);
+    padding-block: 0.5em;
+  }
+
+  .button {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    justify-content: space-between;
+    border: none;
+    background: none;
+    cursor: pointer;
+    outline: none;
+    padding-block: 0.5em;
+    padding-inline: 1rem;
+    text-align: start;
+    transition: background-color 0.2s;
+    @include fontType(1.4rem, var(--text));
+    @include colorButton(var(--primary));
+
+    @include hover {
+      background-color: rgb(from var(--secondBackground) r g b / 50%);
+
+      svg {
+        fill: var(--primary);
+      }
+    }
+  }
+
+  .parameter {
+    overflow: hidden;
+    max-width: 25ch;
+    padding-left: 1em;
+    margin: 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .dangerButton {
+    @include colorButton(var(--red));
+  }
+}
+
+@mixin fontType($fontSize: null, $fontColor: null, $fontWeight: null) {
+  color: $fontColor;
+  font-size: $fontSize;
+  font-weight: $fontWeight;
+}
+
+@mixin colorButton($color) {
+  transition:
+    border-color 0.2s,
+    background-image 0.2s,
+    color 0.2s;
+
+  @include hover {
+    border-color: $color;
+    color: $color;
+  }
+}
+
+@mixin loadingCircle($width, $thick) {
+  width: $width;
+  height: $width;
+  border: $thick solid transparent;
+  border-radius: 50%;
+  border-top-color: var(--text);
+  border-left-color: var(--text);
+  animation: loading 1s linear infinite;
+
+  @keyframes loading {
+    0% {
+      transform: rotate(0);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+@mixin cross($width, $thick) {
+  position: relative;
+  display: grid;
+  place-items: center;
+
+  @include hover {
+    &::after,
+    &::before {
+      background-color: var(--red);
+    }
+  }
+
+  &::after {
+    position: absolute;
+    width: $width;
+    height: $thick;
+    background-color: var(--text);
+    content: '';
+    rotate: -45deg;
+    transition: 0.2s;
+  }
+
+  &::before {
+    position: absolute;
+    width: $width;
+    height: $thick;
+    background-color: var(--text);
+    content: '';
+    rotate: 45deg;
+    transition: 0.2s;
+  }
+}
+
+@mixin bigDesktop() {
+  @media only screen and (width <= 1440px) {
+    @content;
+  }
+}
+
+@mixin mediumDesktop() {
+  @media only screen and (width <= 1280px) {
+    @content;
+  }
+}
+
+@mixin desktop() {
+  @media only screen and (width <= 1024px) {
+    @content;
+  }
+}
+
+@mixin bigTablet() {
+  @media only screen and (width <= 854px) {
+    @content;
+  }
+}
+
+@mixin tablet() {
+  @media only screen and (width <= 640px) {
+    @content;
+  }
+}

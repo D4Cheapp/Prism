@@ -1,0 +1,39 @@
+{
+  "extends": [
+    "stylelint-config-standard-scss",
+    "stylelint-config-idiomatic-order"
+  ],
+  "plugins": [
+    "stylelint-order"
+  ],
+  "rules": {
+    "at-rule-empty-line-before": [
+      "always",
+      {
+        "ignore": [
+          "after-comment"
+        ],
+        "except": [
+          "first-nested"
+        ],
+        "ignoreAtRules": [
+          "include"
+        ]
+      }
+    ],
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "include",
+          "mixin"
+        ]
+      }
+    ],
+    "selector-class-pattern": "^[a-zA-Z][a-zA-Z0-9]*$",
+    "scss/at-mixin-pattern": "^[a-zA-Z][a-zA-Z0-9]*$",
+    "scss/dollar-variable-pattern": "^[a-zA-Z][a-zA-Z0-9]*$",
+    "custom-property-pattern": "^[a-zA-Z][a-zA-Z0-9]*$",
+    "value-keyword-case": null
+  }
+}

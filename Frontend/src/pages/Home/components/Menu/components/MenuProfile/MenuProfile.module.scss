@@ -1,0 +1,40 @@
+.root {
+  @include modalWindowList;
+
+  .profileHeder {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .input {
+    cursor: text;
+  }
+
+  .modalInput {
+    width: calc(100% - 2em);
+    margin-block: 1em;
+    margin-inline: 1em;
+  }
+
+  .name {
+    max-width: calc(100% - 2em);
+    border: 2px solid transparent;
+    background: transparent;
+    margin-block: 1em;
+    outline: none;
+    text-align: center;
+    @include fontType(1.5rem, var(--text), 500);
+
+    &:focus {
+      border-bottom-color: var(--text);
+    }
+  }
+}
+
+.loadingCircle {
+  align-self: center;
+  margin-block: 10vh;
+  @include loadingCircle(7vh, 4px);
+}

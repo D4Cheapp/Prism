@@ -1,0 +1,55 @@
+.icon {
+  cursor: pointer;
+  transition: 0.2s;
+  user-select: none;
+}
+
+.leftFade {
+  animation: left-fade 0.15s;
+}
+
+.rightFade {
+  animation: right-fade 0.15s;
+}
+
+@keyframes right-fade {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-20%, 0);
+  }
+
+  51% {
+    opacity: 0;
+    transform: translate(20%, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes left-fade {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(20%, 0);
+  }
+
+  51% {
+    opacity: 0;
+    transform: translate(-20%, 0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+}

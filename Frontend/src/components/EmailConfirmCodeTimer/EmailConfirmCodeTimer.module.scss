@@ -1,0 +1,19 @@
+.resendText {
+  margin-bottom: 0;
+  text-align: center;
+  @include fontType(1.1rem, var(--text));
+}
+
+.resendButton {
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  @include fontType(1.1rem, var(--text));
+}
+
+.resendButtonText {
+  margin-bottom: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}
