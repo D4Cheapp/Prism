@@ -1,0 +1,52 @@
+.profilePictureContainer {
+  position: relative;
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding-top: 1em;
+}
+
+.iconOverlay {
+  overflow: hidden;
+  width: 10vw;
+  height: 10vw;
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+
+  @include desktop {
+    width: 20vh;
+    height: 20vh;
+  }
+}
+
+.icon {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  fill: var(--text);
+  object-fit: cover;
+  object-position: center;
+}
+
+.deleteIcon {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 3vw;
+  height: 3vw;
+  padding-right: calc(50% - 5vw);
+  cursor: pointer;
+  fill: var(--text);
+
+  @include desktop {
+    width: 6vh;
+    height: 6vh;
+    padding-right: calc(50% - 10vh);
+  }
+}
+
+.hiddenInput {
+  display: none;
+}

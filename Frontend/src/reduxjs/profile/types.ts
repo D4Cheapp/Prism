@@ -11,3 +11,4 @@ export type SetChangedProfileInfoActionType = PayloadAction<{
   value: string | number;
 }>;
 export type SetProfileTagActionType = PayloadAction<{ tag: string }>;
+export type SetProfilePictureActionType = PayloadAction<string>;

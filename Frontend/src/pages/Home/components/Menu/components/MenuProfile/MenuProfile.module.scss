@@ -31,15 +31,6 @@
       border-bottom-color: var(--text);
     }
   }
-
-  .icon {
-    width: 30%;
-    height: fit-content;
-    padding-top: 1em;
-    aspect-ratio: 1 / 1;
-    cursor: pointer;
-    fill: var(--text);
-  }
 }
 
 .loadingCircle {

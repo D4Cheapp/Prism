@@ -43,13 +43,23 @@ const ModalWindow = ({
     [handleCloseWindowClick],
   );
 
+  const handleEnterPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const isConfirmValid = e.key === 'Enter' && onConfirmClick;
+    if (isConfirmValid) {
+      void onConfirmClick();
+    }
+  };
+
   useEffect(() => {
     addEventListener('keydown', handleEscapeKeyClick);
     return () => removeEventListener('keydown', handleEscapeKeyClick);
   }, [handleEscapeKeyClick]);
 
   return (
-    <aside className={cn(s.root, { [s.disappearing]: isCloseButtonClicked })}>
+    <aside
+      className={cn(s.root, { [s.disappearing]: isCloseButtonClicked })}
+      onKeyDown={handleEnterPress}
+    >
       <div className={s.background} onClick={handleCloseWindowClick} />
       <div
         className={cn(s.componentFrom, {

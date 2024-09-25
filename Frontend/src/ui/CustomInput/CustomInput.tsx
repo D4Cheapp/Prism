@@ -35,8 +35,8 @@ function CustomInput({
   mask,
   type = 'text',
   onChange,
-  value,
   onBlur,
+  value,
   reference,
   defaultValue,
   id,
@@ -50,17 +50,16 @@ function CustomInput({
     placeholder,
     autoFocus,
     onBlur,
-    onChange,
     readOnly,
   };
   return (
     <div className={s.root}>
       {isFormInput ? (
-        <Field {...inputInfo} defaultValue={defaultValue} />
+        <Field {...inputInfo} />
       ) : mask ? (
-        <InputMask value={value} mask={mask} {...inputInfo} />
+        <InputMask {...inputInfo} value={value} mask={mask} onChange={onChange} />
       ) : (
-        <input {...inputInfo} ref={reference} defaultValue={defaultValue} />
+        <input {...inputInfo} ref={reference} defaultValue={defaultValue} onChange={onChange} />
       )}
       {label && (
         <label className={cn(s.label, classNames ? classNames.title : '')} htmlFor={id ? id : name}>

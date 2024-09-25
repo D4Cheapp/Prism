@@ -3,7 +3,12 @@ import { sagaHandling } from '@/src/utils/sagaHandling';
 import { CurrentUserProfileType } from '@/src/types/profileReceiveTypes';
 import { TextReceiveType } from '@/src/types/receiveTypes';
 import { profileActions } from '.';
-import { ProfileTagActionType, SetProfileDataActionType, SetProfileTagActionType } from './types';
+import {
+  ProfileTagActionType,
+  SetProfileDataActionType,
+  SetProfilePictureActionType,
+  SetProfileTagActionType,
+} from './types';
 
 function* unblockUserSaga(action: ProfileTagActionType) {
   yield sagaHandling<TextReceiveType>({
@@ -60,6 +65,36 @@ function* setProfilePhoneNumberSaga(action: SetProfileDataActionType) {
   });
 }
 
+function* setProfilePictureSaga(action: SetProfilePictureActionType) {
+  const formData = new FormData();
+  const arr = action.payload.split(',');
+  //@ts-ignore
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[arr.length - 1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  const file = new File([u8arr], 'profilePicture.jpg', { type: mime });
+  formData.append('file', file);
+  yield sagaHandling<TextReceiveType>({
+    href: '/profile/picture',
+    method: 'PATCH',
+    server: 'messenger',
+    multipart: true,
+    body: formData,
+  });
+}
+
+function* deleteProfilePictureSaga() {
+  yield sagaHandling<TextReceiveType>({
+    href: '/profile/picture',
+    method: 'DELETE',
+    server: 'messenger',
+  });
+}
+
 export default function* profileSaga() {
   yield all([
     takeEvery(profileActions.unblockUser, unblockUserSaga),
@@ -68,5 +103,7 @@ export default function* profileSaga() {
     takeEvery(profileActions.setProfileNickName, setProfileNickNameSaga),
     takeEvery(profileActions.setProfileTag, setProfileTagSaga),
     takeEvery(profileActions.setProfilePhoneNumber, setProfilePhoneNumberSaga),
+    takeEvery(profileActions.setProfilePicture, setProfilePictureSaga),
+    takeEvery(profileActions.deleteProfilePicture, deleteProfilePictureSaga),
   ]);
 }

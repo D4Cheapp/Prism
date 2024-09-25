@@ -15,11 +15,15 @@
 
 ## Запуск приложения
 
-- Добавить файлы переменных окружения backend.env и frontend.env
+- Добавить файлы переменных окружения backend.env и .env для frontend части
 - docker network create prism-network
 - docker compose -f ./Backend/docker-compose.yml --env-file backend.env up
 - docker compose -f ./Backend/Authentication/docker-compose.yml --env-file backend.env up
 - docker compose -f ./Backend/Messenger/docker-compose.yml --env-file backend.env up
+- Перейти в папку Frontend
+- npm run dev (Если установлен nodejs)
+- Результат тут [http://localhost:3000/](http://localhost:3000/)
+
 - Запустить файл index.html из папки Frontend
 
 ## Полезные ссылки
@@ -54,4 +58,4 @@
 - **NextJs** - фреймворк для создания server-side rendered (SSR) приложений на React.
 - **SCSS** - препроцессор CSS, который позволяет использовать variables, functions, mixins, imports и другие функции для упрощения написания CSS.
 - **Typescript** - статически типизированный язык программирования, который компилируется в JavaScript.
-- **Redux** - библиотека для управления состоянием в приложении, которая позволяет центализовать логику приложения и упрощает работу с состоянием.
+- **Redux** - библиотека для управления состоянием в приложении, которая позволяет централизовать логику приложения и упрощает работу с состоянием.

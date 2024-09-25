@@ -6,6 +6,7 @@ type SagaHandlingPropsType<T> = {
   href: string;
   server: 'auth' | 'messenger';
   method: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  multipart?: boolean;
   body?: object;
   action?: (data?: T) => void;
   isDataInAction?: boolean;
@@ -15,6 +16,7 @@ function* sagaHandling<T>({
   href,
   server,
   method,
+  multipart,
   body,
   action,
   isDataInAction,
@@ -29,6 +31,7 @@ function* sagaHandling<T>({
       method,
       href: serverUrl + href,
       body: body ?? undefined,
+      multipart,
     }),
   );
   const isActionExist = action !== undefined;

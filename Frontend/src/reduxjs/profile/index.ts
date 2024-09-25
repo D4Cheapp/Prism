@@ -6,6 +6,7 @@ import {
   SetChangedProfileInfoActionType,
   SetCurrentUserProfileActionType,
   SetProfileDataActionType,
+  SetProfilePictureActionType,
   SetProfileTagActionType,
 } from './types';
 
@@ -37,6 +38,10 @@ const profileSlice = createSlice({
     setProfileTag: (state, tag: SetProfileTagActionType) => state,
 
     setProfilePhoneNumber: (state, phoneNumber: SetProfileDataActionType) => state,
+
+    setProfilePicture: (state, picture: SetProfilePictureActionType) => state,
+
+    deleteProfilePicture: (state) => state,
 
     setChangedProfileInfo: (state, changedProfileInfo: SetChangedProfileInfoActionType) => {
       const { property, value } = changedProfileInfo.payload;
