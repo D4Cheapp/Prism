@@ -1,11 +1,11 @@
 package com.prism.messenger.advice;
 
-import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNotExistException;
 import com.prism.messenger.exception.profile.StatusIsTooLongException;
 import com.prism.messenger.exception.profile.TagAlreadyExistException;
+import com.prism.messenger.exception.relation.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.model.common.TextResponseModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

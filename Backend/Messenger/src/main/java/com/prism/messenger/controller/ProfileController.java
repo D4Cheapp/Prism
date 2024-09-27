@@ -1,6 +1,5 @@
 package com.prism.messenger.controller;
 
-import com.prism.messenger.exception.profile.AddCurrentProfileToCurrentProfileException;
 import com.prism.messenger.exception.profile.IncorrectPhoneNumberException;
 import com.prism.messenger.exception.profile.PhoneNumberAlreadyExistException;
 import com.prism.messenger.exception.profile.ProfileNameIsTooLongException;
@@ -35,7 +34,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -98,116 +96,6 @@ public class ProfileController {
     Integer size = requestPaginationListModel.getSize();
     ReceiveProfileListModel foundedProfiles = profileService.searchProfileByTag(tag, page, size);
     return new ResponseEntity<>(foundedProfiles, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Add friend")
-  @PostMapping("/friend")
-  public ResponseEntity<TextResponseModel> addFriend(@RequestBody ProfileTagModel friendTag,
-      Authentication authentication)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
-    String email = authentication.getName();
-    profileService.addFriend(email, friendTag.getTag());
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend was added", true),
-        HttpStatus.OK);
-  }
-
-  @Operation(summary = "Delete friend")
-  @DeleteMapping("/friend")
-  public ResponseEntity<TextResponseModel> deleteFriend(@RequestBody ProfileTagModel friendTag,
-      Authentication authentication) {
-    String email = authentication.getName();
-    profileService.deleteFriend(email, friendTag.getTag());
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("Friend deleted", true),
-        HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get friend profile list ")
-  @GetMapping("/friend-list")
-  public ResponseEntity<ReceiveProfileListModel> getFriendList(
-      @RequestBody PaginationListModel requestPaginationListModel, Authentication authentication)
-      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-      NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException,
-      InternalException {
-    String email = authentication.getName();
-    Integer page = requestPaginationListModel.getPage();
-    Integer size = requestPaginationListModel.getSize();
-    ReceiveProfileListModel currentProfile = profileService.getFriendList(email, page, size);
-    return new ResponseEntity<>(currentProfile, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get sent friend request list ")
-  @GetMapping("/sent-friend-requests")
-  public ResponseEntity<ReceiveProfileListModel> getSentFriendRequestList(
-      @RequestBody PaginationListModel requestPaginationListModel, Authentication authentication)
-      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-      NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException,
-      InternalException {
-    String email = authentication.getName();
-    Integer page = requestPaginationListModel.getPage();
-    Integer size = requestPaginationListModel.getSize();
-    ReceiveProfileListModel sentRequests = profileService.getSentFriendRequestList(email, page,
-        size);
-    return new ResponseEntity<>(sentRequests, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Decline friend request")
-  @PostMapping("/friend-decline")
-  public ResponseEntity<TextResponseModel> friendRequestDecline(
-      @RequestBody ProfileTagModel friendTag, Authentication authentication) {
-    String email = authentication.getName();
-    profileService.declineFriendRequest(email, friendTag.getTag());
-    return new ResponseEntity<>(
-        TextResponseModel.toTextResponseModel("Friend request was declined", true), HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get friend request list ")
-  @GetMapping("/friend-requests")
-  public ResponseEntity<ReceiveProfileListModel> getFriendRequestList(
-      @RequestBody PaginationListModel requestPaginationListModel, Authentication authentication)
-      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-      NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException,
-      InternalException {
-    String email = authentication.getName();
-    Integer page = requestPaginationListModel.getPage();
-    Integer size = requestPaginationListModel.getSize();
-    ReceiveProfileListModel friendRequests = profileService.getFriendRequestsList(email, page,
-        size);
-    return new ResponseEntity<>(friendRequests, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Block user")
-  @PostMapping("/block")
-  public ResponseEntity<TextResponseModel> blockUser(@RequestBody ProfileTagModel userTag,
-      Authentication authentication)
-      throws ProfileNotExistException, AddCurrentProfileToCurrentProfileException {
-    String email = authentication.getName();
-    profileService.blockUser(email, userTag.getTag());
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User blocked", true),
-        HttpStatus.OK);
-  }
-
-  @Operation(summary = "Get blocked profile list ")
-  @GetMapping("/block-list")
-  public ResponseEntity<ReceiveProfileListModel> getBlockList(
-      @RequestBody PaginationListModel requestPaginationListModel, Authentication authentication)
-      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
-      NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException,
-      InternalException {
-    String email = authentication.getName();
-    Integer page = requestPaginationListModel.getPage();
-    Integer size = requestPaginationListModel.getSize();
-    ReceiveProfileListModel profileBockList = profileService.getBlockList(email, page, size);
-    return new ResponseEntity<>(profileBockList, HttpStatus.OK);
-  }
-
-  @Operation(summary = "Unblock user")
-  @PostMapping("/unblock")
-  public ResponseEntity<TextResponseModel> unBlockUser(@RequestBody ProfileTagModel userTag,
-      Authentication authentication) {
-    String email = authentication.getName();
-    profileService.unBlockUser(email, userTag.getTag());
-    return new ResponseEntity<>(TextResponseModel.toTextResponseModel("User unblocked", true),
-        HttpStatus.OK);
   }
 
   @Operation(summary = "Change profile name")

@@ -1,4 +1,4 @@
-package com.prism.messenger.exception.profile;
+package com.prism.messenger.exception.relation;
 
 public class AddCurrentProfileToCurrentProfileException extends Exception {
 
