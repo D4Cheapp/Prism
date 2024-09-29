@@ -18,5 +18,6 @@ export type ShortProfileInfoType = {
   lastOnlineTime: number;
   profilePicture: string | undefined;
   online: boolean;
+  error?: string;
 } | null;
 export type SelectedCategoryType = 'friends' | 'chats' | 'groups';
