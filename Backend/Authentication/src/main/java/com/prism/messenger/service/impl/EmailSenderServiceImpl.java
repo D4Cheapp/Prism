@@ -5,6 +5,7 @@ import com.prism.messenger.exception.ActivationCodeExpireException;
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.UserAlreadyExistException;
 import com.prism.messenger.exception.UserNotFoundException;
+import com.prism.messenger.exception.email.EmailServiceError;
 import com.prism.messenger.exception.email.EmptyEmailException;
 import com.prism.messenger.exception.email.IncorectEmailException;
 import com.prism.messenger.exception.password.EmptyPasswordException;
@@ -47,7 +48,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   @Value("${spring.mail.username}")
   private String fromEmail;
 
-  public void saveActivationCode(Auth account, String title) {
+  public void saveActivationCode(Auth account, String title) throws EmailServiceError {
     String code = String.valueOf((int) ((Math.random() * (9999 - 1000)) + 1000));
     MimeMessagePreparator mail = mimeMessage -> {
       MimeMessageHelper message = new MimeMessageHelper(mimeMessage);
@@ -61,7 +62,11 @@ public class EmailSenderServiceImpl implements EmailSenderService {
       message.setText(html, true);
     };
     activationCodeRepo.saveActivationCode(new ActivationCodeModel(account, code));
-    javaMailSender.send(mail);
+    try {
+      javaMailSender.send(mail);
+    } catch (Exception e) {
+      throw new EmailServiceError();
+    }
   }
 
   public ActivationCodeModel getUserByEmail(String email) throws ActivationCodeExpireException {
@@ -74,7 +79,8 @@ public class EmailSenderServiceImpl implements EmailSenderService {
 
   public void sendEditUserEmailCode(ChangeEmailModel editData, Authentication authentication,
       HttpServletRequest request)
-      throws UserNotFoundException, PermissionsException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException {
+      throws UserNotFoundException, PermissionsException, UserAlreadyExistException,
+      EmptyEmailException, IncorectEmailException, EmailServiceError {
     Auth storedUser = AuthUtils.getUser(editData.getId(), storeUserRepo);
     Auth changedEmailUser = storeUserRepo.findByEmail(editData.getEmail());
     boolean isEmailAlreadyExists = changedEmailUser != null;
@@ -89,7 +95,9 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   }
 
   public void sendRegistrationCode(UserRegistrationModel user, HttpServletRequest request)
-      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException {
+      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException,
+      PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException,
+      EmptyEmailException, IncorectEmailException, EmailServiceError {
     boolean isDeveloperFieldMissing = user.getIsDeveloper() == null;
     boolean isUserAlreadyExists = storeUserRepo.findByEmail(user.getEmail()) != null;
     boolean isConfirmPasswordIncorrect = !(user.getConfirmPassword() != null
@@ -111,7 +119,7 @@ public class EmailSenderServiceImpl implements EmailSenderService {
   }
 
   public void sendRestorePasswordCode(String email, HttpServletRequest request)
-      throws UserNotFoundException {
+      throws UserNotFoundException, EmailServiceError {
     Auth currentUser = storeUserRepo.findByEmail(email);
     boolean isUserNotFound = currentUser == null;
     if (isUserNotFound) {

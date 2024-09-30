@@ -9,6 +9,7 @@ import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.TooManyAttemptsException;
 import com.prism.messenger.exception.UserAlreadyExistException;
 import com.prism.messenger.exception.UserNotFoundException;
+import com.prism.messenger.exception.email.EmailServiceError;
 import com.prism.messenger.exception.email.EmptyEmailException;
 import com.prism.messenger.exception.email.IncorectEmailException;
 import com.prism.messenger.exception.password.EmptyPasswordException;
@@ -92,7 +93,10 @@ public class AuthController {
   @PostMapping("/registration")
   public ResponseEntity<TextResponseModel> sendRegistrationCode(
       @RequestBody UserRegistrationModel user, HttpServletRequest request)
-      throws TooManyAttemptsException, EmptyPasswordException, PasswordIsTooWeakException, IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, TooLongPasswordException, TooShortPasswordException {
+      throws TooManyAttemptsException, EmptyPasswordException, PasswordIsTooWeakException,
+      IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyEmailException,
+      IncorectEmailException, TooLongPasswordException, TooShortPasswordException,
+      EmailServiceError {
     authService.checkThrottleRequest(request, "registration");
     emailSenderService.sendRegistrationCode(user, request);
     return new ResponseEntity<>(
@@ -121,7 +125,8 @@ public class AuthController {
   @PostMapping("/restore-password")
   public ResponseEntity<TextResponseModel> sendRestorePasswordEmail(
       @RequestBody EmailModel email,
-      HttpServletRequest request) throws TooManyAttemptsException, UserNotFoundException {
+      HttpServletRequest request)
+      throws TooManyAttemptsException, UserNotFoundException, EmailServiceError {
     authService.checkThrottleRequest(request, "restore-password");
     emailSenderService.sendRestorePasswordCode(email.getEmail(), request);
     return new ResponseEntity<>(
@@ -149,7 +154,8 @@ public class AuthController {
   public ResponseEntity<TextResponseModel> sendEditUserEmailConfirmation(
       @RequestBody ChangeEmailModel email, HttpServletRequest request,
       Authentication authentication)
-      throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException, PermissionsException {
+      throws TooManyAttemptsException, UserNotFoundException, UserAlreadyExistException,
+      EmptyEmailException, IncorectEmailException, PermissionsException, EmailServiceError {
     authService.checkThrottleRequest(request, "edit-email");
     emailSenderService.sendEditUserEmailCode(email, authentication, request);
     return new ResponseEntity<>(TextResponseModel.toTextResponseModel(
