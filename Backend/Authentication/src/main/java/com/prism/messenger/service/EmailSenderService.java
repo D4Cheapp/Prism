@@ -5,6 +5,7 @@ import com.prism.messenger.exception.ActivationCodeExpireException;
 import com.prism.messenger.exception.PermissionsException;
 import com.prism.messenger.exception.UserAlreadyExistException;
 import com.prism.messenger.exception.UserNotFoundException;
+import com.prism.messenger.exception.email.EmailServiceError;
 import com.prism.messenger.exception.email.EmptyEmailException;
 import com.prism.messenger.exception.email.IncorectEmailException;
 import com.prism.messenger.exception.password.EmptyPasswordException;
@@ -20,19 +21,22 @@ import org.springframework.security.core.Authentication;
 
 public interface EmailSenderService {
 
-  void saveActivationCode(Auth account, String message);
+  void saveActivationCode(Auth account, String message) throws EmailServiceError;
 
   ActivationCodeModel getUserByEmail(String email) throws ActivationCodeExpireException;
 
   void sendRegistrationCode(UserRegistrationModel user, HttpServletRequest request)
-      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException, PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException, EmptyEmailException, IncorectEmailException;
+      throws IncorrectConfirmPasswordException, UserAlreadyExistException, EmptyPasswordException,
+      PasswordIsTooWeakException, TooLongPasswordException, TooShortPasswordException,
+      EmptyEmailException, IncorectEmailException, EmailServiceError;
 
 
   void sendEditUserEmailCode(ChangeEmailModel email, Authentication authentication,
       HttpServletRequest request)
-      throws UserNotFoundException, PermissionsException, UserAlreadyExistException, EmptyEmailException, IncorectEmailException;
+      throws UserNotFoundException, PermissionsException, UserAlreadyExistException,
+      EmptyEmailException, IncorectEmailException, EmailServiceError;
 
 
   void sendRestorePasswordCode(String email, HttpServletRequest request)
-      throws UserNotFoundException;
+      throws UserNotFoundException, EmailServiceError;
 }
